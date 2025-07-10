@@ -45,7 +45,10 @@ describe('SearchComponent', () => {
       })
       .mock(AuthenticationService, {currentUser: signal(mockUser)})
       .mock(GoogleAnalyticsService, {})
-      .mock(GoogleMapsLibraryService, {core: signal(undefined)})
+      .mock(GoogleMapsLibraryService, {
+        core: signal(undefined),
+        marker: signal(undefined),
+      })
       .mock(SearchService, {})
       .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
       .provide({provide: GOOGLE_MAPS_MAP_IDS, useValue: googleMapsMapIds})

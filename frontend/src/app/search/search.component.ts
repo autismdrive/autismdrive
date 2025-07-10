@@ -4,7 +4,6 @@ import {CommonModule, Location} from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   effect,
   HostBinding,
@@ -61,7 +60,7 @@ import {SearchService} from '@services/search/search.service';
 import {StorageService} from '@services/storage/storage.service';
 import {WindowService} from '@services/window/window.service';
 import createClone from 'rfdc';
-import {firstValueFrom, fromEvent} from 'rxjs';
+import {fromEvent, lastValueFrom} from 'rxjs';
 import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
 
 export const markerIconUrls = {
@@ -151,10 +150,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
   prevQuery: Query = null;
   prevMapQuery: Query = null;
   resourceTypes = HitType.all_resources();
-  selectedMapResource: Resource;
-  selectedMapHit: Hit;
-  selectedType: HitType = HitType.ALL_RESOURCES;
-  selectedTypeTabIndex = 0;
+  selectedMapResource: WritableSignal<Resource> = signal<Resource>(null);
+  selectedMapHit: WritableSignal<Hit> = signal<Hit>(null);
+  selectedType: WritableSignal<HitType> = signal<HitType>(HitType.ALL_RESOURCES);
+  selectedTypeTabIndex: WritableSignal<number> = signal<number>(0);
 
   ageLabels = AgeRange.labels;
   languageLabels = Language.labels;
@@ -254,7 +253,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
   constructor(
     private api: ApiService,
     private authenticationService: AuthenticationService,
-    private changeDetectorRef: ChangeDetectorRef,
     private googleAnalyticsService: GoogleAnalyticsService,
     private location: Location,
     private meta: Meta,
@@ -307,7 +305,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
       this.loading.set(true);
       const geoBox = this.geoBox();
-      this.mapQueryWithResults = await firstValueFrom(this.searchService.mapSearch(newMapQuery, geoBox));
+      this.mapQueryWithResults = await lastValueFrom(this.searchService.mapSearch(newMapQuery, geoBox));
 
       if (this.mapQueryWithResults?.hits?.length > 0) {
         this.hitsWithAddress = this.mapQueryWithResults.hits.filter(h => !h.no_address);
@@ -324,7 +322,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
       // Update the UI with the new results.
       this.loading.set(false);
-      this.changeDetectorRef.detectChanges();
     });
 
     // Watch for changes to the current user.
@@ -358,7 +355,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
       // Get the results from the API.
       this.loading.set(true);
-      this.queryWithResults = await firstValueFrom(this.searchService.search(newQuery));
+      this.queryWithResults = await lastValueFrom(this.searchService.search(newQuery));
 
       // Log the search event to Google Analytics.
       this.googleAnalyticsService?.searchEvent(this.queryWithResults);
@@ -370,7 +367,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
       await this.loadRelatedStudies();
       this.updatePaginator();
       this.loading.set(false);
-      this.changeDetectorRef.detectChanges();
     });
 
     this.sortMethods = createClone()(sortMethods);
@@ -467,7 +463,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   updateShouldShowMap() {
-    const isLocation = this.selectedType && ['event', 'location'].includes(this.selectedType.name);
+    const isLocation = this.selectedType() && ['event', 'location'].includes(this.selectedType().name);
     this.shouldShowMap.set(!!this.mapsCoreLibrary && !!this.mapsMarkerLibrary && (isLocation || this.isDistanceSort));
   }
 
@@ -494,7 +490,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
      */
 
     this.setDefaultMapLocation(async () => {
-      const qParamMap = await firstValueFrom(this.route.queryParamMap);
+      const qParamMap = await lastValueFrom(this.route.queryParamMap);
       this.queryParamMap.set(qParamMap);
       this.query.set(this.queryParamsToQuery(qParamMap));
 
@@ -544,7 +540,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
   async setZipLocation(zipCode: string, callback?: () => void) {
     this.storedZip = zipCode;
-    const z = await firstValueFrom(this.api.getZipCoords(this.storedZip));
+    const z = await lastValueFrom(this.api.getZipCoords(this.storedZip));
     this.setLocation(LocationMode.zipcode, {lat: z.latitude, lng: z.longitude});
     this.mapZoomLevel = 10;
     if (callback) {
@@ -668,10 +664,10 @@ export class SearchComponent implements AfterViewInit, OnInit {
     const allName = HitType.ALL_RESOURCES.name;
     const forceReSort = !(keepType && keepType !== allName);
 
-    this.selectedTypeTabIndex = this.resourceTypes.findIndex(t =>
-      forceReSort ? t.name === keepType : t.name === allName,
+    this.selectedTypeTabIndex.set(
+      this.resourceTypes.findIndex(t => (forceReSort ? t.name === keepType : t.name === allName)),
     );
-    this.selectedType = this.resourceTypes[this.selectedTypeTabIndex];
+    this.selectedType.set(this.resourceTypes[this.selectedTypeTabIndex()]);
     const sortMethod = this.getSortMethod(forceReSort, keepType);
     this.selectedSort = this.sortMethods[sortMethod];
 
@@ -770,15 +766,16 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   async showInfoWindow(marker: MapAdvancedMarker, hit: Hit) {
-    this.selectedMapResource = await firstValueFrom(this.api.getResource(hit.id));
-    this.selectedMapHit = hit;
+    const resource = await lastValueFrom(this.api.getResource(hit.id));
+    this.selectedMapResource.set(resource);
+    this.selectedMapHit.set(hit);
     this.googleAnalyticsService?.mapEvent(hit.id.toString());
     this.infoWindow.open(marker);
   }
 
   closeInfoWindow() {
-    this.selectedMapResource = null;
-    this.selectedMapHit = null;
+    this.selectedMapResource.set(null);
+    this.selectedMapHit.set(null);
     this.infoWindow.close();
   }
 
@@ -1087,16 +1084,17 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   async loadRelatedStudies() {
+    this.loading.set(true);
     const studyQuery = createClone()(this.query());
     studyQuery.types = ['study'];
-    const results = await firstValueFrom(this.api.searchStudies(studyQuery));
+    const results = await lastValueFrom(this.api.searchStudies(studyQuery));
     if (results.hits.length > 0) {
-      this.highlightedStudy = await firstValueFrom(this.api.getStudy(results.hits[0].id));
+      this.highlightedStudy = await lastValueFrom(this.api.getStudy(results.hits[0].id));
     } else {
-      const studies = await firstValueFrom(this.api.getStudiesByStatus('currently_enrolling'));
+      const studies = await lastValueFrom(this.api.getStudiesByStatus('currently_enrolling'));
       this.highlightedStudy = studies[Math.floor(Math.random() * Math.floor(studies.length))];
     }
-    this.changeDetectorRef.detectChanges();
+    this.loading.set(false);
   }
 
   updatePaginator() {
@@ -1104,7 +1102,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
     const pageStart = q.start ? q.start - 1 : 0;
     this.paginatorElement.pageIndex = pageStart / this.pageSize;
     this.expandResults = true;
-    this.changeDetectorRef.detectChanges();
   }
 
   updateQueryParams(newParams: Params) {
@@ -1135,7 +1132,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
       fillColor: hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200',
       fillOpacity: 0.1,
       clickable: true,
-      // visible: this.selectedMapHit?.id === hit.id,
       zIndex: -1,
     };
   }

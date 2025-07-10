@@ -59,14 +59,14 @@
               <div fxHide fxShow.lt-md id="type-filter">
                 <mat-form-field>
                   <mat-label>Resource types</mat-label>
-                  <mat-select [(value)]="selectedType">
+                  <mat-select [value]="selectedType()">
                     <mat-select-trigger>
                       <app-type-icon
-                        *ngIf="selectedType"
-                        [iconType]="selectedType && selectedType.name"
+                        *ngIf="selectedType()"
+                        [iconType]="selectedType() && selectedType().name"
                         [size]="1"
                       ></app-type-icon>
-                      <span class="type-label" *ngIf="selectedType">{{ selectedType.label }}</span>
+                      <span class="type-label" *ngIf="selectedType()">{{ selectedType().label }}</span>
                     </mat-select-trigger>
                     <mat-option *ngFor="let type of resourceTypes" [value]="type" (click)="selectType(type.name)">
                       <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
@@ -152,7 +152,7 @@
       fxHide.lt-md
       [ngClass]="'type-tabs'"
       (selectedTabChange)="selectTypeTab($event)"
-      [(selectedIndex)]="selectedTypeTabIndex"
+      [selectedIndex]="selectedTypeTabIndex()"
       color="accent"
     >
       <mat-tab>
@@ -344,12 +344,12 @@
         (zoomChanged)="updateZoom(mapTemplate.getZoom())"
         (boundsChanged)="updateResultsList(mapTemplate.getBounds())"
       >
-        <map-marker-clusterer *ngIf="hitsLoaded">
+        <map-marker-clusterer>
           <map-advanced-marker *ngIf="loc" [options]="markerOptions(loc, 'user')"></map-advanced-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
-            <map-circle *ngIf="selectedMapHit?.id === hit.id" [options]="mapCircleOptions(hit)"> </map-circle>
+            <map-circle *ngIf="selectedMapHit()?.id === hit.id" [options]="mapCircleOptions(hit)"> </map-circle>
             <map-advanced-marker
-              #marker="mapAdvancedMarker"
+              #markerWithNoAddress="mapAdvancedMarker"
               [options]="
                 markerOptions(
                   {
@@ -359,13 +359,13 @@
                   hit.type + '-no-address'
                 )
               "
-              (mapClick)="showInfoWindow(marker, hit)"
+              (mapClick)="showInfoWindow(markerWithNoAddress, hit)"
             >
             </map-advanced-marker>
           </ng-container>
           <ng-container *ngFor="let hit of hitsWithAddress">
             <map-advanced-marker
-              #marker="mapAdvancedMarker"
+              #markerWithAddress="mapAdvancedMarker"
               [options]="
                 markerOptions(
                   {
@@ -375,28 +375,27 @@
                   hit.type
                 )
               "
-              (mapClick)="showInfoWindow(marker, hit)"
+              (mapClick)="showInfoWindow(markerWithAddress, hit)"
             ></map-advanced-marker>
           </ng-container>
         </map-marker-clusterer>
         <map-info-window
-          *ngIf="!loading() && hitsLoaded"
           [options]="{
             position: {
-              lat: selectedMapHit?.latitude || loc.lat,
-              lng: selectedMapHit?.longitude || loc.lng,
+              lat: selectedMapHit()?.latitude || loc.lat,
+              lng: selectedMapHit()?.longitude || loc.lng,
             },
           }"
           (closeclick)="closeInfoWindow()"
         >
           <a
-            class="title mat-h2"
-            href="/#/{{ selectedMapResource?.type?.toLowerCase() }}/{{ selectedMapResource?.id }}"
-            (click)="goSelectedMapResource(selectedMapResource)"
-            >{{ selectedMapResource?.title }}</a
+            class="title"
+            href="/#/{{ selectedMapResource()?.type?.toLowerCase() }}/{{ selectedMapResource()?.id }}"
+            (click)="goSelectedMapResource(selectedMapResource())"
+            >{{ selectedMapResource()?.title }}</a
           >
-          <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource)">
-            {{ selectedMapHit?.no_address ? 'In-home therapy' : selectedMapHit?.type }} Details</a
+          <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource())">
+            {{ selectedMapHit()?.no_address ? 'In-home therapy' : selectedMapHit()?.type }} Details</a
           >
         </map-info-window>
       </google-map>

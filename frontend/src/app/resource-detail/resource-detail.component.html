@@ -122,20 +122,18 @@
       <div *ngIf="mapOptions() && resource?.hasCoords()" id="resource-map">
         <google-map [options]="mapOptions()">
           <map-circle
-            *ngIf="resource.hasCoords() && !resource.street_address1"
+            *ngIf="!resource.street_address1"
             [options]="mapCircleOptions(resource)"
             [radius]="32186.9"
           >
           </map-circle>
           <map-advanced-marker
-            #marker="mapAdvancedMarker"
-            *ngIf="resource.hasCoords()"
+             #marker="mapAdvancedMarker"
             [options]="markerOptions(resource)"
             (mapClick)="toggleInfoWindow(marker)"
           >
           </map-advanced-marker>
           <map-info-window
-            *ngIf="resource.hasCoords() && showInfoWindow"
             [options]="{
               position: {
                 lat: resource.latitude,
