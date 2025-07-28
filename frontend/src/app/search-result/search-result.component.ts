@@ -9,6 +9,7 @@ import {DetailsLinkComponent} from '@app/details-link/details-link.component';
 import {EventDateComponent} from '@app/event-date/event-date.component';
 import {FavoriteResourceButtonComponent} from '@app/favorite-resource-button/favorite-resource-button.component';
 import {LastUpdatedDateComponent} from '@app/last-updated-date/last-updated-date.component';
+import {StudyStatusBadgeComponent} from '@app/study-status-badge/study-status-badge.component';
 import {TypeIconComponent} from '@app/type-icon/type-icon.component';
 import {Hit} from '@models/query';
 import {StudyStatus} from '@models/study';
@@ -34,6 +35,7 @@ import {MarkdownModule} from 'ngx-markdown';
     CommonModule,
     RouterModule,
     TypeIconComponent,
+    StudyStatusBadgeComponent,
   ],
 })
 export class SearchResultComponent {
@@ -47,10 +49,6 @@ export class SearchResultComponent {
 
   get isPastEvent(): boolean {
     return !!(this.hit.date && new Date(this.hit.date) < new Date() && this.hit.post_event_description);
-  }
-
-  isEnrolling(status: string) {
-    return status === StudyStatus.currently_enrolling;
   }
 
   statusKey() {

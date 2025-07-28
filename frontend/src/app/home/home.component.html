@@ -46,24 +46,27 @@
   </div>
 </div>
 
-<div class="jumbo-section">
-  <header class="jumbo-section-header">
-    <span class="watermark" role="presentation">Autism</span>
-    <h2>
-      <span class="line-1">
-        Transformative <br fxShow fxHide.gt-sm />
-        Autism Research
-      </span>
-      <span class="line-2">Current Studies</span>
-    </h2>
-  </header>
-</div>
+<app-loading *ngIf="!newsItems()"></app-loading>
+<ng-container *ngIf="newsItems()?.length > 0">
+  <div class="jumbo-section">
+    <header class="jumbo-section-header">
+      <span class="watermark" role="presentation">Autism</span>
+      <h2>
+        <span class="line-1">
+          Transformative <br fxShow fxHide.gt-sm />
+          Autism Research
+        </span>
+        <span class="line-2">Current Studies</span>
+      </h2>
+    </header>
+  </div>
 
-<div class="container">
-  <div class="row">
-    <app-news-item *ngFor="let item of newsItems(); let i = index" [item]="item" [index]="i"></app-news-item>
-    <div class="more-studies">
-      <app-details-link [url]="'/studies'" label="View more studies" [size]="2"></app-details-link>
+  <div class="container">
+    <div class="row">
+      <app-news-item *ngFor="let item of newsItems(); let i = index" [item]="item" [index]="i"></app-news-item>
+      <div class="more-studies">
+        <app-details-link [url]="'/studies'" label="View more studies" [size]="2"></app-details-link>
+      </div>
     </div>
   </div>
-</div>
+</ng-container>

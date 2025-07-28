@@ -8,6 +8,16 @@ export enum StudyStatus {
   study_results_published = 'Study results published',
 }
 
+export interface StudyStatusItem {
+  name: string;
+  label: string;
+}
+
+export const StudyStatuses: StudyStatusItem[] = Object.entries(StudyStatus).map(([name, label]) => ({
+  name,
+  label,
+}));
+
 export interface StudyProps {
   id?: number;
   title: string;

@@ -37,6 +37,10 @@ export class HitType extends LabelsOptions {
   static all_resources(): HitType[] {
     return [this.ALL_RESOURCES, this.LOCATION, this.RESOURCE, this.EVENT];
   }
+
+  static geo_resources(): HitType[] {
+    return [this.ALL_RESOURCES, this.LOCATION, this.EVENT];
+  }
 }
 
 export class AgeRange extends LabelsOptions {

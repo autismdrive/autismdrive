@@ -283,7 +283,7 @@
     fxShow
     *ngIf="shouldShowMap()"
     [fxShow.lt-md]="!expandResults"
-    [ngClass.gt-sm]="mapDockClass(scrollSpy, searchHeader, searchFooter)"
+    [ngClass.gt-sm]="mapDockClass()"
     [ngStyle.gt-sm]="{width: '40%'}"
   >
     <span class="inset-shadow"></span>
@@ -334,7 +334,8 @@
         </div>
       </div>
     </mat-expansion-panel>
-    <div id="map" fxLayout="column" fxLayoutGap="2em" *ngIf="shouldShowMap()">
+
+    <div id="map" *ngIf="shouldShowMap()">
       <google-map
         #mapTemplate
         [options]="mapOptions()"
@@ -343,11 +344,13 @@
         (mapDragend)="handleMapDragEnd()"
         (zoomChanged)="updateZoom(mapTemplate.getZoom())"
         (boundsChanged)="updateResultsList(mapTemplate.getBounds())"
+        width="100%"
+        height="100%"
       >
         <map-marker-clusterer>
           <map-advanced-marker *ngIf="loc" [options]="markerOptions(loc, 'user')"></map-advanced-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
-            <map-circle *ngIf="selectedMapHit()?.id === hit.id" [options]="mapCircleOptions(hit)"> </map-circle>
+            <map-circle *ngIf="selectedMapHit()?.id === hit.id" [options]="mapCircleOptions(hit)"></map-circle>
             <map-advanced-marker
               #markerWithNoAddress="mapAdvancedMarker"
               [options]="
@@ -392,14 +395,13 @@
             class="title"
             href="/#/{{ selectedMapResource()?.type?.toLowerCase() }}/{{ selectedMapResource()?.id }}"
             (click)="goSelectedMapResource(selectedMapResource())"
-            >{{ selectedMapResource()?.title }}</a
+          >{{ selectedMapResource()?.title }}</a
           >
           <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource())">
             {{ selectedMapHit()?.no_address ? 'In-home therapy' : selectedMapHit()?.type }} Details</a
           >
         </map-info-window>
       </google-map>
-
       <div *ngIf="highlightedStudy" id="studies-highlight">
         <mat-card>
           <mat-card-content>
@@ -414,6 +416,7 @@
         </mat-card>
       </div>
     </div>
+
   </div>
 </div>
 <div

@@ -1,24 +1,21 @@
 import {CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AddButtonComponent} from '@app/add-button/add-button.component';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {SearchResultComponent} from '@app/search-result/search-result.component';
-import {TypeIconComponent} from '@app/type-icon/type-icon.component';
 import {AgeRange} from '@models/hit_type';
 import {Hit, Query} from '@models/query';
-import {Study, StudyStatus} from '@models/study';
+import {Study, StudyStatus, StudyStatuses, StudyStatusItem} from '@models/study';
 import {User} from '@models/user';
 import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
 import {ApiService} from '@services/api/api.service';
 import {AuthenticationService} from '@services/authentication/authentication-service';
-
-interface StudyStatusObj {
-  name: string;
-  label: string;
-}
+import {lastValueFrom} from 'rxjs';
 
 interface AgeObj {
   name: string;
@@ -38,16 +35,17 @@ interface AgeObj {
     MatSelectModule,
     CommonModule,
     SearchResultComponent,
-    TypeIconComponent,
+    LoadingComponent,
+    MatIconModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudiesComponent {
   query: Query;
-  studyStatuses: StudyStatusObj[];
-  selectedStatus: StudyStatusObj;
+  studyStatuses = StudyStatuses;
+  selectedStatus: StudyStatusItem = StudyStatuses[0];
   selectedAge: AgeObj;
-  studyHits: Hit[];
+  studyHits: WritableSignal<Hit[]> = signal(undefined);
   currentUser: User;
   Ages: AgeObj[];
 
@@ -97,20 +95,19 @@ export class StudiesComponent {
     });
   }
 
-  loadStudies() {
+  async loadStudies() {
+    let studies: Study[];
     if (this.selectedAge) {
-      this.api.getStudiesByAge(this.selectedStatus.name, this.selectedAge.name).subscribe(studies => {
-        this.studyHits = this._studiesToHits(studies);
-      });
+      studies = await lastValueFrom(this.api.getStudiesByAge(this.selectedStatus.name, this.selectedAge.name));
     } else {
-      this.api.getStudiesByStatus(this.selectedStatus.name).subscribe(studies => {
-        this.studyHits = this._studiesToHits(studies);
-      });
+      studies = await lastValueFrom(this.api.getStudiesByStatus(this.selectedStatus.name));
     }
+    this.studyHits.set(this._studiesToHits(studies));
   }
 
-  selectStatus(status: StudyStatusObj) {
+  selectStatus(status: StudyStatusItem) {
     this.selectedStatus = status;
+    this.studyHits.set(undefined);
     this.router.navigate(['/studies/' + status.name]);
     this.loadStudies();
   }
@@ -143,7 +140,7 @@ export class StudiesComponent {
     });
   }
 
-  getEnrollmentStatusMessage(selectedStatus: StudyStatusObj): string {
+  getEnrollmentStatusMessage(selectedStatus: StudyStatusItem): string {
     switch (StudyStatus[selectedStatus.name]) {
       case StudyStatus.currently_enrolling:
         return 'that are enrolling';

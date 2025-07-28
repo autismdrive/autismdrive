@@ -20,14 +20,9 @@
     >
       <mat-form-field style="margin-bottom: -1em" id="set-status">
         <mat-label>Study Status</mat-label>
-        <mat-select [(value)]="selectedStatus">
+        <mat-select [(value)]="selectedStatus" panelWidth="auto">
           <mat-select-trigger>
-            <app-type-icon
-              *ngIf="selectedStatus"
-              [iconType]="selectedStatus && selectedStatus.name"
-              [size]="1"
-            ></app-type-icon>
-            <span class="type-label" *ngIf="selectedStatus">{{ selectedStatus.label }}</span>
+            {{ selectedStatus.label }}
           </mat-select-trigger>
           <mat-option
             *ngFor="let status of studyStatuses"
@@ -35,14 +30,14 @@
             (click)="selectStatus(status)"
             [ngClass]="'sort-by-' + status.name.toLowerCase()"
           >
-            <span class="type-label">{{ status.label }}</span>
+            {{ status.label }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Age Range</mat-label>
-        <mat-select [(value)]="selectedAge" placeholder="All Ages">
+        <mat-select [(value)]="selectedAge" panelWidth="auto" placeholder="All Ages">
           <mat-select-trigger>
             <span class="type-label" *ngIf="selectedAge">{{ selectedAge.label }}</span>
           </mat-select-trigger>
@@ -67,24 +62,19 @@
     >
       <mat-form-field style="margin-bottom: -1em">
         <mat-label>Study Status</mat-label>
-        <mat-select [(value)]="selectedStatus">
+        <mat-select [(value)]="selectedStatus" panelWidth="100%">
           <mat-select-trigger>
-            <app-type-icon
-              *ngIf="selectedStatus"
-              [iconType]="selectedStatus && selectedStatus.name"
-              [size]="1"
-            ></app-type-icon>
-            <span class="type-label" *ngIf="selectedStatus">{{ selectedStatus.label }}</span>
+            {{ selectedStatus.label }}
           </mat-select-trigger>
           <mat-option *ngFor="let status of studyStatuses" [value]="status" (click)="selectStatus(status)">
-            <span class="type-label">{{ status.label }}</span>
+            {{ status.label }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Age Range</mat-label>
-        <mat-select [(value)]="selectedAge" placeholder="All Ages">
+        <mat-select [(value)]="selectedAge" panelWidth="100%" placeholder="All Ages">
           <mat-select-trigger>
             <span class="type-label" *ngIf="selectedAge">{{ selectedAge.label }}</span>
           </mat-select-trigger>
@@ -96,7 +86,15 @@
       </mat-form-field>
     </div>
   </div>
-  <div class="studies" fxLayout="column" fxLayoutGap="40px" ngStyle.gt-md="padding-top:10px;">
+
+  <app-loading *ngIf="studyHits() === undefined" message="Loading..."></app-loading>
+  <div
+    *ngIf="studyHits() !== undefined"
+    class="studies"
+    fxLayout="column"
+    fxLayoutGap="40px"
+    ngStyle.gt-md="padding-top:10px;"
+  >
     <app-add-button
       *ngIf="currentUser && currentUser.permissions.includes('create_study')"
       [addLabel]="'Add Study'"
@@ -104,14 +102,18 @@
       [currentUser]="currentUser"
     ></app-add-button>
     <h2>{{ selectedStatus.label }}</h2>
-    <ng-container *ngIf="studyHits && studyHits.length > 0">
+    <ng-container *ngIf="studyHits() && studyHits().length > 0">
       <app-search-result
-        *ngFor="let hit of studyHits"
+        *ngFor="let hit of studyHits()"
         [hit]="hit"
         [attr.data-study-status]="selectedStatus.name"
       ></app-search-result>
     </ng-container>
-    <p *ngIf="!studyHits || studyHits.length === 0" class="no-results" [attr.data-study-status]="selectedStatus.name">
+    <p
+      *ngIf="!studyHits() || studyHits().length === 0"
+      class="no-results"
+      [attr.data-study-status]="selectedStatus.name"
+    >
       We don't have any Autism DRIVE studies
       {{ getEnrollmentStatusMessage(selectedStatus) }}
       at this time, but we're working on it. Check back soon, as the status of our research is constantly changing!

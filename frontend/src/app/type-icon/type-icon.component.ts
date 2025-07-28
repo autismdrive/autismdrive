@@ -20,7 +20,7 @@ export class TypeIconComponent {
     const key = this.iconType.toUpperCase();
 
     if (!(key in HitType)) {
-      console.error(`Invalid icon type: ${this.iconType}`);
+      console.error(`Invalid HitType: ${this.iconType}`);
     }
 
     return HitType[key as keyof typeof HitType] as HitType;

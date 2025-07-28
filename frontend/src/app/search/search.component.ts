@@ -154,6 +154,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   selectedMapHit: WritableSignal<Hit> = signal<Hit>(null);
   selectedType: WritableSignal<HitType> = signal<HitType>(HitType.ALL_RESOURCES);
   selectedTypeTabIndex: WritableSignal<number> = signal<number>(0);
+  mapDockClass: WritableSignal<string> = signal<string>('');
 
   ageLabels = AgeRange.labels;
   languageLabels = Language.labels;
@@ -342,6 +343,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
         mapId: this.googleMapsMapIds.searchPage,
         center: this.loc || this.defaultLoc,
         zoom: this.mapZoomLevel || this.defaultZoom,
+        disableDefaultUI: true,
       });
       this.updateShouldShowMap();
     });
@@ -463,7 +465,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
   }
 
   updateShouldShowMap() {
-    const isLocation = this.selectedType() && ['event', 'location'].includes(this.selectedType().name);
+    const isLocation = this.selectedType() && HitType.geo_resources().includes(this.selectedType());
     this.shouldShowMap.set(!!this.mapsCoreLibrary && !!this.mapsMarkerLibrary && (isLocation || this.isDistanceSort));
   }
 
@@ -833,7 +835,14 @@ export class SearchComponent implements AfterViewInit, OnInit {
     this.query.update(q => new Query({...q, geo_box: shouldRestrict ? this.geoBox() : null}));
   }
 
-  mapDockClass(scrollSpy: HTMLSpanElement, searchHeader: HTMLDivElement, searchFooter: HTMLDivElement): string {
+  updateMapDockClass(): void {
+    const _document = this.windowService?.window?.document;
+
+    if (!_document) return;
+
+    const scrollSpy: HTMLSpanElement = _document.querySelector('#scroll-spy');
+    const searchHeader: HTMLDivElement = _document.querySelector('#hero');
+    const searchFooter: HTMLDivElement = _document.querySelector('#partners');
     const scrollSpyPos = scrollSpy.getBoundingClientRect();
     const headerPos = searchHeader.getBoundingClientRect();
     const footerPos = searchFooter.getBoundingClientRect();
@@ -849,7 +858,7 @@ export class SearchComponent implements AfterViewInit, OnInit {
       alignClass = 'docked';
     }
 
-    return alignClass + ' ' + scrollDirection;
+    this.mapDockClass.set(alignClass + ' ' + scrollDirection);
   }
 
   focusOnInput(zipCodeInput: HTMLInputElement) {
@@ -867,10 +876,12 @@ export class SearchComponent implements AfterViewInit, OnInit {
 
     scroll$.pipe(filter(direction => direction === Direction.Up)).subscribe(() => {
       this.scrollDirection = Direction.Up;
+      this.updateMapDockClass();
     });
 
     scroll$.pipe(filter(direction => direction === Direction.Down)).subscribe(() => {
       this.scrollDirection = Direction.Down;
+      this.updateMapDockClass();
     });
   }
 

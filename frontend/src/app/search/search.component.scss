@@ -245,6 +245,27 @@ app-search-filters-breadcrumbs {
   position: relative;
 }
 
+#list-mapped-results-button {
+  position: absolute;
+  z-index: 2;
+  width: 240px;
+  height: 48px;
+  transition:
+    top 300ms ease-in-out,
+    margin-top 300ms ease-in-out;
+
+  &.gt-sm {
+    top: 10px;
+    right: 10px;
+  }
+
+  &.lt-md {
+    // 20px - 48px - 64px = 132px
+    top: calc(100vh - 132px);
+    left: 10px;
+  }
+}
+
 #location-and-map {
   position: absolute;
   top: 0;
@@ -262,37 +283,25 @@ app-search-filters-breadcrumbs {
   }
 
   &.docked {
-    &.up {
-      #set-location,
-      #list-mapped-results-button {
-        top: 194px;
-      }
-    }
-
-    &.down {
-      #set-location,
-      #list-mapped-results-button {
-        top: 74px;
-      }
-    }
-
     #set-location {
+      top: 114px;
       position: fixed;
-      top: 74px;
       left: calc(60% + 10px);
-      width: 240px;
+      width: 300px;
+      z-index: 1;
     }
 
     #list-mapped-results-button {
       position: fixed;
+      top: 114px;
       width: 240px;
-      top: 74px;
       right: 10px;
+      z-index: 2;
     }
 
     #map {
       position: fixed;
-      inset: 64px 0 0 60%;
+      inset: 88px 0 0 60%;
     }
   }
 
@@ -308,53 +317,28 @@ app-search-filters-breadcrumbs {
     }
   }
 
-  #list-mapped-results-button {
-    position: absolute;
-    z-index: 1;
-    width: 240px;
-    height: 48px;
-    transition:
-      top 300ms ease-in-out,
-      margin-top 300ms ease-in-out;
-
-    &.gt-sm {
-      top: 10px;
-      right: 10px;
-    }
-
-    &.lt-md {
-      // 20px - 48px - 64px = 132px
-      top: calc(100vh - 132px);
-      left: 10px;
-    }
-  }
-
-  :root mat-expansion-panel#set-location {
+  #set-location {
     position: absolute;
     top: 10px;
     left: 10px;
     z-index: 1;
     background-color: white;
     border-radius: 5px;
-    width: 240px;
+    width: 300px;
     transition:
       top 300ms ease-in-out,
       margin-top 300ms ease-in-out;
 
-    :root mat-expansion-panel-header {
+    mat-expansion-panel-header {
       font-size: 1em;
       height: 48px !important;
     }
   }
 
   #map {
-    height: 100%;
-
-    agm-map {
-      height: calc(100vh - 64px);
-      width: 100%;
-      z-index: 0;
-    }
+    height: calc(100vh - 64px - 24px);
+    width: 100%;
+    z-index: 0;
   }
 
   .inset-shadow {
@@ -368,7 +352,7 @@ app-search-filters-breadcrumbs {
 
 #scroll-spy {
   position: fixed;
-  inset: 64px 0 0;
+  inset: 88px 0 0;
   pointer-events: none;
   background: transparent;
 }
@@ -447,20 +431,20 @@ app-search-filters-breadcrumbs {
 %invert-headings {
   @extend %invert-hint;
 
-  :root h1,
-  :root h5,
-  :root .mat-select-value-text,
-  :root .mat-form-field-label,
-  :root .mat-menu-trigger,
-  :root .mat-tab-label,
-  :root .show-all,
-  :root .done-button,
-  :root app-search-filters-breadcrumbs h4,
-  :root app-search-filters-breadcrumbs .mat-button {
+  h1,
+  h5,
+  .mat-select-value-text,
+  .mat-form-field-label,
+  .mat-menu-trigger,
+  .mat-tab-label,
+  .show-all,
+  .done-button,
+  app-search-filters-breadcrumbs h4,
+  app-search-filters-breadcrumbs .mat-button {
     color: white !important;
   }
 
-  :root .mat-menu-trigger {
+  .mat-menu-trigger {
     background-color: rgb(0 0 0 / 20%);
   }
 }
@@ -552,7 +536,7 @@ app-border-box-tile {
   transition: position 3s;
 }
 
-:root .mat-tooltip {
+.mat-tooltip {
   font-size: 15px !important;
 }
 

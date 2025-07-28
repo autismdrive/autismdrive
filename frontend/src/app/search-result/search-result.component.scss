@@ -44,25 +44,9 @@
   font-weight: 700;
 }
 
-.status-badge {
+.status-label {
   display: flex;
   align-items: center;
   font-weight: 700;
   line-height: 2;
-}
-
-.status-currently-enrolling {
-  color: config.$brand-accent;
-}
-
-.status-study-in-progress {
-  color: config.$brand-primary-tint-1;
-}
-
-.status-results-being-analyzed {
-  color: config.$brand-primary-tint-2;
-}
-
-.status-study-results-published {
-  color: config.$brand-primary-tint-3;
 }

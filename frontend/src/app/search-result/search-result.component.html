@@ -22,9 +22,9 @@
     </button>
     <app-type-icon *ngIf="hit.type === 'study'" [iconType]="hit.type.toLowerCase()" [size]="3"></app-type-icon>
   </div>
-  <ng-container *ngIf="hit && hit.status && isEnrolling(hit.status)">
-    <em [ngClass]="'status-badge status-' + statusKey()">
-      <mat-icon>timer</mat-icon>
+  <ng-container *ngIf="hit && hit.status">
+    <em class="status-label">
+      <app-study-status-badge [status]="{name: statusKey(), label: hit.status}"></app-study-status-badge>
       {{ hit.status }}
     </em>
   </ng-container>

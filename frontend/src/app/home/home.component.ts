@@ -4,6 +4,7 @@ import {Meta} from '@angular/platform-browser';
 import {Router, RouterModule} from '@angular/router';
 import {BorderBoxTileComponent} from '@app/border-box-tile/border-box-tile.component';
 import {DetailsLinkComponent} from '@app/details-link/details-link.component';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {NewsItemComponent} from '@app/news-item/news-item.component';
 import {HitType} from '@models/hit_type';
 import {NewsItem} from '@models/news-item';
@@ -26,6 +27,7 @@ import {lastValueFrom} from 'rxjs';
     FlexModule,
     RouterModule,
     ExtendedModule,
+    LoadingComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

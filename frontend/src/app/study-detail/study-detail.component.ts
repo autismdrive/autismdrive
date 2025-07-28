@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
@@ -39,7 +39,7 @@ import {InvestigatorFormComponent} from '../investigator-form/investigator-form.
   ],
 })
 export class StudyDetailComponent {
-  study: Study;
+  study: WritableSignal<Study> = signal(undefined);
   loading = true;
   currentUser: User;
 
@@ -59,7 +59,7 @@ export class StudyDetailComponent {
 
         if (isFinite(studyId)) {
           this.api.getStudy(studyId).subscribe(study => {
-            this.study = study;
+            this.study.set(study);
             this.loading = false;
           });
         }
