@@ -3,59 +3,60 @@ import enum
 import typing
 
 import click
+from psycopg import OperationalError
 from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.engine.reflection import Inspector as EngineInspector
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, joinedload
 from sqlalchemy_utils import database_exists
 
 from app.utils import get_random_integer
-from app.utils.decorators import handle_db_connection_errors
 from config.load import settings
 
-
-@handle_db_connection_errors
-def _get_db_engine():
-    return create_engine(
-        settings.SQLALCHEMY_DATABASE_URI,
-        echo=settings.SQLALCHEMY_TRACK_MODIFICATIONS,
-        pool_pre_ping=True,
-    )
+engine: Engine = create_engine(
+    settings.SQLALCHEMY_DATABASE_URI,
+    echo=settings.SQLALCHEMY_TRACK_MODIFICATIONS,
+    pool_pre_ping=True,
+)
 
 
-engine: Engine = _get_db_engine()
-
-
-@handle_db_connection_errors
 def _create_db(engine_: Engine):
     from sqlalchemy_utils import create_database
 
-    click.secho(f"Recreating database...")
-    create_database(engine_.url)
-    click.secho(f"\n*** Database {engine_.url.database} created. ***\n")
+    try:
+        click.secho(f"Recreating database...")
+        create_database(engine_.url)
+        click.secho(f"\n*** Database {engine_.url.database} created. ***\n")
+
+    except OperationalError as e:
+        click.secho(f"Error creating database: {e}. Make sure the database server is running.", fg="red")
 
 
-@handle_db_connection_errors
 def _create_tables(base_metadata: MetaData, engine_: Engine):
-    click.secho(f"Adding tables from the model...")
-    with engine_.begin() as conn:
-        click.secho(f"Creating tables...")
-        base_metadata.create_all(bind=conn)
-        click.secho(f"Done.")
+    try:
+        click.secho(f"Adding tables from the model...")
+        with engine_.begin() as conn:
+            click.secho(f"Creating tables...")
+            base_metadata.create_all(bind=conn)
+            click.secho(f"Done.")
+    except Exception as e:
+        click.secho(f"Error connecting to database: {e}")
 
 
-@handle_db_connection_errors
 def _delete_tables(base_metadata: MetaData, engine_: Engine):
     """Deletes all tables in the given database in reverse dependency order"""
 
     # Clear out any tables that may have been created
-    click.secho(f"Deleting tables from database {engine_.url.database}...", color=True, fg="yellow")
+    click.secho(f"Deleting tables from database {engine_.url.database}...")
     for table in reversed(base_metadata.sorted_tables):
-        # Delete all rows in the table
-        with engine.begin() as conn:
-            # Check if table exists
-            if engine.dialect.has_table(conn, table.name):
-                conn.execute(table.delete())
+        try:
+            # Delete all rows in the table
+            with engine.begin() as conn:
+                # Check if table exists
+                if engine.dialect.has_table(conn, table.name):
+                    conn.execute(table.delete())
+
+        except Exception as e:
+            click.secho(f"Error cleaning table {table.name}: {e}")
 
 
 class Base(DeclarativeBase):
@@ -69,51 +70,34 @@ class Base(DeclarativeBase):
 
 Base.metadata.bind = engine
 
-
-@handle_db_connection_errors
-def _create_db_and_tables():
-    if not database_exists(engine.url):
-        _create_db(engine)
-        _create_tables(Base.metadata, engine)
+if not database_exists(engine.url):
+    _create_db(engine)
+    _create_tables(Base.metadata, engine)
 
 
-_create_db_and_tables()
-
-
-@handle_db_connection_errors
-def _get_session():
-    return scoped_session(
-        sessionmaker(
-            bind=engine,
-            autoflush=True,
-            expire_on_commit=False,
-        )
+session = scoped_session(
+    sessionmaker(
+        bind=engine,
+        autoflush=True,
+        expire_on_commit=False,
     )
+)
+inspector = inspect(engine)
 
 
-session = _get_session()
-
-
-# Create an inspector to inspect the database schema
-@handle_db_connection_errors
-def _get_inspector():
-    return inspect(engine)
-
-
-inspector: EngineInspector = _get_inspector()
-
-
-@handle_db_connection_errors
 def _reset_table_id_sequences(base_metadata: MetaData, engine_: Engine):
     click.secho(f"Resetting id sequences for {engine_.url.database} tables...")
     for table in reversed(base_metadata.sorted_tables):
-        with engine.begin() as conn:
-            if engine.dialect.has_table(conn, table.name):
-                sequence_name = f"{table.name}_id_seq"
-                conn.execute(text(f"ALTER SEQUENCE IF EXISTS {sequence_name} RESTART WITH 1"))
+        try:
+            with engine.begin() as conn:
+                if engine.dialect.has_table(conn, table.name):
+                    sequence_name = f"{table.name}_id_seq"
+                    conn.execute(text(f"ALTER SEQUENCE IF EXISTS {sequence_name} RESTART WITH 1"))
+
+        except Exception as e:
+            click.secho(f"Error resetting table {table.name}: {e}")
 
 
-@handle_db_connection_errors
 def clear_db(base_metadata: MetaData = Base.metadata):
     base_metadata.bind = engine
 
@@ -127,7 +111,6 @@ def clear_db(base_metadata: MetaData = Base.metadata):
     _reset_table_id_sequences(base_metadata, engine)
 
 
-@handle_db_connection_errors
 def migrate_db():
     """Runs Alembic database migrations"""
     import os
@@ -141,7 +124,6 @@ def migrate_db():
     revision(config=alembic_cfg, autogenerate=True, message="auto")
 
 
-@handle_db_connection_errors
 def upgrade_db():
     """Runs Alembic database migrations"""
     import os
@@ -169,7 +151,6 @@ def upgrade_db():
     upgrade(config=alembic_cfg, revision="head")
 
 
-@handle_db_connection_errors
 def random_integer(context) -> int:
     """
     Returns a random integer id that is not already in the database.
@@ -189,7 +170,6 @@ def random_integer(context) -> int:
     return id_
 
 
-@handle_db_connection_errors
 def get_class_for_table(table: Table):
     """Gets Python class matching the given SQLAlchemy table's name"""
     from sqlalchemy_utils import get_class_by_table
@@ -197,7 +177,6 @@ def get_class_for_table(table: Table):
     return get_class_by_table(Base, table)
 
 
-@handle_db_connection_errors
 def get_class(class_name: str):
     """Gets Python class matching the given class name"""
 
@@ -206,14 +185,12 @@ def get_class(class_name: str):
             return c
 
 
-@handle_db_connection_errors
 def _select_by_id(model, object_id: int, joins: list = None):
     """Selects a record by its id"""
     statement = _add_joins(select(model), joins)
     return statement.filter_by(id=object_id)
 
 
-@handle_db_connection_errors
 def _add_joins(statement: Select, joins: list = None):
     """Adds joins to a select statement"""
     joins = joins or []
@@ -224,7 +201,6 @@ def _add_joins(statement: Select, joins: list = None):
     return statement
 
 
-@handle_db_connection_errors
 def get_db_object_by_id(model, object_id: int, joins: list = None):
     """Gets a record from the given model by its id, closes the session, and returns the object."""
     statement = _select_by_id(model, object_id, joins)
@@ -233,7 +209,6 @@ def get_db_object_by_id(model, object_id: int, joins: list = None):
     return result
 
 
-@handle_db_connection_errors
 def get_all_db_objects(model, order_by=None, joins: list = None):
     """Gets all records from the given model, closes the session, and returns the objects."""
     statement = select(model).order_by(order_by) if order_by else select(model)

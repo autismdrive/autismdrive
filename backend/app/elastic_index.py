@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 
-import elastic_transport
 from dateutil import tz
 from elasticsearch import RequestError, Elasticsearch
 from elasticsearch_dsl import (
@@ -29,7 +28,6 @@ from elasticsearch_dsl.query import MultiMatch, MatchAll, MoreLikeThis
 from app.database import session
 from app.enums import Permission
 from app.utils.category_utils import search_path, calculate_level
-from app.utils.decorators import handle_es_connection_errors
 from app.utils.resource_utils import DatabaseObjectDict
 from app.utils.resource_utils import indexable_content, category_names
 from config.base import ElasticsearchSettings
@@ -88,7 +86,6 @@ class ElasticIndex(object):
         ElasticIndex.instance()
 
     @classmethod
-    @handle_es_connection_errors
     def instance(cls) -> ElasticIndex:
         if cls._instance is None:
             cls._instance = cls.__new__(cls)
@@ -108,16 +105,12 @@ class ElasticIndex(object):
                 else:
                     cls.logger.fatal("Error Creating Index. ")
                     raise requestError
-            except elastic_transport.ConnectionError as connection_error:
-                cls.logger.fatal("Error Connecting to ElasticSearch: %s", connection_error)
-                raise connection_error  # Re-raise the connection error to be handled by the decorator
             except Exception as e:
                 cls.logger.info("Failed to create the index(s).  They may already exist." + str(e))
 
         return cls._instance
 
     @classmethod
-    @handle_es_connection_errors
     def establish_connection(cls, es_settings: ElasticsearchSettings):
         """Establish connection to an ElasticSearch host, and initialize the Submission collection"""
         if es_settings.http_auth_user != "":
@@ -138,7 +131,6 @@ class ElasticIndex(object):
             )
 
     @classmethod
-    @handle_es_connection_errors
     def clear(cls):
         _instance = cls._instance
 
@@ -150,7 +142,6 @@ class ElasticIndex(object):
             _instance.logger.error("Failed to delete the indices. They might not exist.")
 
     @classmethod
-    @handle_es_connection_errors
     def refresh_and_flush(cls, es_index: Index, flush=True):
         es_index.refresh()
 
@@ -158,7 +149,6 @@ class ElasticIndex(object):
             es_index.flush(force=True, wait_if_ongoing=True)
 
     @classmethod
-    @handle_es_connection_errors
     def remove_document(cls, document: DatabaseObjectDict, flush: bool = True):
         doc_id = cls._instance.get_id(document)
         exists = cls._instance.connection.exists(id=doc_id, index=cls._instance.index_name)
@@ -172,24 +162,20 @@ class ElasticIndex(object):
         cls.refresh_and_flush(cls._instance.index, flush)
 
     @classmethod
-    @handle_es_connection_errors
     def get_id(cls, document: DatabaseObjectDict):
         return document.type.lower() + "_" + str(document.id)
 
     @classmethod
-    @handle_es_connection_errors
     def get_document(cls, document: DatabaseObjectDict):
         uid = cls._instance.get_id(document)
         return StarDocument.get(id=uid, index=cls._instance.index_name)
 
     @classmethod
-    @handle_es_connection_errors
     def update_document(cls, document: DatabaseObjectDict, flush=True):
         # update is the same as add, as it will overwrite.  Better to have code in one place.
         cls._instance.add_document(document=document, flush=flush)
 
     @classmethod
-    @handle_es_connection_errors
     def add_document(
         cls,
         document: DatabaseObjectDict,
@@ -217,7 +203,6 @@ class ElasticIndex(object):
         cls.refresh_and_flush(cls._instance.index, flush)
 
     @classmethod
-    @handle_es_connection_errors
     def load_documents(
         cls,
         resources: list[DatabaseObjectDict],
@@ -236,7 +221,6 @@ class ElasticIndex(object):
         cls.refresh_and_flush(cls._instance.index)
 
     @classmethod
-    @handle_es_connection_errors
     def search(cls, search):
         from flask import g
         from app.resources.UserEndpoint import get_user_by_id
@@ -297,12 +281,10 @@ class ElasticIndex(object):
             if top_left.lat == bottom_right.lat or top_left.lon == bottom_right.lon:
                 from app.utils.geo_box import coords_to_geo_box
 
-                geo_box = coords_to_geo_box(
-                    {
-                        "lat": top_left.lat + bottom_right.lat / 2,
-                        "lon": top_left.lon + bottom_right.lon / 2,
-                    }
-                )
+                geo_box = coords_to_geo_box({
+                    "lat": top_left.lat + bottom_right.lat / 2,
+                    "lon": top_left.lon + bottom_right.lon / 2,
+                })
 
                 top_left.lat = geo_box["top_left"]["lat"]
                 top_left.lon = geo_box["top_left"]["lon"]
@@ -389,7 +371,6 @@ class ElasticIndex(object):
         return elastic_search.execute()
 
     @classmethod
-    @handle_es_connection_errors
     def more_like_this(cls, item, max_hits=3):
         """Finds all resources related to the given item."""
 
