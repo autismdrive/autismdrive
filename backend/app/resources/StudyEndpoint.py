@@ -13,7 +13,13 @@ from app.database import session
 from app.elastic_index import elastic_index
 from app.enums import Permission, Role
 from app.log_service import LogService
-from app.models import Study, StudyCategory, StudyChangeLog, StudyInvestigator, StudyUser
+from app.models import (
+    Study,
+    StudyCategory,
+    StudyChangeLog,
+    StudyInvestigator,
+    StudyUser,
+)
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
@@ -21,11 +27,15 @@ from app.utils.resource_utils import to_database_object_dict
 from app.wrappers import requires_permission, requires_roles
 
 
-def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+def add_joins_to_statement(
+    statement: Select | ExecutableOption,
+) -> Select | LoaderOption:
     return statement.options(
         joinedload(Study.study_categories).joinedload(StudyCategory.category),
         add_cat_joins(joinedload(Study.categories)),
-        joinedload(Study.study_investigators).joinedload(StudyInvestigator.investigator),
+        joinedload(Study.study_investigators).joinedload(
+            StudyInvestigator.investigator
+        ),
         joinedload(Study.investigators),
     )
 
@@ -62,7 +72,7 @@ class StudyEndpoint(flask_restful.Resource):
 
     def get(self, study_id: int):
         model = get_study_by_id(study_id, with_joins=True)
-        session.close()
+        # session.close()
 
         if model is None:
             raise RestException(RestException.NOT_FOUND)
@@ -85,7 +95,9 @@ class StudyEndpoint(flask_restful.Resource):
         session.query(Study).filter_by(id=study_id).delete()
         session.commit()
 
-        LogService.log_study_change(study_id=study_id, study_title=study_title, change_type="delete")
+        LogService.log_study_change(
+            study_id=study_id, study_title=study_title, change_type="delete"
+        )
         return None
 
     @auth.login_required
@@ -100,10 +112,14 @@ class StudyEndpoint(flask_restful.Resource):
         updated.last_updated = datetime.datetime.utcnow()
         session.add(updated)
         session.commit()
-        elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
+        elastic_index.update_document(
+            document=to_database_object_dict(self.schema, updated)
+        )
         db_study = get_study_by_id(study_id, with_joins=True)
 
-        LogService.log_study_change(study_id=study_id, study_title=db_study.title, change_type="edit")
+        LogService.log_study_change(
+            study_id=study_id, study_title=db_study.title, change_type="edit"
+        )
         return self.schema.dump(db_study)
 
 
@@ -112,7 +128,12 @@ class StudyListEndpoint(flask_restful.Resource):
     study_schema = SchemaRegistry.StudySchema()
 
     def get(self):
-        studies = session.execute(add_joins_to_statement(select(Study))).unique().scalars().all()
+        studies = (
+            session.execute(add_joins_to_statement(select(Study)))
+            .unique()
+            .scalars()
+            .all()
+        )
         return self.studies_schema.dump(studies)
 
     @auth.login_required
@@ -127,8 +148,12 @@ class StudyListEndpoint(flask_restful.Resource):
             session.close()
 
             db_study = get_study_by_id(study_id, with_joins=True)
-            elastic_index.add_document(document=to_database_object_dict(self.study_schema, db_study))
-            LogService.log_study_change(study_id=study_id, study_title=db_study.title, change_type="create")
+            elastic_index.add_document(
+                document=to_database_object_dict(self.study_schema, db_study)
+            )
+            LogService.log_study_change(
+                study_id=study_id, study_title=db_study.title, change_type="create"
+            )
 
             return self.study_schema.dump(db_study)
         except ValidationError as err:
@@ -139,7 +164,11 @@ class StudyByStatusListEndpoint(flask_restful.Resource):
     studiesSchema = SchemaRegistry.StudySchema(many=True)
 
     def get(self, status):
-        statement = add_joins_to_statement(select(Study)).filter_by(status=status).order_by(Study.last_updated.desc())
+        statement = (
+            add_joins_to_statement(select(Study))
+            .filter_by(status=status)
+            .order_by(Study.last_updated.desc())
+        )
         studies = session.execute(statement).unique().scalars().all()
         return self.studiesSchema.dump(studies)
 
