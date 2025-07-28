@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+
 from .fixture_utils import fake
 from .resource import MockResource
 

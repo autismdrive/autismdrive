@@ -2,13 +2,13 @@ import copy
 import datetime
 
 import flask_restful
-from flask import request, g
+from flask import g, request
 from marshmallow import ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
-from app.database import session, get_class
+from app.database import get_class, session
 from app.export_service import ExportService
 from app.models import Flows, Participant, StepLog
 from app.rest_exception import RestException

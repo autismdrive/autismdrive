@@ -2,14 +2,12 @@ import flask_restful
 from flask import request
 
 from app.database import session
-from app.models import Category, Study
-from app.models import StudyCategory
+from app.models import Category, Study, StudyCategory
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
 class StudyByCategoryEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.CategoryStudiesSchema()
 
     def get(self, category_id: int):
@@ -24,7 +22,6 @@ class StudyByCategoryEndpoint(flask_restful.Resource):
 
 
 class CategoryByStudyEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.StudyCategoriesSchema()
 
     def get(self, study_id: int):

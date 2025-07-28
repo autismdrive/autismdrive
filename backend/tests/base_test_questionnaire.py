@@ -2,9 +2,9 @@ import random
 import string
 
 from dateutil import parser
-from sqlalchemy import cast, Integer, select
+from fixtures.fixture_utils import fake
+from sqlalchemy import Integer, cast, select
 
-from tests.base_test import BaseTest
 from app.enums import Relationship, Role
 from app.models import (
     AlternativeAugmentative,
@@ -37,7 +37,7 @@ from app.models import (
 )
 from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.UserEndpoint import get_user_by_id
-from fixtures.fixture_utils import fake
+from tests.base_test import BaseTest
 
 
 class BaseTestQuestionnaire(BaseTest):
@@ -165,7 +165,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id)
         u_id = u.id
         p_id = p.id
@@ -232,7 +231,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ) -> CurrentBehaviorsSelfQuestionnaire:
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
         u_id = u.id
         p_id = p.id
@@ -263,7 +261,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
         u_id = u.id
         p_id = p.id
@@ -291,7 +288,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
         u_id = u.id
         p_id = p.id
@@ -324,7 +320,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
         u_id = u.id
         p_id = p.id
@@ -357,7 +352,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
         u_id = u.id
         p_id = p.id
@@ -392,7 +386,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
         u_id = u.id
         p_id = p.id
@@ -487,7 +480,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         user_id: int = None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.dependent)
         u_id = u.id
         p_id = p.id
@@ -555,7 +547,6 @@ class BaseTestQuestionnaire(BaseTest):
         home_dependent_questionnaire=None,
         home_self_questionnaire=None,
     ):
-
         h_dict = {"name": name, "relationship": relationship, "age": age, "has_autism": has_autism}
         if home_dependent_questionnaire is not None:
             h_dict["home_dependent_questionnaire_id"] = home_dependent_questionnaire.id
@@ -665,7 +656,6 @@ class BaseTestQuestionnaire(BaseTest):
         participant_id: int = None,
         event=None,
     ):
-
         u, p = self.construct_user_and_participant(user_id, participant_id, relationship=Relationship.self_participant)
         u_id = u.id
         p_id = p.id
@@ -698,7 +688,6 @@ class BaseTestQuestionnaire(BaseTest):
         notes="I feel better than ever!",
         supports_questionnaire_id=None,
     ):
-
         m = Medication(symptom=symptom, name=name, notes=notes)
         if supports_questionnaire_id is not None:
             m.supports_questionnaire_id = supports_questionnaire_id
@@ -721,7 +710,6 @@ class BaseTestQuestionnaire(BaseTest):
     def construct_therapy(
         self, therapy_type="behavioral", timeframe="current", notes="Small steps", supports_questionnaire_id=None
     ):
-
         t = Therapy(type=therapy_type, timeframe=timeframe, notes=notes)
         if supports_questionnaire_id is not None:
             t.supports_questionnaire_id = supports_questionnaire_id

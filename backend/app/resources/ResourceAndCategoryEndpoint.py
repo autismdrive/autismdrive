@@ -1,18 +1,16 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.models import Category, Resource
-from app.models import ResourceCategory
+from app.models import Category, Resource, ResourceCategory
 from app.rest_exception import RestException
-from app.schemas import SchemaRegistry, ResourceSchema
+from app.schemas import ResourceSchema, SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
 
 
 class ResourceByCategoryEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.CategoryResourcesSchema()
 
     def get(self, category_id):
@@ -27,7 +25,6 @@ class ResourceByCategoryEndpoint(flask_restful.Resource):
 
 
 class CategoryByResourceEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.ResourceCategoriesSchema()
 
     def get(self, resource_id):

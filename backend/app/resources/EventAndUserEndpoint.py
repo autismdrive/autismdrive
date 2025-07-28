@@ -1,6 +1,6 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.database import session
 from app.models import Event, EventUser, User
@@ -9,7 +9,6 @@ from app.schemas import SchemaRegistry
 
 
 class EventByUserEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.EventUserSchema()
 
     def get(self, user_id):
@@ -24,7 +23,6 @@ class EventByUserEndpoint(flask_restful.Resource):
 
 
 class UserByEventEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.EventUserSchema()
 
     def get(self, event_id: int):

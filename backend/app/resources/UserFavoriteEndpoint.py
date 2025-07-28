@@ -1,6 +1,6 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.auth import auth
 from app.database import session
@@ -10,7 +10,6 @@ from app.schemas import SchemaRegistry
 
 
 class FavoritesByUserEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required
@@ -20,7 +19,6 @@ class FavoritesByUserEndpoint(flask_restful.Resource):
 
 
 class FavoritesByUserAndTypeEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required

@@ -5,13 +5,13 @@ Revises: cf9f2ed356ab, 12b4edc6125b
 Create Date: 2020-04-21 14:04:13.168702
 
 """
-from alembic import op
-import sqlalchemy as sa
 
+import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = '80c3b2f1d995'
-down_revision = ('cf9f2ed356ab', '12b4edc6125b')
+revision = "80c3b2f1d995"
+down_revision = ("cf9f2ed356ab", "12b4edc6125b")
 branch_labels = None
 depends_on = None
 

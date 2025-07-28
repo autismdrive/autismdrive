@@ -1,7 +1,7 @@
 import datetime
 
 import flask_restful
-from flask import request, g
+from flask import g, request
 from marshmallow import ValidationError
 from sqlalchemy import Select, select
 from sqlalchemy.orm import joinedload
@@ -11,14 +11,14 @@ from sqlalchemy.sql.base import ExecutableOption
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
-from app.enums import Role, Permission
+from app.enums import Permission, Role
 from app.log_service import LogService
-from app.models import Study, StudyInvestigator, StudyCategory, StudyUser, StudyChangeLog
+from app.models import Study, StudyCategory, StudyChangeLog, StudyInvestigator, StudyUser
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
-from app.wrappers import requires_roles, requires_permission
+from app.wrappers import requires_permission, requires_roles
 
 
 def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
@@ -108,7 +108,6 @@ class StudyEndpoint(flask_restful.Resource):
 
 
 class StudyListEndpoint(flask_restful.Resource):
-
     studies_schema = SchemaRegistry.StudySchema(many=True)
     study_schema = SchemaRegistry.StudySchema()
 

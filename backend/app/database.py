@@ -4,9 +4,9 @@ import typing
 
 import click
 from psycopg import OperationalError
-from sqlalchemy import create_engine, MetaData, inspect, DateTime, Enum, Table, select, Select, text
+from sqlalchemy import DateTime, Enum, MetaData, Select, Table, create_engine, inspect, select, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, joinedload
+from sqlalchemy.orm import DeclarativeBase, joinedload, scoped_session, sessionmaker
 from sqlalchemy_utils import database_exists
 
 from app.utils import get_random_integer
@@ -114,9 +114,10 @@ def clear_db(base_metadata: MetaData = Base.metadata):
 def migrate_db():
     """Runs Alembic database migrations"""
     import os
+    from inspect import getsourcefile
+
     from alembic.command import revision
     from alembic.config import Config
-    from inspect import getsourcefile
 
     current_dir = os.path.dirname(getsourcefile(lambda: 0))
     alembic_cfg = Config(current_dir + "/../migrations/alembic.ini")
@@ -127,9 +128,10 @@ def migrate_db():
 def upgrade_db():
     """Runs Alembic database migrations"""
     import os
+    from inspect import getsourcefile
+
     from alembic.command import upgrade
     from alembic.config import Config
-    from inspect import getsourcefile
 
     current_dir = os.path.dirname(getsourcefile(lambda: 0))
     alembic_cfg = Config(current_dir + "/../migrations/alembic.ini")

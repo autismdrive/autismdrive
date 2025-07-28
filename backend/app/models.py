@@ -2,18 +2,18 @@ import copy
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Optional, Literal, TypedDict
+from typing import Literal, Optional, TypedDict
 
 import googlemaps
 import jwt
-from sqlalchemy import ForeignKey, TEXT, func, ARRAY, select, Integer, Boolean, String, cast
+from sqlalchemy import ARRAY, TEXT, Boolean, ForeignKey, Integer, String, cast, func, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, column_property, declared_attr
+from sqlalchemy.orm import Mapped, backref, column_property, declared_attr, mapped_column, relationship
 
 from app.auth import bcrypt, password_requirements
-from app.database import Base, session, random_integer, get_class
-from app.enums import Relationship, Status, Role, StudyUserStatus
+from app.database import Base, get_class, random_integer, session
+from app.enums import Relationship, Role, Status, StudyUserStatus
 from app.export_service import ExportService
 from app.utils import pascal_case_it
 from config.load import settings
@@ -351,7 +351,6 @@ class Flow:
 
 
 class Flows:
-
     # WIP Method
     @staticmethod
     def parse_form():
@@ -505,10 +504,10 @@ class LatLng(TypedDict):
 class Geocode:
     @staticmethod
     def get_geocode(address_dict) -> LatLng | None:
-
         # If we're testing, just use fake coordinates to avoid exceeding the Google Maps API quota
         if not settings.PRODUCTION:
             from tests.utils import fake
+
             fake_coords = fake.latlng()
             print(f"TEST:  Pretending to get the geocode and setting lat/lng to {fake_coords[0]} - {fake_coords[1]}")
             return LatLng(lat=float(fake_coords[0]), lng=float(fake_coords[1]))
@@ -541,7 +540,6 @@ class Geocode:
             return LatLng(lat=float(lat), lng=float(lng))
 
         return None
-
 
 
 class Investigator(Base):
@@ -600,9 +598,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
                 "required": True,
             },
             "hide_expression": relationship_to_participant_other_hide_expression,
-            "expression_properties": {
-                "props.required": "!" + relationship_to_participant_other_hide_expression
-            },
+            "expression_properties": {"props.required": "!" + relationship_to_participant_other_hide_expression},
         },
     )
     first_name: Mapped[Optional[str]] = mapped_column(
@@ -1328,8 +1324,8 @@ class User(Base):
         return participant_id in p_ids
 
     def self_participant(self):
-        from app.resources.UserEndpoint import get_user_by_id
         from app.resources.ParticipantEndpoint import get_participant_by_id
+        from app.resources.UserEndpoint import get_user_by_id
 
         db_self = get_user_by_id(self.id, with_joins=True)
         participants = db_self.participants
@@ -1379,9 +1375,9 @@ class User(Base):
 
     @classmethod
     def is_correct_password(cls, user_id: int, plaintext: str) -> bool:
-        from app.rest_exception import RestException
         from app.database import session
         from app.resources.UserEndpoint import get_user_by_id
+        from app.rest_exception import RestException
 
         db_user = get_user_by_id(user_id, with_joins=False)
 
@@ -2478,7 +2474,7 @@ class CurrentBehaviorsDependentQuestionnaire(Base, QuestionnaireMixin, CurrentBe
                 ],
             },
             "expression_properties": {
-                "props.label": '(formState.preferredName || "Your child") + "\'s current ' 'verbal ability:"'
+                "props.label": '(formState.preferredName || "Your child") + "\'s current verbal ability:"'
             },
         },
     )
@@ -2611,7 +2607,7 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
             "expression_properties": {
                 "props.label": {
                     "RELATIONSHIP_SPECIFIC": {
-                        "dependent": '(formState.preferredName || "your child") + "\'s" ' '+ " sex at birth"',
+                        "dependent": '(formState.preferredName || "your child") + "\'s" + " sex at birth"',
                     }
                 },
             },
@@ -2967,7 +2963,7 @@ class EducationMixin(object):
                         {"value": "dayTreatment", "label": "Day treatment or residential center"},
                         {
                             "value": "disabilitySupports",
-                            "label": "Disability supports services (at college/vocational " "school)",
+                            "label": "Disability supports services (at college/vocational school)",
                         },
                         {"value": "servicesNone", "label": "None of the above"},
                         {"value": "servicesOther", "label": "Other"},
@@ -3477,9 +3473,9 @@ class EvaluationHistorySelfQuestionnaire(Base, QuestionnaireMixin, EvaluationHis
 
     def get_field_groups(self):
         field_groups = super().get_field_groups()
-        field_groups["partner_centers"]["props"][
-            "label"
-        ] = "Have you ever been evaluated at any of the following centers?"
+        field_groups["partner_centers"]["props"]["label"] = (
+            "Have you ever been evaluated at any of the following centers?"
+        )
         return field_groups
 
 
@@ -3599,9 +3595,9 @@ class HomeDependentQuestionnaire(Base, QuestionnaireMixin, HomeMixin):
                 'live (select all that apply)?"'
             },
         }
-        field_groups["housemates"][
-            "hide_expression"
-        ] = '((formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("residentialFacility"))||(formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("groupHome")))'
+        field_groups["housemates"]["hide_expression"] = (
+            '((formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("residentialFacility"))||(formState.mainModel.dependent_living_situation && formState.mainModel.dependent_living_situation.includes("groupHome")))'
+        )
 
         field_groups["housemates"]["expression_properties"] = {
             "props.label": '"Who else lives with " + (formState.preferredName || "your child") + "?"'

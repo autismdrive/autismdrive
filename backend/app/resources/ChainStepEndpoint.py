@@ -2,13 +2,13 @@ import datetime
 
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 from sqlalchemy.exc import IntegrityError
 
 from app.auth import auth
 from app.database import session
 from app.enums import Permission
-from app.models import ChainStep, ChainSessionStep
+from app.models import ChainSessionStep, ChainStep
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission

@@ -15,11 +15,11 @@ def coords_to_geo_box(geo_point: GeoPointType) -> GeoBoxType:
     Returns:
     - dict: A dictionary with the corners of the geo_box.
     """
-    lat = geo_point.get('lat', None)
-    lon = geo_point.get('lon', None)
+    lat = geo_point.get("lat", None)
+    lon = geo_point.get("lon", None)
 
     if not lat or not lon:
-        raise ValueError('Latitude and Longitude must be provided.')
+        raise ValueError("Latitude and Longitude must be provided.")
 
     km_deg = 111.0  # 1 degree latitude = 111.0km
     lat_offset = (1 / km_deg) / 2

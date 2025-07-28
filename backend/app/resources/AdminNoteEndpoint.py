@@ -3,13 +3,13 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
-from sqlalchemy import cast, Integer, select
+from sqlalchemy import Integer, cast, select
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
-from app.models import AdminNote, Resource, User
 from app.enums import Permission
+from app.models import AdminNote, Resource, User
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
@@ -21,7 +21,6 @@ select_admin_notes_with_joins = select(AdminNote).options(
 
 
 class AdminNoteEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.AdminNoteSchema()
 
     @auth.login_required
@@ -55,7 +54,6 @@ class AdminNoteEndpoint(flask_restful.Resource):
 
 
 class AdminNoteListEndpoint(flask_restful.Resource):
-
     adminNotesSchema = SchemaRegistry.AdminNoteSchema(many=True)
     adminNoteSchema = SchemaRegistry.AdminNoteSchema()
 

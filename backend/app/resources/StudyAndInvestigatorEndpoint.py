@@ -1,19 +1,17 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.auth import auth
 from app.database import session
-from app.enums import Role, Permission
+from app.enums import Permission, Role
 from app.models import Investigator, Study, StudyInvestigator
-from app.models import StudyInvestigator
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_roles, requires_permission
+from app.wrappers import requires_permission, requires_roles
 
 
 class StudyByInvestigatorEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.InvestigatorStudiesSchema()
 
     def get(self, investigator_id):
@@ -28,7 +26,6 @@ class StudyByInvestigatorEndpoint(flask_restful.Resource):
 
 
 class InvestigatorByStudyEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.StudyInvestigatorSchema()
 
     def get(self, study_id: int):

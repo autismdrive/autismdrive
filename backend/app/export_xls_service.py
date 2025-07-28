@@ -8,9 +8,9 @@ import xlsxwriter
 from flask import Response
 from werkzeug.datastructures import Headers
 
+from app.database import get_class
 from app.export_service import ExportService
 from app.utils import pascal_case_it
-from app.database import get_class
 
 
 class ExportXlsService:
@@ -73,7 +73,7 @@ class ExportXlsService:
             col = 0
 
             # Write the column headers.
-            for (key, value) in header_fields.items():
+            for key, value in header_fields.items():
                 if key != "_links":
                     worksheet.write(row, col, key, bold)
                     col += 1
@@ -83,7 +83,7 @@ class ExportXlsService:
             for questionnaire in questionnaires:
                 # Start from the first cell. Rows and columns are zero indexed.
                 col = 0
-                for (key, value) in questionnaire.items():
+                for key, value in questionnaire.items():
                     if key == "_links":
                         continue  # Don't export _links
                     if isinstance(value, dict):

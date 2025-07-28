@@ -1,16 +1,15 @@
 import flask_restful
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.auth import auth
 from app.database import session
 from app.enums import Permission, Role
 from app.models import StepLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_roles, requires_permission
+from app.wrappers import requires_permission, requires_roles
 
 
 class StepLogListEndpoint(flask_restful.Resource):
-
     stepLogsSchema = SchemaRegistry.StepLogSchema(many=True)
 
     @auth.login_required

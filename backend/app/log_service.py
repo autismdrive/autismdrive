@@ -1,5 +1,6 @@
 from typing import Literal
-from icecream import ic, IceCreamDebugger
+
+from icecream import IceCreamDebugger, ic
 
 ic.configureOutput(includeContext=True, contextAbsPath=True)
 

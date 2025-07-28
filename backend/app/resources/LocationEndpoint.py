@@ -9,7 +9,7 @@ from app.database import session
 from app.elastic_index import elastic_index
 from app.enums import Permission
 from app.log_service import LogService
-from app.models import Location, Event, Geocode
+from app.models import Event, Geocode, Location
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
@@ -17,7 +17,6 @@ from app.wrappers import requires_permission
 
 
 class LocationEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.LocationSchema()
 
     def get(self, location_id: int):
@@ -78,7 +77,6 @@ class LocationEndpoint(flask_restful.Resource):
 
 
 class LocationListEndpoint(flask_restful.Resource):
-
     locations_schema = SchemaRegistry.LocationSchema(many=True)
     location_schema = SchemaRegistry.LocationSchema()
 

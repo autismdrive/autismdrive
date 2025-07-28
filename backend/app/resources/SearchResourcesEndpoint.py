@@ -1,7 +1,6 @@
-from app.resources.SearchEndpoint import SearchEndpoint
+from app.models import Event, Location, Resource
 from app.resources.Auth import login_optional
-from app.models import Resource, Location, Event
-from app.models import Location
+from app.resources.SearchEndpoint import SearchEndpoint
 
 
 class SearchResourcesEndpoint(SearchEndpoint):

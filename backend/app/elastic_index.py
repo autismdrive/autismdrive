@@ -4,32 +4,31 @@ import logging
 from datetime import datetime
 
 from dateutil import tz
-from elasticsearch import RequestError, Elasticsearch
+from elasticsearch import Elasticsearch, RequestError
 from elasticsearch_dsl import (
+    A,
+    Boolean,
     Date,
-    Keyword,
-    Text,
-    Index,
-    analyzer,
-    Integer,
-    tokenizer,
     Document,
     Double,
     GeoPoint,
-    Search,
-    A,
+    Index,
+    Integer,
+    Keyword,
     Q,
-    Boolean,
+    Search,
+    Text,
     analysis,
+    analyzer,
+    tokenizer,
 )
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import MultiMatch, MatchAll, MoreLikeThis
+from elasticsearch_dsl.query import MatchAll, MoreLikeThis, MultiMatch
 
 from app.database import session
 from app.enums import Permission
-from app.utils.category_utils import search_path, calculate_level
-from app.utils.resource_utils import DatabaseObjectDict
-from app.utils.resource_utils import indexable_content, category_names
+from app.utils.category_utils import calculate_level, search_path
+from app.utils.resource_utils import DatabaseObjectDict, category_names, indexable_content
 from config.base import ElasticsearchSettings
 from config.load import settings
 
@@ -223,8 +222,9 @@ class ElasticIndex(object):
     @classmethod
     def search(cls, search):
         from flask import g
-        from app.resources.UserEndpoint import get_user_by_id
+
         from app.resources.CategoryEndpoint import get_category_by_id
+        from app.resources.UserEndpoint import get_user_by_id
 
         sort = None if search.sort is None else search.sort.translate()
 
@@ -281,10 +281,12 @@ class ElasticIndex(object):
             if top_left.lat == bottom_right.lat or top_left.lon == bottom_right.lon:
                 from app.utils.geo_box import coords_to_geo_box
 
-                geo_box = coords_to_geo_box({
-                    "lat": top_left.lat + bottom_right.lat / 2,
-                    "lon": top_left.lon + bottom_right.lon / 2,
-                })
+                geo_box = coords_to_geo_box(
+                    {
+                        "lat": top_left.lat + bottom_right.lat / 2,
+                        "lon": top_left.lon + bottom_right.lon / 2,
+                    }
+                )
 
                 top_left.lat = geo_box["top_left"]["lat"]
                 top_left.lon = geo_box["top_left"]["lon"]

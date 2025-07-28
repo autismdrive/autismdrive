@@ -1,30 +1,26 @@
-from typing import Callable
-
 import math
 from datetime import datetime
+from typing import Callable
 from unittest.mock import patch
+
+from utils import MockGoogleMapsClient
 
 from app.elastic_index import elastic_index
 from app.models import (
     Category,
     ChainStep,
+    Event,
+    Location,
+    Participant,
     Resource,
     ResourceCategory,
-    Location,
-    Event,
-    Participant,
     Search,
     Study,
     StudyCategory,
     User,
     ZipCode,
 )
-from app.models import ResourceCategory
-from app.models import StudyCategory
-from app.models import User
-from app.models import ZipCode
 from tests.base_test import BaseTest
-from utils import MockGoogleMapsClient
 
 
 class TestDataLoader(BaseTest):

@@ -1,13 +1,13 @@
 import json
-from dataclasses import dataclass, KW_ONLY
-from datetime import datetime, date
+from dataclasses import KW_ONLY, dataclass
+from datetime import date, datetime
 from enum import Enum
-from typing import cast, TypedDict
+from typing import TypedDict, cast
 
 from marshmallow import Schema
 
 from app.enums import Status
-from app.models import Resource, Event, Location, Study
+from app.models import Event, Location, Resource, Study
 
 DatabaseObject = Event | Resource | Location | Study
 

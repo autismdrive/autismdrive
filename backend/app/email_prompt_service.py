@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Callable
 
-from sqlalchemy import cast, Integer, select
+from sqlalchemy import Integer, cast, select
 from sqlalchemy.orm import joinedload
 
 from app.database import session

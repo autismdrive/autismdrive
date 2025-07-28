@@ -1,7 +1,9 @@
+import os
+
+import dotenv
+
 from app.api_app import APIApp
 from app.create_app import create_app
-import dotenv
-import os
 
 print("Loading backend/run.py")
 

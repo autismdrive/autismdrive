@@ -1,4 +1,4 @@
-from sqlalchemy import cast, Integer, select
+from sqlalchemy import Integer, cast, select
 
 from app.models import Category
 from app.utils.category_utils import all_search_paths

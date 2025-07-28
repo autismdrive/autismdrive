@@ -1,8 +1,7 @@
+from math import floor
 from unittest import TestCase
 
-from math import floor
-
-from app.utils import snake_case_it, pascal_case_it, get_random_integer
+from app.utils import get_random_integer, pascal_case_it, snake_case_it
 
 
 class TestUtils(TestCase):

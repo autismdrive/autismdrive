@@ -1,6 +1,6 @@
 import flask_restful
 from flask import request
-from sqlalchemy import update, select, Select
+from sqlalchemy import Select, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.interfaces import LoaderOption
@@ -9,7 +9,7 @@ from sqlalchemy.sql.base import ExecutableOption
 from app.auth import auth
 from app.database import session
 from app.enums import Permission
-from app.models import Category, ResourceCategory, StudyCategory, UserFavorite, Resource, Study
+from app.models import Category, Resource, ResourceCategory, Study, StudyCategory, UserFavorite
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission

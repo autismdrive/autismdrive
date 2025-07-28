@@ -1,16 +1,15 @@
 import flask_restful
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.auth import auth
 from app.database import session
-from app.models import EmailLog
 from app.enums import Permission, Role
+from app.models import EmailLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_roles, requires_permission
+from app.wrappers import requires_permission, requires_roles
 
 
 class EmailLogListEndpoint(flask_restful.Resource):
-
     emailLogsSchema = SchemaRegistry.EmailLogSchema(many=True)
 
     @auth.login_required

@@ -1,9 +1,9 @@
 import datetime
 
 import flask_restful
-from flask import request, g
+from flask import g, request
 from marshmallow import ValidationError
-from sqlalchemy import exists, desc, select, Select
+from sqlalchemy import Select, desc, exists, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -14,7 +14,7 @@ from app.auth import auth
 from app.database import session
 from app.email_service import EmailService, email_service
 from app.enums import Permission, Role
-from app.models import EmailLog, EventUser, Study, User, UserFavorite, StudyUser
+from app.models import EmailLog, EventUser, Study, StudyUser, User, UserFavorite
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
@@ -32,6 +32,7 @@ def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | Loa
         joinedload(User.studies),
         joinedload(User.user_studies),
     )
+
 
 def get_user_by_email(email: str, with_joins=False) -> User | None:
     """
@@ -64,7 +65,6 @@ def get_user_by_id(user_id: int, with_joins=False) -> User | None:
 
 
 class UserEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.UserSchema()
 
     @auth.login_required
@@ -115,7 +115,6 @@ class UserEndpoint(flask_restful.Resource):
 
 
 class UserListEndpoint(flask_restful.Resource):
-
     users_schema = SchemaRegistry.UserSchema(many=True)
     user_schema = SchemaRegistry.UserSchema()
     search_schema = SchemaRegistry.UserSearchSchema()

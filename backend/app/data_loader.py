@@ -5,12 +5,13 @@ import re
 from typing import Optional
 
 import googlemaps
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
 from app.elastic_index import elastic_index
 from app.enums import Status
 from config.load import settings
-from .database import session, engine, get_all_db_objects
+
+from .database import engine, get_all_db_objects, session
 from .models import LatLng
 
 
@@ -32,7 +33,6 @@ class DataLoader:
     file = "example_data/resources.csv"
 
     def __init__(self, directory=default_dir):
-
         self.category_file = directory + "/categories.csv"
         self.event_file = directory + "/events.csv"
         self.location_file = directory + "/locations.csv"
@@ -62,11 +62,7 @@ class DataLoader:
         print("Categories loaded.  There are now %i categories in the database." % session.query(Category).count())
 
     def load_events(self):
-        from .models import AgeRange
-        from .models import EventUser
-        from .models import Event
-        from .models import ResourceCategory
-        from .models import Resource
+        from .models import AgeRange, Event, EventUser, Resource, ResourceCategory
 
         with open(self.event_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -142,10 +138,7 @@ class DataLoader:
         print("There are now %i links between events and users in the database." % session.query(EventUser).count())
 
     def load_locations(self):
-        from .models import AgeRange
-        from .models import Location
-        from .models import ResourceCategory
-        from .models import Resource
+        from .models import AgeRange, Location, Resource, ResourceCategory
 
         with open(self.location_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -208,9 +201,7 @@ class DataLoader:
         )
 
     def load_resources(self):
-        from .models import AgeRange
-        from .models import ResourceCategory
-        from .models import Resource
+        from .models import AgeRange, Resource, ResourceCategory
 
         with open(self.resource_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -254,11 +245,7 @@ class DataLoader:
         )
 
     def load_studies(self):
-        from .models import AgeRange
-        from .models import Investigator
-        from .models import StudyCategory
-        from .models import StudyInvestigator
-        from .models import Study
+        from .models import AgeRange, Investigator, Study, StudyCategory, StudyInvestigator
 
         with open(self.study_file, newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter, quotechar=csv.excel.quotechar)
@@ -406,8 +393,9 @@ class DataLoader:
         )
 
     def get_category_by_name(self, category_name, parent=None, create_missing=False):
-        from .models import Category
         from sqlalchemy.orm import joinedload
+
+        from .models import Category
 
         category = (
             session.execute(
@@ -427,21 +415,20 @@ class DataLoader:
         session.close()
         return category
 
-    def get_geocode(self, address_dict: dict, lat_long_dict: Optional[LatLng]=None) -> None | LatLng:
+    def get_geocode(self, address_dict: dict, lat_long_dict: Optional[LatLng] = None) -> None | LatLng:
         # Avoid hitting the Google Maps API unnecessarily.
         if not lat_long_dict:
-
             from app.models import Geocode
 
             return Geocode.get_geocode(address_dict)
 
         return lat_long_dict
 
-
     def build_index(self):
-        from .models import Resource, Location, Event, Study
-        from app.utils.resource_utils import to_database_object_dict
         from app.schemas import SchemaRegistry
+        from app.utils.resource_utils import to_database_object_dict
+
+        from .models import Event, Location, Resource, Study
 
         # from app.resources.ResourceEndpoint import get_all_resources
         # from app.resources.StudyEndpoint import get_all_studies
@@ -482,22 +469,25 @@ class DataLoader:
         clear_db()
 
     def clear_resources(self):
-        from .models import AdminNote
-        from .models import Category
-        from .models import ChainStep
-        from .models import EventUser
-        from .models import Event
-        from .models import Investigator
-        from .models import Location
         from app.models import ChainSessionStep
-        from .models import ResourceCategory
-        from .models import Resource
-        from .models import StudyUser
-        from .models import StudyCategory
-        from .models import StudyInvestigator
-        from .models import Study
-        from .models import UserFavorite
-        from .models import ZipCode
+
+        from .models import (
+            AdminNote,
+            Category,
+            ChainStep,
+            Event,
+            EventUser,
+            Investigator,
+            Location,
+            Resource,
+            ResourceCategory,
+            Study,
+            StudyCategory,
+            StudyInvestigator,
+            StudyUser,
+            UserFavorite,
+            ZipCode,
+        )
 
         session.query(AdminNote).delete()
         session.query(ResourceCategory).delete()

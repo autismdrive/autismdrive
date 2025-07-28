@@ -11,7 +11,6 @@ from app.schemas import SchemaRegistry
 
 
 class InvestigatorEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.InvestigatorSchema()
 
     def get(self, investigator_id: int):
@@ -42,7 +41,6 @@ class InvestigatorEndpoint(flask_restful.Resource):
 
 
 class InvestigatorListEndpoint(flask_restful.Resource):
-
     investigatorsSchema = SchemaRegistry.InvestigatorSchema(many=True)
     investigatorSchema = SchemaRegistry.InvestigatorSchema()
 

@@ -1,7 +1,7 @@
 import elasticsearch
 import flask_restful
-from flask import request, json, jsonify
-from sqlalchemy import cast, Integer, select
+from flask import json, jsonify, request
+from sqlalchemy import Integer, cast, select
 
 from app.database import session
 from app.elastic_index import elastic_index

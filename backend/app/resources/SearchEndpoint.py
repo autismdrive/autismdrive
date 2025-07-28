@@ -2,7 +2,8 @@ from typing import Literal
 
 import elasticsearch
 import flask_restful
-from elasticsearch_dsl.response import Response as ElasticsearchResponse, AggResponse
+from elasticsearch_dsl.response import AggResponse
+from elasticsearch_dsl.response import Response as ElasticsearchResponse
 from elasticsearch_dsl.utils import HitMeta
 from flask import request
 from marshmallow import ValidationError
@@ -91,8 +92,8 @@ class SearchEndpoint(flask_restful.Resource):
         which includes counts for top-level categories.
         """
 
-        from app.resources.CategoryEndpoint import add_joins_to_statement, get_category_by_id
         from app.database import session
+        from app.resources.CategoryEndpoint import add_joins_to_statement, get_category_by_id
 
         # Make a fake category to hold all the other categories.
         topic_category = Category(id=99999, name="Topics", children=[], parent=None)

@@ -3,14 +3,13 @@ from flask import request
 
 from app.database import session
 from app.elastic_index import elastic_index
-from app.models import Category, ResourceCategory, Event
+from app.models import Category, Event, ResourceCategory
 from app.rest_exception import RestException
-from app.schemas import SchemaRegistry, EventSchema
+from app.schemas import EventSchema, SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
 
 
 class EventByCategoryEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.CategoryEventsSchema()
 
     def get(self, category_id: int):
@@ -25,7 +24,6 @@ class EventByCategoryEndpoint(flask_restful.Resource):
 
 
 class CategoryByEventEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.EventCategoriesSchema()
 
     def get(self, event_id: int):

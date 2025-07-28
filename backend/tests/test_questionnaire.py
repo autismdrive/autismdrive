@@ -5,10 +5,11 @@ import random
 
 import openpyxl
 from dateutil import parser
+from fixtures.endpoints_map import endpoints_map
+from fixtures.fixture_utils import fake, fake_user_id
 from sqlalchemy import select
 
 from app.enums import Role
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 from app.export_service import ExportService
 from app.models import (
     ChainQuestionnaire,
@@ -32,13 +33,13 @@ from app.models import (
     StepLog,
     SupportsQuestionnaire,
 )
-from fixtures.endpoints_map import endpoints_map
-from fixtures.fixture_utils import fake, fake_user_id
+from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
 class TestQuestionnaire(BaseTestQuestionnaire):
     def test_base_endpoint(self):
         import re
+
         from flask import url_for
 
         param_pattern = re.compile(r"<(int|string|path):([a-z_]+)>")
@@ -1501,7 +1502,6 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             headers=headers,
         )
         self.assert_success(rv_meta)
-
 
         rv = self.client.post(
             "api/flow/self_intake/home_self_questionnaire",

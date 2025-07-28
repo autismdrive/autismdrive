@@ -1,19 +1,18 @@
 import flask_restful
-from flask import request, g
+from flask import g, request
 from marshmallow import ValidationError
-from sqlalchemy import exc, cast, Integer, select
+from sqlalchemy import Integer, cast, exc, select
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
-from app.models import Participant, User
 from app.enums import Relationship
+from app.models import Participant, User
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
 class ParticipantBySessionEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.ParticipantSchema()
 
     @auth.login_required

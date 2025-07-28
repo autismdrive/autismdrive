@@ -9,7 +9,7 @@ from marshmallow import ValidationError
 from sqlalchemy import desc, select
 from sqlalchemy.orm import joinedload
 
-from app.database import session, get_class
+from app.database import get_class, session
 from app.export_service import ExportService
 from app.log_service import LogService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo

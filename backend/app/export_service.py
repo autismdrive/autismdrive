@@ -4,16 +4,15 @@ import logging
 import typing
 
 from flask import url_for
-from sqlalchemy import func, desc, select
+from sqlalchemy import desc, func, select
 from sqlalchemy.orm import joinedload
 
-from app.database import session, Base, get_class_for_table, get_class
+from app.database import Base, get_class, get_class_for_table, session
 from app.email_service import email_service
 from app.utils import snake_case_it
 
 
 class ExportService:
-
     logger = logging.getLogger("ExportService")
 
     SCHEMA_PACKAGE = "app.schemas"

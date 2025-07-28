@@ -1,5 +1,5 @@
-from tests.base_test import BaseTest
 from app.models import AdminNote
+from tests.base_test import BaseTest
 
 
 class TestAdminNote(BaseTest):

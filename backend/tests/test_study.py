@@ -1,11 +1,16 @@
-from sqlalchemy import cast, Integer
+from fixtures.study import MockStudy, MockStudyWithMoreFields
+from sqlalchemy import Integer, cast
 
 from app.email_service import EmailService
 from app.enums import Relationship
-from app.models import EmailLog, Study, StudyInvestigator, ContactQuestionnaire
-from app.models import IdentificationQuestionnaire
-from app.models import StudyCategory
-from fixtures.study import MockStudy, MockStudyWithMoreFields
+from app.models import (
+    ContactQuestionnaire,
+    EmailLog,
+    IdentificationQuestionnaire,
+    Study,
+    StudyCategory,
+    StudyInvestigator,
+)
 from tests.base_test import BaseTest
 
 
@@ -338,7 +343,6 @@ class TestStudy(BaseTest):
         participant=None,
         user=None,
     ):
-
         iq = IdentificationQuestionnaire(
             relationship_to_participant=relationship_to_participant,
             first_name=first_name,
@@ -377,7 +381,6 @@ class TestStudy(BaseTest):
         participant=None,
         user=None,
     ):
-
         cq = ContactQuestionnaire(
             phone=phone, can_leave_voicemail=can_leave_voicemail, contact_times=contact_times, email=email
         )

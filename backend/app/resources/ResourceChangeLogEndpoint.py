@@ -1,16 +1,15 @@
 import flask_restful
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.auth import auth
 from app.database import session
 from app.enums import Permission, Role
 from app.models import ResourceChangeLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_roles, requires_permission
+from app.wrappers import requires_permission, requires_roles
 
 
 class ResourceChangeLogListEndpoint(flask_restful.Resource):
-
     resourceChangeLogSchema = SchemaRegistry.ResourceChangeLogSchema(many=True)
 
     @auth.login_required

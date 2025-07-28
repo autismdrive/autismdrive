@@ -17,7 +17,6 @@ from app.wrappers import requires_permission
 
 
 class EventEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.EventSchema()
 
     def get(self, event_id: int):
@@ -77,7 +76,6 @@ class EventEndpoint(flask_restful.Resource):
 
 
 class EventListEndpoint(flask_restful.Resource):
-
     events_schema = SchemaRegistry.EventSchema(many=True)
     event_schema = SchemaRegistry.EventSchema()
 

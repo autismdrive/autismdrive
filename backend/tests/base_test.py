@@ -5,14 +5,18 @@ import quopri
 import re
 from inspect import getsourcefile
 from json import JSONEncoder
-from typing import MutableMapping, Unpack, TypedDict, get_type_hints
+from typing import MutableMapping, TypedDict, Unpack, get_type_hints
 from unittest import TestCase
 
+from fixtures.fixture_utils import fake, fake_password
+from fixtures.location import MockLocationWithLatLong
+from fixtures.resource import MockResource
+from fixtures.study import MockStudy
 from flask import json
 from flask.ctx import RequestContext
 from flask.testing import FlaskClient
-from sqlalchemy import cast, Integer, select
-from sqlalchemy.orm import scoped_session, close_all_sessions, joinedload
+from sqlalchemy import Integer, cast, select
+from sqlalchemy.orm import close_all_sessions, joinedload, scoped_session
 from werkzeug.test import TestResponse
 
 from app.api_app import APIApp
@@ -36,23 +40,19 @@ from app.models import (
     StepLog,
     Study,
     StudyCategory,
+    StudyChangeLog,
     StudyInvestigator,
     StudyUser,
     User,
     UserFavorite,
     UserMeta,
     ZipCode,
-    StudyChangeLog,
 )
 from app.resources.CategoryEndpoint import get_category_by_id
 from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.ResourceEndpoint import get_resource_by_id
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
-from fixtures.fixture_utils import fake, fake_password
-from fixtures.location import MockLocationWithLatLong
-from fixtures.resource import MockResource
-from fixtures.study import MockStudy
 
 os.environ.setdefault("ENV_NAME", "testing")
 os.putenv("ENV_NAME", "testing")
@@ -150,7 +150,6 @@ class BaseTest(TestCase):
         clear_db()
 
     def logged_in_headers(self, user_id: int = None, password: str = None) -> dict[str, str]:
-
         # If no user is provided, generate a dummy Admin user
         if user_id is not None and user_id in self.auths:
             return self.auths[user_id]
@@ -470,7 +469,6 @@ class BaseTest(TestCase):
         registered_users=None,
         post_event_description=None,
     ):
-
         if registered_users is None:
             registered_users = [
                 self.construct_user(email="e1@sartography.com"),

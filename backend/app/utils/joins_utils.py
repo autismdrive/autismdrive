@@ -1,9 +1,9 @@
 from sqlalchemy import Select
-from sqlalchemy.orm import joinedload, QueryableAttribute
+from sqlalchemy.orm import QueryableAttribute, joinedload
 from sqlalchemy.orm.interfaces import LoaderOption
 from sqlalchemy.sql.base import ExecutableOption
 
-from app.models import Resource, ResourceCategory, Category, Location, Event, Study, StudyCategory, StudyInvestigator
+from app.models import Category, Event, Location, Resource, ResourceCategory, Study, StudyCategory, StudyInvestigator
 
 NestedQueryableAttribute = QueryableAttribute | list["NestedQueryableAttribute"]
 

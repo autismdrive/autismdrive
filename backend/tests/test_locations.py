@@ -1,10 +1,11 @@
 from unittest.mock import patch
 
-from app.models import ResourceCategory, Location, ResourceChangeLog
-from app.enums import Role
 from fixtures.location import MockLocation
-from tests.base_test import BaseTest
 from utils import MockGoogleMapsClient
+
+from app.enums import Role
+from app.models import Location, ResourceCategory, ResourceChangeLog
+from tests.base_test import BaseTest
 
 
 class TestLocations(BaseTest):

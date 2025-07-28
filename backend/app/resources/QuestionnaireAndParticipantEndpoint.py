@@ -1,12 +1,11 @@
 import flask_restful
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.auth import auth
-from app.database import session, get_class
+from app.database import get_class, session
 from app.enums import Permission
 from app.export_service import ExportService
 from app.wrappers import requires_permission
-
 
 # The Questionnaire by Participant Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:

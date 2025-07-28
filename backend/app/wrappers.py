@@ -1,6 +1,5 @@
 from functools import wraps
 
-
 from app.rest_exception import RestException
 
 

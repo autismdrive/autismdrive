@@ -1,7 +1,8 @@
-import flask_restful
 import math
+
+import flask_restful
 from flask import request
-from sqlalchemy import select, desc
+from sqlalchemy import desc, select
 
 from app.auth import auth
 from app.database import session
@@ -15,7 +16,6 @@ class DataTransferLogEndpoint(flask_restful.Resource):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self):
-
         logs_schema = SchemaRegistry.DataTransferLogPageSchema()
 
         args = request.args

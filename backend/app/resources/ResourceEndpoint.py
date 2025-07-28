@@ -3,7 +3,7 @@ import datetime
 import flask_restful
 from flask import request
 from marshmallow import ValidationError
-from sqlalchemy import select, Select
+from sqlalchemy import Select, select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.interfaces import LoaderOption
 from sqlalchemy.sql.base import ExecutableOption
@@ -13,7 +13,7 @@ from app.database import session
 from app.elastic_index import elastic_index
 from app.enums import Permission
 from app.log_service import LogService
-from app.models import AdminNote, Resource, Location, Event, UserFavorite, ResourceCategory
+from app.models import AdminNote, Event, Location, Resource, ResourceCategory, UserFavorite
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
@@ -56,7 +56,6 @@ def get_resource_by_id(resource_id: int, with_joins=False) -> Resource:
 
 
 class ResourceEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.ResourceSchema()
 
     def get(self, resource_id: int):
@@ -105,7 +104,6 @@ class ResourceEndpoint(flask_restful.Resource):
 
 
 class ResourceListEndpoint(flask_restful.Resource):
-
     resources_schema = SchemaRegistry.ResourceSchema(many=True)
     resource_schema = SchemaRegistry.ResourceSchema()
 
@@ -135,7 +133,6 @@ class ResourceListEndpoint(flask_restful.Resource):
 
 
 class EducationResourceListEndpoint(flask_restful.Resource):
-
     resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
 
     def get(self):
@@ -155,7 +152,6 @@ class EducationResourceListEndpoint(flask_restful.Resource):
 
 
 class Covid19ResourceListEndpoint(flask_restful.Resource):
-
     resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
 
     def get(self, category):

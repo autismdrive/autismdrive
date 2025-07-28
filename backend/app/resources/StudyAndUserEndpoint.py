@@ -1,6 +1,6 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer, select
+from sqlalchemy import Integer, cast, select
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
@@ -13,7 +13,6 @@ from app.wrappers import requires_roles
 
 
 class StudyInquiryByUserEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.UserStudiesSchema()
 
     @auth.login_required
@@ -30,7 +29,6 @@ class StudyInquiryByUserEndpoint(flask_restful.Resource):
 
 
 class StudyEnrolledByUserEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.UserStudiesSchema()
 
     @auth.login_required
@@ -47,7 +45,6 @@ class StudyEnrolledByUserEndpoint(flask_restful.Resource):
 
 
 class UserByStudyEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.StudyUsersSchema()
 
     @auth.login_required

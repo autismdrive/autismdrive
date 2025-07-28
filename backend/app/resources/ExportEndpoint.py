@@ -45,7 +45,6 @@ class ExportEndpoint(flask_restful.Resource):
 
 
 class ExportListEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.ExportInfoSchema(many=True)
 
     @auth.login_required

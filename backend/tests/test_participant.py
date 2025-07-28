@@ -1,7 +1,7 @@
 from flask import json
 
-from app.models import Participant, UserMeta
 from app.enums import Relationship
+from app.models import Participant, UserMeta
 from app.schemas import SchemaRegistry
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 

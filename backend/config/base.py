@@ -1,6 +1,6 @@
-from typing import Optional, Literal
+from typing import Literal, Optional
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 
@@ -13,9 +13,11 @@ class ElasticsearchSettings(BaseModel):
     use_ssl: bool = False
     verify_certs: bool = False
 
+
 class GoogleMapsMapIds(BaseModel):
     resource_details_page: str = ""
     search_page: str = ""
+
 
 class Settings(BaseSettings):
     NAME: str = "STAR DRIVE Database"

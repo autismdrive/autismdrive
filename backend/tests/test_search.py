@@ -1,9 +1,13 @@
 import copy
 from datetime import datetime, timedelta
+from math import floor
 
 import dateutil.parser
-from math import floor
+from fixtures.fixture_utils import fake
+from fixtures.resource import MockResource
+from fixtures.study import MockStudy
 from sqlalchemy import asc, select
+from utils import ordinal
 
 from app.elastic_index import elastic_index
 from app.enums import Role, Status
@@ -11,11 +15,7 @@ from app.models import Category, Resource
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
 from app.resources.StudyEndpoint import get_study_by_id
-from fixtures.fixture_utils import fake
-from fixtures.resource import MockResource
-from fixtures.study import MockStudy
 from tests.base_test import BaseTest
-from utils import ordinal
 
 
 def fake_params(kw):
@@ -103,7 +103,6 @@ class TestSearch(BaseTest):
         self.assertEqual(1, studies["count"])
 
     def test_search_has_counts_by_age_range(self):
-
         basic_query = {"words": ""}
         search_results = self.search(basic_query)
         self.assertEqual(0, len(search_results["hits"]))
@@ -395,7 +394,9 @@ class TestSearch(BaseTest):
             _top = i <= 1
             parent_index = None if _top else floor((i - 1) / 2)
             categories.append(
-                self.construct_category(name=name, parent_id=None if _top else categories[parent_index].id, display_order=i)
+                self.construct_category(
+                    name=name, parent_id=None if _top else categories[parent_index].id, display_order=i
+                )
             )
 
         for i in range(num_resources):
@@ -441,7 +442,7 @@ class TestSearch(BaseTest):
 
         for i, cat in enumerate(search_results["category"]["children"]):
             self.assertEqual(
-                categories[i].name, cat["name"], f"The {ordinal(i+1)} category should be {categories[i].name}"
+                categories[i].name, cat["name"], f"The {ordinal(i + 1)} category should be {categories[i].name}"
             )
             self.assertEqual(2, cat["hit_count"], f"There should be 2 resources in {categories[i].name}")
 

@@ -2,6 +2,7 @@ import datetime
 import os
 import time
 
+from fixtures.fixture_utils import fake, fake_password
 from flask import json
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -10,10 +11,9 @@ from app.email_service import EmailService
 from app.enums import Relationship, Role
 from app.export_service import ExportService
 from app.import_service import ImportService
-from app.models import DataTransferLog, Participant, User, IdentificationQuestionnaire
+from app.models import DataTransferLog, IdentificationQuestionnaire, Participant, User
 from app.resources.UserEndpoint import get_user_by_id
-from app.schemas import SchemaRegistry, ParticipantSchema
-from fixtures.fixture_utils import fake, fake_password
+from app.schemas import ParticipantSchema, SchemaRegistry
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 os.environ["ENV_NAME"] = "testing"
@@ -210,7 +210,6 @@ class TestExportService(BaseTestQuestionnaire):
         self.assertTrue(db_user_after.email_verified, msg="Email should now be verified.")
 
     def test_identifying_questionnaire_does_not_export(self):
-
         # Construct the base user.
         u = self.construct_user()
         u_id = u.id
@@ -354,8 +353,7 @@ class TestExportService(BaseTestQuestionnaire):
         self.assertIsNotNone(export_logs[0].last_updated)
         self.assertTrue(
             export_logs[0].total_records > 0,
-            msg="The act of setting up this test harness should mean "
-            "at least one user record is avialable for export",
+            msg="The act of setting up this test harness should mean at least one user record is avialable for export",
         )
         self.assertEqual(1, len(export_logs[0].details))
         detail = export_logs[0].details[0]
@@ -364,7 +362,6 @@ class TestExportService(BaseTestQuestionnaire):
         self.assertEqual(1, detail.success_count)
 
     def test_exporter_sends_no_email_alert_if_less_than_30_minutes_pass_without_export(self):
-
         message_count = len(EmailService.TEST_MESSAGES)
 
         log = DataTransferLog(

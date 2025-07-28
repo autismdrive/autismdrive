@@ -3,15 +3,15 @@
 import datetime
 from functools import wraps
 
-from flask import g, request, Blueprint, jsonify, has_request_context
-from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from flask import Blueprint, g, has_request_context, jsonify, request
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
 from app.email_service import email_service
-from app.resources.UserEndpoint import get_user_by_id, get_user_by_email
+from app.resources.UserEndpoint import get_user_by_email, get_user_by_id
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from config.load import settings
@@ -100,8 +100,7 @@ def login_password():
 
 @auth_blueprint.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
-    from app.models import User
-    from app.models import EmailLog
+    from app.models import EmailLog, User
 
     request_data = request.get_json()
     email = request_data["email"]

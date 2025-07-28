@@ -1,30 +1,30 @@
 from app.resources.AdminNoteEndpoint import (
-    AdminNoteListByUserEndpoint,
-    AdminNoteListByResourceEndpoint,
-    AdminNoteListEndpoint,
     AdminNoteEndpoint,
+    AdminNoteListByResourceEndpoint,
+    AdminNoteListByUserEndpoint,
+    AdminNoteListEndpoint,
 )
 from app.resources.CategoryEndpoint import (
     CategoryEndpoint,
     CategoryListEndpoint,
-    RootCategoryListEndpoint,
     CategoryNamesListEndpoint,
+    RootCategoryListEndpoint,
 )
 from app.resources.ChainStepEndpoint import ChainStepEndpoint, ChainStepListEndpoint
 from app.resources.ConfigEndpoint import ConfigEndpoint
 from app.resources.DataTransferLogEndpoint import DataTransferLogEndpoint
 from app.resources.EmailLogEndpoint import EmailLogEndpoint, EmailLogListEndpoint
 from app.resources.EventAndCategoryEndpoint import (
-    EventCategoryEndpoint,
     CategoryByEventEndpoint,
     EventByCategoryEndpoint,
+    EventCategoryEndpoint,
     EventCategoryListEndpoint,
 )
 from app.resources.EventAndUserEndpoint import (
     EventByUserEndpoint,
     EventUserEndpoint,
-    UserByEventEndpoint,
     EventUserListEndpoint,
+    UserByEventEndpoint,
 )
 from app.resources.EventEndpoint import EventEndpoint, EventListEndpoint
 from app.resources.ExportEndpoint import ExportEndpoint, ExportListEndpoint
@@ -36,75 +36,73 @@ from app.resources.FlowEndpoint import (
 )
 from app.resources.InvestigatorEndpoint import InvestigatorEndpoint, InvestigatorListEndpoint
 from app.resources.LocationAndCategoryEndpoint import (
-    LocationCategoryEndpoint,
     CategoryByLocationEndpoint,
     LocationByCategoryEndpoint,
+    LocationCategoryEndpoint,
     LocationCategoryListEndpoint,
 )
 from app.resources.LocationEndpoint import LocationEndpoint, LocationListEndpoint
-from app.resources.ParticipantEndpoint import ParticipantEndpoint, ParticipantListEndpoint, ParticipantAdminListEndpoint
+from app.resources.ParticipantEndpoint import ParticipantAdminListEndpoint, ParticipantEndpoint, ParticipantListEndpoint
 from app.resources.PasswordRequirementsEndpoint import PasswordRequirementsEndpoint
 from app.resources.QuestionnaireAndParticipantEndpoint import QuestionnaireByParticipantEndpoint
 from app.resources.QuestionnaireEndpoint import (
+    QuestionnaireDataExportEndpoint,
     QuestionnaireEndpoint,
+    QuestionnaireInfoEndpoint,
     QuestionnaireListEndpoint,
     QuestionnaireListMetaEndpoint,
-    QuestionnaireDataExportEndpoint,
     QuestionnaireUserDataExportEndpoint,
-    QuestionnaireInfoEndpoint,
 )
 from app.resources.RelatedResultsEndpoint import RelatedResultsEndpoint
 from app.resources.ResourceAndCategoryEndpoint import (
-    ResourceCategoryEndpoint,
     CategoryByResourceEndpoint,
     ResourceByCategoryEndpoint,
+    ResourceCategoryEndpoint,
     ResourceCategoryListEndpoint,
 )
-from app.resources.ResourceChangeLogEndpoint import ResourceChangeLogByUserEndpoint, ResourceChangeLogByResourceEndpoint
+from app.resources.ResourceChangeLogEndpoint import ResourceChangeLogByResourceEndpoint, ResourceChangeLogByUserEndpoint
 from app.resources.ResourceEndpoint import (
+    Covid19ResourceListEndpoint,
+    EducationResourceListEndpoint,
     ResourceEndpoint,
     ResourceListEndpoint,
-    EducationResourceListEndpoint,
-    Covid19ResourceListEndpoint,
 )
 from app.resources.SearchEndpoint import SearchEndpoint
 from app.resources.SearchResourcesEndpoint import SearchResourcesEndpoint
 from app.resources.SearchStudiesEndpoint import SearchStudiesEndpoint
 from app.resources.SessionEndpoint import SessionEndpoint
-from app.resources.StepLogEndpoint import StepLogEndpoint
-from app.resources.StepLogEndpoint import StepLogListEndpoint
+from app.resources.StepLogEndpoint import StepLogEndpoint, StepLogListEndpoint
 from app.resources.StudyAndCategoryEndpoint import (
-    StudyCategoryEndpoint,
     CategoryByStudyEndpoint,
     StudyByCategoryEndpoint,
+    StudyCategoryEndpoint,
     StudyCategoryListEndpoint,
 )
 from app.resources.StudyAndInvestigatorEndpoint import (
+    InvestigatorByStudyEndpoint,
     StudyByInvestigatorEndpoint,
     StudyInvestigatorEndpoint,
-    InvestigatorByStudyEndpoint,
     StudyInvestigatorListEndpoint,
 )
 from app.resources.StudyAndUserEndpoint import (
-    StudyInquiryByUserEndpoint,
     StudyEnrolledByUserEndpoint,
+    StudyInquiryByUserEndpoint,
     StudyUserEndpoint,
-    UserByStudyEndpoint,
     StudyUserListEndpoint,
+    UserByStudyEndpoint,
 )
-from app.resources.StudyEndpoint import StudyEndpoint, StudyListEndpoint, StudyByStatusListEndpoint, StudyByAgeEndpoint
+from app.resources.StudyEndpoint import StudyByAgeEndpoint, StudyByStatusListEndpoint, StudyEndpoint, StudyListEndpoint
 from app.resources.StudyInquiryEndpoint import StudyInquiryEndpoint
 from app.resources.UserAndParticipantEndpoint import ParticipantBySessionEndpoint
 from app.resources.UserEndpoint import UserEndpoint, UserListEndpoint, UserRegistrationEndpoint
 from app.resources.UserFavoriteEndpoint import (
+    FavoritesByUserAndTypeEndpoint,
+    FavoritesByUserEndpoint,
     UserFavoriteEndpoint,
     UserFavoriteListEndpoint,
-    FavoritesByUserEndpoint,
-    FavoritesByUserAndTypeEndpoint,
 )
 from app.resources.UserMetaEndpoint import UserMetaEndpoint
 from app.resources.ZipCodeCoordsEndpoint import ZipCodeCoordsEndpoint
-
 
 endpoints = [
     # Categories

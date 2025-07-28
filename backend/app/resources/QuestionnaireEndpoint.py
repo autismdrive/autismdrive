@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from app.auth import auth
-from app.database import session, get_class
+from app.database import get_class, session
 from app.enums import Permission
 from app.export_service import ExportService
 from app.export_xls_service import ExportXlsService
@@ -15,7 +15,6 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.utils import pascal_case_it
 from app.wrappers import requires_permission
-
 
 # The Questionnaire Endpoint expects a "type" that is the exact Class name of a file
 # located in the Questionnaire Package. It should have the following properties:

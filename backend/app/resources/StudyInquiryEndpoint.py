@@ -1,13 +1,12 @@
 import flask_restful
 from flask import request
-from sqlalchemy import cast, Integer
+from sqlalchemy import Integer, cast
 
 from app.auth import auth
 from app.database import session
 from app.email_service import email_service
-from app.models import EmailLog, Study, StudyUser, User
 from app.enums import StudyUserStatus
-from app.models import StudyUser
+from app.models import EmailLog, Study, StudyUser, User
 from app.rest_exception import RestException
 
 

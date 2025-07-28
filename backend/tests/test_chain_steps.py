@@ -1,5 +1,4 @@
-from app.models import ChainStep
-from app.models import ChainSessionStep
+from app.models import ChainSessionStep, ChainStep
 from tests.base_test import BaseTest
 
 

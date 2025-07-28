@@ -1,4 +1,4 @@
-from config.base import Settings, ElasticsearchSettings
+from config.base import ElasticsearchSettings, Settings
 
 settings = Settings(
     CORS_ENABLED=False,

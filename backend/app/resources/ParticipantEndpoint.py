@@ -1,8 +1,8 @@
 import datetime
 
 import flask_restful
-from flask import request, g
-from sqlalchemy import func, select, Select
+from flask import g, request
+from sqlalchemy import Select, func, select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.interfaces import LoaderOption
 from sqlalchemy.sql.base import ExecutableOption
@@ -13,7 +13,7 @@ from app.enums import Permission, Role
 from app.models import Participant, User
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_roles, requires_permission
+from app.wrappers import requires_permission, requires_roles
 
 
 def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
@@ -40,7 +40,6 @@ def get_participant_by_id(participant_id: int, with_joins=False) -> Participant 
 
 
 class ParticipantEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.ParticipantSchema()
 
     @auth.login_required
@@ -94,7 +93,6 @@ class ParticipantEndpoint(flask_restful.Resource):
 
 
 class ParticipantListEndpoint(flask_restful.Resource):
-
     schema = SchemaRegistry.ParticipantSchema(many=True)
 
     @auth.login_required

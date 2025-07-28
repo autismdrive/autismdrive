@@ -2,13 +2,12 @@ import flask_restful
 from flask import jsonify, request
 
 from app.auth import password_requirements
-from app.models import User
 from app.enums import Role
+from app.models import User
 from app.rest_exception import RestException
 
 
 class PasswordRequirementsEndpoint(flask_restful.Resource):
-
     # Returns password requirements for the given role
     def get(self, role):
         if Role.has_name(role):

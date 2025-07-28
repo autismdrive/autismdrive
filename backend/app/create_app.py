@@ -1,12 +1,12 @@
 import json
 import logging.config
 import re
-from inspect import getargvalues, currentframe, getouterframes
+from inspect import currentframe, getargvalues, getouterframes
 
 import click
 import flask_restful
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import jsonify, Blueprint
+from flask import Blueprint, jsonify
 from flask_cors import CORS
 from flask_restful.reqparse import RequestParser
 
@@ -22,8 +22,8 @@ from config.logging import logging_config
 
 
 def create_app(settings=None):
-    from config.load import settings as loaded_settings
     from config.base import Settings
+    from config.load import settings as loaded_settings
 
     _settings: Settings = loaded_settings if settings is None else settings
 
@@ -41,8 +41,10 @@ def create_app(settings=None):
     # Enable CORS
     if _settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
-        origins_re = re.compile(r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS]))
-        logging.getLogger('flask_cors').level = logging.DEBUG
+        origins_re = re.compile(
+            r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS])
+        )
+        logging.getLogger("flask_cors").level = logging.DEBUG
 
         CORS(_app, origins=origins_re)
 
@@ -97,6 +99,7 @@ def create_app(settings=None):
                     error_dict["details"] = details.__dict__
         except Exception as _:
             import traceback_with_variables
+
             error_dict = {"details": traceback_with_variables.format_exc(error)}
 
         error_location = None
@@ -247,9 +250,9 @@ def create_app(settings=None):
 
     @_app.cli.command("schedule-tasks")
     def schedule_tasks():
-        from app.models import User, Study, EmailLog
         from app.export_service import ExportService
         from app.import_service import ImportService
+        from app.models import EmailLog, Study, User
 
         scheduler = BackgroundScheduler(daemon=True)
         scheduler.start()
@@ -314,7 +317,6 @@ def create_app(settings=None):
         from app.database import session
 
         session.remove()
-
 
     # Schedule Tasks
     _app.schedule_tasks = schedule_tasks

@@ -1,8 +1,10 @@
 import datetime
 import random
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 import requests
+from fixtures.fixture_utils import fake, fake_password, fake_user_id
+from mocks.mock_response import MockRequestsResponse
 from sqlalchemy import select
 
 from app.enums import Role
@@ -11,8 +13,6 @@ from app.import_service import ImportService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo, User
 from app.schemas import SchemaRegistry
 from config.load import settings
-from fixtures.fixture_utils import fake, fake_password, fake_user_id
-from mocks.mock_response import MockRequestsResponse
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 fake_token = fake.md5()

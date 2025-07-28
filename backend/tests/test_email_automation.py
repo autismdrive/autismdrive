@@ -1,15 +1,15 @@
 import datetime
 import uuid
 
+from fixtures.fixture_utils import fake
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.email_prompt_service import EmailPromptService
 from app.email_service import EmailService
-from app.models import EmailLog, Study, User
 from app.enums import Relationship
+from app.models import EmailLog, Study, User
 from app.resources.UserEndpoint import get_user_by_id
-from fixtures.fixture_utils import fake
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 

@@ -1,13 +1,13 @@
 from collections import Counter
 
+from fixtures.fixture_utils import fake
+from fixtures.resource import MockResource
 from sqlalchemy import select
 
 from app.elastic_index import elastic_index
 from app.enums import Role
 from app.models import Resource, ResourceCategory, ResourceChangeLog
 from app.resources.ResourceEndpoint import get_resource_by_id
-from fixtures.fixture_utils import fake
-from fixtures.resource import MockResource
 from tests.base_test import BaseTest
 
 
