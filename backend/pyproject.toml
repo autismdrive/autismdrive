@@ -62,6 +62,7 @@ dependencies = [
     "psycopg-c==3.2.3",
     "psycopg-binary==3.2.3",
     "uwsgi==2.0.28",
+    "notebook>=7.4.4",
 ]
 
 [project.urls]
@@ -85,19 +86,8 @@ dev = [
     "traceback-with-variables==2.1.1",
 ]
 
-[tool.isort]
-profile = "black"
-
-[tool.black]
-include = '\.pyi?$'
+[tool.ruff]
 line-length = 120
-target-version = ['py312']
-
-[tool.flake8]
-max-line-length = 120
-
-[tool.coverage.run]
-concurrency = ["gevent"]
 
 [tool.setuptools.packages.find]
 where = ["app"]
