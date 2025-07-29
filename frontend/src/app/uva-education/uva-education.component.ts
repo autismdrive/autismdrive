@@ -1,7 +1,8 @@
 import {CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {Meta} from '@angular/platform-browser';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {NewsItemComponent} from '@app/news-item/news-item.component';
 import {HitType} from '@models/hit_type';
 import {NewsItem} from '@models/news-item';
@@ -17,11 +18,11 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
   templateUrl: './uva-education.component.html',
   styleUrls: ['./uva-education.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FlexModule, MatProgressSpinnerModule, CommonModule, NewsItemComponent],
+  imports: [FlexModule, MatProgressSpinnerModule, CommonModule, NewsItemComponent, LoadingComponent],
 })
 export class UvaEducationComponent {
   edResources: Resource[];
-  newsItems: NewsItem[];
+  newsItems: WritableSignal<NewsItem[]> = signal(undefined);
   currentUser: User;
   loading = true;
 
@@ -51,7 +52,7 @@ export class UvaEducationComponent {
   loadResources() {
     this.api.getEducationResources().subscribe(resources => {
       this.edResources = resources;
-      this.newsItems = this._resourcesToNewsItems(this.edResources) || [];
+      this.newsItems.set(this._resourcesToNewsItems(this.edResources) || []);
       this.loading = false;
     });
   }

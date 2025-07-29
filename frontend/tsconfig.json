@@ -30,7 +30,7 @@
     "strict": false,
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
-    "target": "ES2016",
+    "target": "ES2022",
     "typeRoots": ["node_modules/@types"]
   },
   "angularCompilerOptions": {

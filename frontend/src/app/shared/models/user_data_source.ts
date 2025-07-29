@@ -1,41 +1,40 @@
 import {CollectionViewer} from '@angular/cdk/collections';
 import {DataSource} from '@angular/cdk/table';
+import {signal, WritableSignal} from '@angular/core';
 import {ApiService} from '@app/shared/services/api/api.service';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {lastValueFrom, Observable, of} from 'rxjs';
 import {User} from './user';
 
 export class UserDataSource implements DataSource<User> {
-  private userSubject = new BehaviorSubject<User[]>([]);
-  private countSubject = new BehaviorSubject<number>(0);
-  public count$ = this.countSubject.asObservable();
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-  public loading$ = this.loadingSubject.asObservable();
+  private users: WritableSignal<User[]> = signal(undefined);
+  private count: WritableSignal<number> = signal(undefined);
+  private loading: WritableSignal<boolean> = signal(undefined);
 
   constructor(private api: ApiService) {}
 
   connect(collectionViewer: CollectionViewer): Observable<User[]> {
-    return this.userSubject.asObservable();
+    return of(this.users());
   }
 
   disconnect(collectionViewer: CollectionViewer): void {
-    this.userSubject.complete();
-    this.loadingSubject.complete();
-    this.countSubject.complete();
+    // Destroy the signals when disconnecting
+    this.users.set(undefined);
+    this.count.set(undefined);
+    this.loading.set(undefined);
   }
 
-  loadUsers(filter = '', sort = 'email', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
-    this.loadingSubject.next(true);
-    this.api.findUsers(filter, sort, sortOrder, pageNumber, pageSize).subscribe(
-      results => {
-        this.userSubject.next(results.items);
-        this.countSubject.next(results.total);
-        this.loadingSubject.next(false);
-      },
-      error1 => {
-        this.userSubject.next(null);
-        this.countSubject.next(0);
-        this.loadingSubject.next(false);
-      },
-    );
+  async loadUsers(filter = '', sort = 'email', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
+    this.loading.set(true);
+
+    try {
+      const results = await lastValueFrom(this.api.findUsers(filter, sort, sortOrder, pageNumber, pageSize));
+      this.users.set(results.items);
+      this.count.set(results.total);
+    } catch (error) {
+      this.users.set(undefined);
+      this.count.set(0);
+    }
+
+    this.loading.set(false);
   }
 }

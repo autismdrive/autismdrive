@@ -7,6 +7,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatTableModule} from '@angular/material/table';
 import {Router} from '@angular/router';
+import {LoadingComponent} from '@app/loading/loading.component';
 import {UserDataSource} from '@models/user_data_source';
 import {ApiService} from '@services/api/api.service';
 import {fromEvent, merge} from 'rxjs';
@@ -28,6 +29,7 @@ import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
     PercentPipe,
     MatInputModule,
     CommonModule,
+    LoadingComponent,
   ],
 })
 export class UserAdminComponent implements OnInit, AfterViewInit {
@@ -71,9 +73,9 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
       .pipe(
         debounceTime(150),
         distinctUntilChanged(),
-        tap(() => {
+        tap(async () => {
           this.paginator.pageIndex = 0;
-          this.loadUsers();
+          await this.loadUsers();
         }),
       )
       .subscribe();
@@ -86,8 +88,8 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
       .subscribe();
   }
 
-  loadUsers() {
-    this.dataSource.loadUsers(
+  async loadUsers() {
+    await this.dataSource.loadUsers(
       this.input.nativeElement.value,
       this.sort.active,
       this.sort.direction,

@@ -13,7 +13,7 @@
     "format-check": "npx prettier . --config .prettierrc.json --log-level warn",
     "format": "npx prettier . --write --config .prettierrc.json --log-level warn",
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --hmr",
     "start_production": "ng serve --configuration=production",
     "start_staging": "ng serve --configuration=staging",
     "start_dev": "ng serve --configuration=development",
@@ -128,5 +128,6 @@
       "jsdom": "25.0.1",
       "rrweb-cssom": "0.8.0"
     }
-  }
+  },
+  "browserslist": ["> 0.1% and not dead and since 2024 and not Android < 138 and not ChromeAndroid < 138 and not FirefoxAndroid < 140 and not Opera < 80 and not OperaMobile < 80 and not Chrome < 94 and not Edge < 94 and not Firefox < 92 and not iOS_saf < 16.4 and not Safari < 16.4 and not Samsung < 17"]
 }
