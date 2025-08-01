@@ -167,7 +167,6 @@ export const appConfig = {
       withRouterConfig({urlUpdateStrategy: 'eager'}),
       withInMemoryScrolling({scrollPositionRestoration: 'enabled'}),
     ),
-    provideAnimations(),
     importProvidersFrom(
       BrowserAnimationsModule,
       BrowserModule,

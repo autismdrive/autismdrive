@@ -48,7 +48,6 @@ import {debounce, map, Observable, startWith, timer} from 'rxjs';
   ],
 })
 export class SearchBoxComponent implements OnInit, AfterViewInit {
-  @Input() variant: 'dark-bg' | 'light-bg' = 'light-bg';
   @Input() words: string;
   @Output() categorySelected = new EventEmitter<Category>();
   @Output() searchUpdated = new EventEmitter<Params>();

@@ -1,8 +1,8 @@
-<div [@toggleBackground]="onHomeScreen() && headerViewportState" id="header-bg" *ngIf="onHomeScreen()"></div>
+<div [@toggleBackground]="onHomeScreen() && headerViewportState()" id="header-bg" *ngIf="onHomeScreen()"></div>
 <mat-toolbar [ngClass]="{mirroring: mirroring}" ngStyle.lt-md="min-height: unset;" id="site-header">
   <mat-toolbar-row
     *ngIf="onHomeScreen()"
-    [@toggleUvaHeader]="headerExpandedState"
+    [@toggleUvaHeader]="headerExpandedState()"
     fxHide.lt-md
     fxShow
     fxLayout="row"
@@ -22,6 +22,7 @@
     <div *ngIf="mirroring" class="mirror-message">THIS IS A MIRRORED SERVER</div>
   </mat-toolbar-row>
   <mat-toolbar-row
+    [@toggleMenuBar]= "onHomeScreen() && menuState()"
     fxLayout="row"
     fxLayoutAlign="start center"
     id="menu-bar"
@@ -30,7 +31,7 @@
   >
     <app-logo variant="light"></app-logo>
     <span fxFlex></span>
-    <div *ngIf="!mobileQuery.matches" id="primary-nav">
+    <div *ngIf="!isMobile()" id="primary-nav">
       <ul>
         <li>
           <a [routerLink]="['/about']" id="about-button" mat-button routerLinkActive="selected">
@@ -94,7 +95,7 @@
       </ul>
     </div>
 
-    <button (click)="toggleMenu()" [color]="menuVisible ? '' : 'accent'" fxHide fxShow.lt-md mat-button>
+    <button (click)="toggleMenu()" [color]="menuVisible() ? '' : 'accent'" fxHide fxShow.lt-md mat-button>
       <mat-icon>menu</mat-icon>
     </button>
   </mat-toolbar-row>
@@ -102,7 +103,7 @@
     *ngIf="onHomeScreen()"
     fxHide.lt-md
     fxShow
-    [@toggleTaglineToolbar]="taglineToolbarState"
+    [@toggleTaglineToolbar]="taglineToolbarState()"
     id="tagline"
   >
     <p fxHide.lt-md fxShow>
@@ -117,7 +118,7 @@
     *ngIf="onResourceScreen()"
     fxHide.lt-md
     fxShow
-    [@toggleResourceBar]="onResourceScreen() && resourceToolbarState"
+    [@toggleResourceBar]="onResourceScreen() && resourceToolbarState()"
     id="search-tag"
   >
     <p style="margin-right: 10px; margin-left: 10px; margin-top: 20px" fxHide.lt-md fxShow>
@@ -129,7 +130,7 @@
   </mat-toolbar-row>
 </mat-toolbar>
 <div
-  [@toggleMobileMenu]="menuState"
+  [@toggleMobileMenu]="menuState()"
   [ngClass]="{mirroring: mirroring}"
   class="mat-typography"
   fxHide

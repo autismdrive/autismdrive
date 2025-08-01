@@ -1,11 +1,11 @@
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import {MediaMatcher} from '@angular/cdk/layout';
-import {CommonModule} from '@angular/common';
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {CommonModule, Location} from '@angular/common';
+import {AfterViewInit, ChangeDetectionStrategy, Component, effect, Input, signal, WritableSignal} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatToolbarModule} from '@angular/material/toolbar';
-import {Router, RouterModule} from '@angular/router';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {LogoComponent} from '@app/logo/logo.component';
 import {Direction, HeaderState, MenuState, ViewportWidth} from '@models/scroll';
 import {User} from '@models/user';
@@ -358,57 +358,32 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
     ]),
   ],
 })
-export class HeaderComponent implements AfterViewInit, OnDestroy {
-  private headerExpanded = true;
+export class HeaderComponent implements AfterViewInit {
   @Input() currentUser: User;
-  menuVisible = false;
-  mobileQuery: MediaQueryList;
-  mdMediaQuery: MediaQueryList;
-  lgMediaQuery: MediaQueryList;
-
-  private readonly _mobileQueryListener: () => void;
-  private readonly _mdMediaQueryListener: () => void;
-  private readonly _lgMediaQueryListener: () => void;
+  headerExpanded: WritableSignal<boolean> = signal(true);
+  headerExpandedState: WritableSignal<HeaderState> = signal(undefined);
+  headerViewportState: WritableSignal<string> = signal(undefined);
+  isLg: WritableSignal<boolean> = signal(undefined);
+  isMd: WritableSignal<boolean> = signal(undefined);
+  isMobile: WritableSignal<boolean> = signal(undefined);
+  menuState: WritableSignal<string> = signal(undefined);
+  menuVisible: WritableSignal<boolean> = signal(false);
+  menuVisibleState: WritableSignal<MenuState> = signal(undefined);
+  taglineToolbarState: WritableSignal<string> = signal(undefined);
+  resourceToolbarState: WritableSignal<string> = signal(undefined);
 
   get viewportWidth(): string {
-    if (this.mobileQuery.matches) {
+    if (this.isMobile()) {
       return ViewportWidth.Small;
     }
-    if (this.mdMediaQuery.matches) {
+    if (this.isMd()) {
       return ViewportWidth.Medium;
     }
-    if (this.lgMediaQuery.matches) {
+    if (this.isLg()) {
       return ViewportWidth.Large;
     }
 
     return ViewportWidth.Medium;
-  }
-
-  get headerViewportState(): string {
-    const headerState = this.headerExpanded ? HeaderState.Expanded : HeaderState.Collapsed;
-    return `${headerState}-${this.viewportWidth}`;
-  }
-
-  get menuState(): string {
-    const menuState = this.menuVisible ? MenuState.Visible : MenuState.Hidden;
-    const headerState = this.headerExpanded ? HeaderState.Expanded : HeaderState.Collapsed;
-    return `${menuState}-${headerState}-${this.viewportWidth}`;
-  }
-
-  get headerExpandedState(): string {
-    return this.headerExpanded ? HeaderState.Expanded : HeaderState.Collapsed;
-  }
-
-  get taglineToolbarState(): string {
-    const menuState = this.menuVisible ? MenuState.Visible : MenuState.Hidden;
-    const headerState = this.headerExpanded ? HeaderState.Expanded : HeaderState.Collapsed;
-    return `${menuState}-${headerState}-${this.viewportWidth}`;
-  }
-
-  get resourceToolbarState(): string {
-    const menuState = MenuState.Hidden;
-    const headerState = this.headerExpanded ? HeaderState.Expanded : HeaderState.Collapsed;
-    return `${menuState}-${headerState}-${this.viewportWidth}`;
   }
 
   get mirroring(): boolean {
@@ -416,24 +391,33 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
   }
 
   constructor(
-    changeDetectorRef: ChangeDetectorRef,
     private router: Router,
+    private route: ActivatedRoute,
     private appEnvironmentService: AppEnvironmentService,
-    media: MediaMatcher,
+    private breakpointObserver: BreakpointObserver,
     private windowService: WindowService,
+    private location: Location,
   ) {
-    this.mobileQuery = media.matchMedia('(max-width: 959px)');
-    this.mdMediaQuery = media.matchMedia('(min-width: 960px) and (max-width: 1279px)');
-    this.lgMediaQuery = media.matchMedia('(min-width: 1280px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this._mdMediaQueryListener = () => changeDetectorRef.detectChanges();
-    this._lgMediaQueryListener = () => changeDetectorRef.detectChanges();
+    breakpointObserver.observe('(max-width: 959px)').subscribe(s => this.isMobile.set(s.matches));
+    breakpointObserver.observe('(min-width: 960px) and (max-width: 1279px)').subscribe(s => this.isMd.set(s.matches));
+    breakpointObserver.observe('(min-width: 1280px)').subscribe(s => this.isLg.set(s.matches));
 
-    this.mobileQuery.addListener(this._mobileQueryListener);
+    effect(() => {
+      this.headerExpandedState.set(this.headerExpanded() ? HeaderState.Expanded : HeaderState.Collapsed);
+    });
 
-    this.mdMediaQuery.addListener(this._mdMediaQueryListener);
+    effect(() => {
+      this.menuVisibleState.set(this.menuVisible() ? MenuState.Visible : MenuState.Hidden);
+    });
 
-    this.lgMediaQuery.addListener(this._lgMediaQueryListener);
+    effect(() => {
+      this.headerViewportState.set(`${this.headerExpandedState()}-${this.viewportWidth}`);
+
+      const combinedState = `${this.menuVisibleState()}-${this.headerExpandedState()}-${this.viewportWidth}`;
+      this.menuState.set(combinedState);
+      this.taglineToolbarState.set(combinedState);
+      this.resourceToolbarState.set(`${MenuState.Hidden}-${this.headerExpandedState()}-${this.viewportWidth}`);
+    });
   }
 
   // https://gist.github.com/zetsnotdead/08cc5632f3427d41254068d322807c51
@@ -441,36 +425,28 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     this.watchScrollEvents();
   }
 
-  ngOnDestroy(): void {
-    this.mobileQuery.removeListener(this._mobileQueryListener);
-
-    this.mdMediaQuery.removeListener(this._mdMediaQueryListener);
-
-    this.lgMediaQuery.removeListener(this._lgMediaQueryListener);
-  }
-
   goLogin() {
-    const onLoginScreen = /^\/login/.test(this.router.url);
-    const onLogoutScreen = /^\/logout/.test(this.router.url);
-    const onHomeScreen = /^\/home/.test(this.router.url);
-    const onTimedOutScreen = /^\/timedout/.test(this.router.url);
+    const onLoginScreen = /^\/login/.test(this.route.snapshot.toString());
+    const onLogoutScreen = /^\/logout/.test(this.location.path());
+    const onHomeScreen = /^\/home/.test(this.location.path());
+    const onTimedOutScreen = /^\/timedout/.test(this.location.path());
     if (onHomeScreen || onLoginScreen || onLogoutScreen || onTimedOutScreen) {
       this.router.navigate(['/login']);
     } else {
-      this.router.navigate(['/login'], {queryParams: {returnUrl: this.router.url}});
+      this.router.navigate(['/login'], {queryParams: {returnUrl: this.location.path()}});
     }
   }
 
   toggleMenu() {
-    this.menuVisible = !this.menuVisible;
+    this.menuVisible.set(!this.menuVisible());
   }
 
   onHomeScreen() {
-    return /^\/home/.test(this.router.url);
+    return /^\/home/.test(this.location.path());
   }
 
   onResourceScreen() {
-    return /^\/search/.test(this.router.url);
+    return /^\/search/.test(this.location.path());
   }
 
   watchScrollEvents() {
@@ -483,12 +459,12 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     );
 
     scroll$.pipe(filter(direction => direction === Direction.Up)).subscribe(() => {
-      this.headerExpanded = true;
+      this.headerExpanded.set(true);
     });
 
     scroll$.pipe(filter(direction => direction === Direction.Down)).subscribe(() => {
-      this.menuVisible = false;
-      this.headerExpanded = false;
+      this.menuVisible.set(false);
+      this.headerExpanded.set(false);
     });
   }
 }

@@ -186,10 +186,10 @@ export class SearchUseCases {
 
   openZipCodeDialog() {
     this.page.waitForVisible('#set-location');
-    this.page.waitForVisible('.zipCodeSetButton');
-    this.page.waitForVisible('.zipCodeField');
-    this.page.clickElement('.zipCodeSetButton');
-    this.page.waitForVisible('.zipCodeField');
+    this.page.waitForVisible('.zip-code-set-button');
+    this.page.waitForVisible('.zip-code-field');
+    this.page.clickElement('.zip-code-set-button');
+    this.page.waitForVisible('.zip-code-field');
   }
 
   enterZipCode(zipCode = '24401') {

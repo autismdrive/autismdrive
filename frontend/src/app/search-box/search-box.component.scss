@@ -1,6 +1,33 @@
+@use '@angular/material' as mat;
 @use '../../styles/config' as config;
 
 .search-bar {
+  .mat-hint {
+    color: white !important;
+    font-style: italic;
+  }
+
+  h1,
+  h5,
+  .mat-select-value-text,
+  .mat-form-field-label,
+  .mat-menu-trigger,
+  .mat-tab-label,
+  .show-all,
+  .done-button,
+  app-search-filters-breadcrumbs h4,
+  app-search-filters-breadcrumbs .mat-button {
+    color: white !important;
+  }
+
+  .mat-menu-trigger {
+    background-color: rgb(0 0 0 / 20%);
+  }
+
+  background-color: #6f7ea0;
+
+
+
   display: inline-flex;
   width: 100%;
   margin-top: 3.5em;
@@ -21,9 +48,7 @@
   .mat-hint {
     font-size: 1em;
   }
-}
 
-:root .search-bar {
   mat-form-field {
     .mat-icon {
       margin-top: 6px;
@@ -45,49 +70,29 @@
     }
   }
 
-  &.dark-bg {
-    .mat-form-field-appearance-outline .mat-form-field-outline {
-      color: white;
-    }
-
-    .mat-hint,
-    input,
-    .mat-form-field-label {
-      color: white;
-    }
-
-    mat-form-field {
-      ::placeholder {
-        color: rgb(255 255 255 / 70%);
-      }
-    }
+  .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: white;
   }
 
-  &.light-bg {
-    .mat-form-field-appearance-outline .mat-form-field-outline {
-      color: black;
-    }
+  .mat-hint,
+  input,
+  .mat-form-field-label {
+    color: white;
+  }
 
-    .mat-hint,
-    input,
-    .mat-form-field-label {
-      color: black;
-    }
-
-    mat-form-field {
-      ::placeholder {
-        color: config.$brand-gray-tint-1;
-      }
+  mat-form-field {
+    ::placeholder {
+      color: rgb(255 255 255 / 70%);
     }
   }
 }
 
-:root #search-field .mat-form-field-outline {
+#search-field .mat-form-field-outline {
   background-color: white;
   border-radius: 5px;
 }
 
-:root .mat-option-text {
+.mat-option-text {
   font-size: 16px;
   overflow: visible !important;
   text-overflow: unset !important;
@@ -105,4 +110,11 @@
 .btn-search {
   margin-top: 4px;
   margin-bottom: -4px;
+}
+
+.show-video {
+  @include mat.fab-overrides((
+    container-color: config.$brand-accent,
+    foreground-color: white,
+  ));
 }

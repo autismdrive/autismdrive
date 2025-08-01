@@ -1,23 +1,7 @@
-<div id="hero" #searchHeader [class]="searchBgClass" fxLayout="column">
-  <app-tutorial-video
-    *ngIf="videoPlacement === 'above' && !shouldHideVideo"
-    [videoSize]="videoSize"
-    [videoId]="videoId"
-    [instructions]="videoInstructions"
-    [links]="videoLinks"
-    fxFlexAlign="center"
-  ></app-tutorial-video>
+<div id="hero" #searchHeader fxLayout="column">
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="center center">
-    <app-tutorial-video
-      *ngIf="videoPlacement === 'left' && !shouldHideVideo"
-      [videoSize]="videoSize"
-      [videoId]="videoId"
-      [instructions]="videoInstructions"
-      [links]="videoLinks"
-    ></app-tutorial-video>
     <div fxLayout="column">
       <app-search-box
-        [variant]="'light-bg'"
         (searchUpdated)="updateQueryParams($event)"
         (categorySelected)="selectCategory($event)"
         [words]="query()?.words"
@@ -40,7 +24,10 @@
         Filter Search Results
       </button>
       <div fxLayout="column" fxLayoutAlign="center center" id="filters-container">
-        <div id="filters" fxFlex.gt-sm="60%" [ngClass.lt-md]="filtersPanelStyles">
+        <div id="filters" fxFlex.gt-sm="60%" [ngClass.lt-md]="{
+          'full-screen': showFilters,
+          minimized: !showFilters,
+        }">
           <div fxHide fxShow.lt-md>
             <div fxLayoutAlign="end end">
               <button class="done-button" mat-button (click)="toggleShowFilters()">Done</button>
@@ -138,14 +125,6 @@
       [links]="videoLinks"
     ></app-tutorial-video>
   </div>
-  <app-tutorial-video
-    *ngIf="videoPlacement === 'below' && !shouldHideVideo"
-    [videoSize]="videoSize"
-    [videoId]="videoId"
-    [instructions]="videoInstructions"
-    [links]="videoLinks"
-    fxFlexAlign="center"
-  ></app-tutorial-video>
   <div class="type-tabs-container" fxShow fxHide.lt-md fxLayout="row" fxLayoutGap="2em" fxLayoutAlign="start end">
     <mat-tab-group
       mat-align-tabs="start"
@@ -304,9 +283,9 @@
     <mat-expansion-panel
       *ngIf="shouldShowMap()"
       id="set-location"
-      [ngClass]="'zipCodeSetButton mat-elevation-z1'"
+      [ngClass]="'zip-code-set-button mat-elevation-z1'"
       (afterExpand)="focusOnInput(zipCodeInput)"
-      [expanded]="showLocationWindow()"
+      [expanded]="showLocationWindow() && panelOpenState()"
       (opened)="panelOpenState.set(true)"
       (closed)="panelOpenState.set(false)"
     >
@@ -316,8 +295,8 @@
         <ng-container *ngIf="locationMode === locationModes.gps">Your current location</ng-container>
         <ng-container *ngIf="locationMode === locationModes.map">Using Map's Center</ng-container>
       </mat-expansion-panel-header>
-      <div [ngClass]="'zipCodeSet'" fxLayout="column">
-        <mat-form-field class="zipCodeField">
+      <div ngClass="zip-code-set" fxLayout="column">
+        <mat-form-field class="zip-code-field">
           <input
             matInput
             placeholder="Enter ZIP Code"
@@ -426,7 +405,6 @@
   fxLayoutGap="3em"
   fxLayoutAlign="auto center"
   #searchFooter
-  [ngStyle]="{'.lt-md.marginTop': '120vh'}"
 >
   <div fxLayout="column" fxLayoutAlign="start">
     <h1>Resource partners</h1>

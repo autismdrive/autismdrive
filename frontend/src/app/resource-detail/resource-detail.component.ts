@@ -94,6 +94,7 @@ export class ResourceDetailComponent {
           mapId: this.googleMapsMapIds.resourceDetailsPage,
           center: {lat: this.resource?.latitude, lng: this.resource?.longitude},
           zoom: 10,
+          disableDefaultUI: true,
         });
       }
     });

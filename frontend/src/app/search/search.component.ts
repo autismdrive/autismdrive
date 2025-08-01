@@ -228,7 +228,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
   showFilters: boolean;
   expandResults: boolean;
   restrictToMappedResults: boolean;
-  searchBgClass = 'mountain';
   videoPlacement = 'right';
   videoSize = 'medium';
   videoId = 'oURTNCsiq3Y';
@@ -412,16 +411,6 @@ export class SearchComponent implements AfterViewInit, OnInit {
     const maxMiles = 100;
     const metersPerMi = 1609.34;
     return (maxMiles * metersPerMi) / (this.mapZoomLevel || 1);
-  }
-
-  get filtersPanelStyles() {
-    const styles = {
-      'full-screen': this.showFilters,
-      minimized: !this.showFilters,
-    };
-
-    styles[this.searchBgClass] = true;
-    return styles;
   }
 
   get hits(): Hit[] {
