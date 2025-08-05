@@ -1,5 +1,5 @@
 import {isPlatformBrowser} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, Inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, Inject, OnInit, PLATFORM_ID, WritableSignal} from '@angular/core';
 import {Meta} from '@angular/platform-browser';
 import {ActivatedRoute, ActivationEnd, ActivationStart, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {FooterComponent} from '@app/footer/footer.component';
@@ -73,7 +73,7 @@ export class AppComponent implements OnInit {
     };
   }
 
-  get currentUser(): User {
-    return this.authenticationService.currentUser();
+  get currentUser(): WritableSignal<User> {
+    return this.authenticationService.currentUser;
   }
 }

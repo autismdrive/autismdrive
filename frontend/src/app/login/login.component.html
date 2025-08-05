@@ -1,7 +1,6 @@
-<app-loading *ngIf="loading" message="Loading..."></app-loading>
+<app-loading *ngIf="loading()" message="Loading..."></app-loading>
 <div
-  [hidden]="loading ? 'hidden' : ''"
-  class="container mat-typography"
+  class="container mat-typography {{loading() ? 'cdk-visually-hidden' : ''}}"
   fxLayout.gt-md="row wrap"
   fxLayout.lt-lg="column"
   fxLayoutGap="10px"
@@ -13,7 +12,7 @@
     <form [formGroup]="form" (ngSubmit)="submit(model)">
       <formly-form [form]="form" [fields]="fields" [model]="model" />
       <div fxLayout="column" fxLayoutGap="2%" fxLayoutAlign="center">
-        <div id="error_message" class="display mat-error">{{ errorEmitter | async }}</div>
+        <mat-error id="error_message">{{ errorEmitter | async }}</mat-error>
         <button mat-flat-button type="submit" color="primary" id="submit">Submit</button>
         <a mat-flat-button [routerLink]="['/home']" color="accent" id="cancel">Cancel</a>
       </div>

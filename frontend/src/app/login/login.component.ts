@@ -1,7 +1,8 @@
 import {AsyncPipe, CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, effect, EventEmitter} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, EventEmitter, signal, WritableSignal} from '@angular/core';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
+import {MatError} from '@angular/material/form-field';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {LoadingComponent} from '@app/loading/loading.component';
 import {LogoComponent} from '@app/logo/logo.component';
@@ -14,6 +15,7 @@ import {AuthenticationService} from '@services/authentication/authentication-ser
 import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 import {WindowService} from '@services/window/window.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
+import {lastValueFrom} from 'rxjs';
 
 @Component({
   standalone: true,
@@ -29,13 +31,14 @@ import {DeviceDetectorService} from 'ngx-device-detector';
     LoadingComponent,
     LogoComponent,
     MatButtonModule,
+    MatError,
     ReactiveFormsModule,
     RouterModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
-  loading = false;
+  loading: WritableSignal<boolean> = signal(false);
   emailToken: string;
   errorEmitter = new EventEmitter<string>();
   form = new FormGroup({});
@@ -93,35 +96,32 @@ export class LoginComponent {
     });
   }
 
-  submit(model) {
-    this.loading = true;
+  async submit(model) {
+    this.loading.set(true);
 
     if (this.form.valid) {
-      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(
-        u => {
-          this._goToReturnUrl(u);
-          this.googleAnalytics.accountEvent('login');
-        },
-        error => {
-          if (error) {
-            this.errorEmitter.emit(error);
-          } else {
-            this.errorEmitter.emit('An unexpected error occurred. Please contact support');
-          }
-          this.loading = false;
-        },
-      );
+      try {
+        await lastValueFrom(this.authenticationService.login(model['email'], model['password'], this.emailToken));
+        this.googleAnalytics?.accountEvent('login');
+      } catch (error) {
+        if (error) {
+          this.errorEmitter.emit(error);
+        } else {
+          this.errorEmitter.emit('An unexpected error occurred. Please contact support');
+        }
+        this.loading.set(false);
+      }
     } else {
-      this.loading = false;
+      this.loading.set(false);
       this.errorEmitter.emit('Please enter a valid email address and password.');
     }
   }
 
   private _goToReturnUrl(user: User) {
     if (user) {
-      this.router
-        .navigateByUrl(this.returnUrl || '/profile')
-        .then(_ => scrollToTop(this.deviceDetectorService, this.windowService));
+      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => {
+        scrollToTop(this.deviceDetectorService, this.windowService);
+      });
     }
   }
 }

@@ -174,12 +174,15 @@ export class ProfileComponent implements OnInit {
     private api: ApiService,
     private route: ActivatedRoute,
   ) {
+    this.user = this.authenticationService.currentUser();
+
     this.route.queryParams.subscribe(params => {
       if (params.hasOwnProperty('meta')) {
         this.profileState.set(ProfileState.NEEDS_META);
       }
     });
 
+    // Update user and participant data when the user logs in or out.
     effect(async () => {
       this.user = this.authenticationService.currentUser();
 

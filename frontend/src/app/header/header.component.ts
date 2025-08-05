@@ -426,7 +426,7 @@ export class HeaderComponent implements AfterViewInit {
   }
 
   goLogin() {
-    const onLoginScreen = /^\/login/.test(this.route.snapshot.toString());
+    const onLoginScreen = /^\/login/.test(this.location.path());
     const onLogoutScreen = /^\/logout/.test(this.location.path());
     const onHomeScreen = /^\/home/.test(this.location.path());
     const onTimedOutScreen = /^\/timedout/.test(this.location.path());

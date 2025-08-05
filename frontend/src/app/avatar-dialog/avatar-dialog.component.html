@@ -1,12 +1,12 @@
-<div class="mat-typography" *ngIf="data.participant">
+<div class="mat-typography" *ngIf="participant()">
   <div mat-dialog-content>
-    <h1 mat-dialog-title>{{ getPrompt() }}</h1>
+    <h1 mat-dialog-title>{{ prompt }}</h1>
 
     <div fxLayout="column" fxLayoutAlign="center center">
-      <div class="avatar" [ngStyle]="{'background-color': selectedColor || data.participant.avatar_color}">
+      <div class="avatar" [ngStyle]="{'background-color': selectedColor || participant().avatar_color}">
         <img
-          [src]="`/public/avatars/${selectedIcon || data.participant.avatar_icon}.svg`"
-          alt="{{ data.participant.name }}"
+          [src]="`/public/avatars/${selectedIcon() || participant().avatar_icon}.svg`"
+          alt="{{ participant().name }}"
           width="192"
           height="192"
         />
@@ -20,10 +20,10 @@
       </button>
       <div class="avatar-images">
         <button
-          *ngFor="let avatarImage of avatarImages; let i = index"
+          *ngFor="let avatarImage of avatarImages(); let i = index"
           class="avatar-image"
-          (click)="setImage(avatarImage)"
-          [ngClass]="{'avatar-image-active': isSelectedImage(avatarImage)}"
+          (click)="selectedIcon.set(avatarImage)"
+          [ngClass]="{'avatar-image-active': avatarImage === this.selectedIcon()}"
         >
           <img alt="#{{ i }}" [ngSrc]="`/public/avatars/${avatarImage}.svg`" [width]="96" [height]="96" />
         </button>
@@ -40,11 +40,11 @@
       </button>
       <div class="color-swatches">
         <button
-          *ngFor="let avatarColor of avatarColors"
-          (click)="setColor(avatarColor)"
+          *ngFor="let avatarColor of avatarColors()"
+          (click)="selectedColor.set(avatarColor)"
           class="color-swatch"
           [ngStyle]="{'background-color': avatarColor}"
-          [ngClass]="{'color-swatch-active': isSelectedColor(avatarColor)}"
+          [ngClass]="{'color-swatch-active': avatarColor === this.selectedColor()}"
         >
           &nbsp;
         </button>

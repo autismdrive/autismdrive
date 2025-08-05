@@ -27,6 +27,11 @@ export class GoogleAnalyticsService {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
           this.ngZone.runOutsideAngular(() => {
+            if (!gtag) {
+              console.warn('Google Analytics gtag function is not available.');
+              return;
+            }
+
             gtag('config', appEnvironmentService.googleAnalyticsTagId, {
               page_path: event.urlAfterRedirects,
             });
@@ -44,6 +49,10 @@ export class GoogleAnalyticsService {
   private event(action: string, category: string, label: string) {
     if (!isPlatformBrowser(this.platformId)) return;
     this.ngZone.runOutsideAngular(() => {
+      if (!gtag) {
+        console.warn('Google Analytics gtag function is not available.');
+        return;
+      }
       gtag('event', action, {
         event_category: category,
         event_label: label,
@@ -116,6 +125,11 @@ export class GoogleAnalyticsService {
   public set_user(user_id) {
     if (!isPlatformBrowser(this.platformId)) return;
     this.ngZone.runOutsideAngular(() => {
+      if (!gtag) {
+        console.warn('Google Analytics gtag function is not available.');
+        return;
+      }
+
       gtag('set', {user_id: user_id}); // Set the user ID using signed-in user_id.
     });
   }

@@ -54,9 +54,7 @@ export class AuthenticationService {
     let message = 'Could not complete your request; please try again later.';
     message = error.message;
 
-    if (this.googleAnalyticsService) {
-      this.googleAnalyticsService.errorEvent(error);
-    }
+    this.googleAnalyticsService?.errorEvent(error);
 
     // return an observable with a user-facing error message
     return throwError(() => message);
@@ -74,7 +72,7 @@ export class AuthenticationService {
     const body = {email, password, email_token};
     return this.http.post<any>(this.urls.login, body).pipe(
       map(userDict => this.loadUser(userDict)),
-      catchError(this._handleError),
+      catchError(this._handleError.bind(this)),
     );
   }
 
