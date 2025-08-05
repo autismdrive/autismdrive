@@ -1,12 +1,11 @@
 # Login
 # *****************************
-import datetime
+import json
+import logging
 from functools import wraps
 
 from flask import Blueprint, g, has_request_context, jsonify, request
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
-from sqlalchemy import func, select, update
-from sqlalchemy.orm import joinedload
 
 from app.auth import auth
 from app.database import session
@@ -14,6 +13,7 @@ from app.email_service import email_service
 from app.resources.UserEndpoint import get_user_by_email, get_user_by_id
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from config.load import settings
 
 auth_blueprint = Blueprint("auth", __name__, url_prefix="/api")
@@ -29,7 +29,7 @@ def confirm_email(email_token):
     try:
         ts = URLSafeTimedSerializer(settings.SECRET_KEY)
         email = ts.loads(email_token, salt="email-confirm-key", max_age=ONE_DAY)
-    except:
+    except Exception as _:
         raise RestException(RestException.EMAIL_TOKEN_INVALID)
 
     user = get_user_by_email(email=email, with_joins=True)
@@ -46,7 +46,7 @@ def confirm_email(email_token):
     user_to_update = get_user_by_id(user_id=user_id, with_joins=True)
 
     user_to_update.token = User.encode_auth_token(user_id=user_id)
-    user_to_update.last_login = datetime.datetime.utcnow()
+    user_to_update.last_login = utcnow()
     session.add(user_to_update)
     session.commit()
     session.close()
@@ -78,7 +78,7 @@ def login_password():
             # redirect users back to the front end, include the new auth token.
             user_to_update = get_user_by_id(user_id=user_id, with_joins=True)
             user_to_update.token = User.encode_auth_token(user_id=user_id)
-            user_to_update.last_login = datetime.datetime.utcnow()
+            user_to_update.last_login = utcnow()
             session.add(user_to_update)
             session.commit()
             session.close()
@@ -100,7 +100,7 @@ def login_password():
 
 @auth_blueprint.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
-    from app.models import EmailLog, User
+    from app.models import EmailLog
 
     request_data = request.get_json()
     email = request_data["email"]
@@ -149,7 +149,7 @@ def reset_password():
     user_to_update.email_verified = True
     user_to_update.password = password
     user_to_update.token = User.encode_auth_token(user_id=user_id)
-    user_to_update.last_login = datetime.datetime.utcnow()
+    user_to_update.last_login = utcnow()
     session.add(user_to_update)
     session.commit()
     session.close()
@@ -165,7 +165,8 @@ def verify_token(token):
     user_id = None
     try:
         user_id = User.decode_auth_token(token)
-    except:
+    except RestException as e:
+        logging.getLogger("Auth").error(f"Error decoding auth token: {json.dumps(e.to_dict())}")
         g.user = None
 
     if user_id is not None:

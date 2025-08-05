@@ -1,16 +1,15 @@
-import datetime
-
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 
 from app.database import session
 from app.models import Investigator, StudyInvestigator
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 
 
-class InvestigatorEndpoint(flask_restful.Resource):
+class InvestigatorEndpoint(MethodView):
     schema = SchemaRegistry.InvestigatorSchema()
 
     def get(self, investigator_id: int):
@@ -23,7 +22,7 @@ class InvestigatorEndpoint(flask_restful.Resource):
         session.query(StudyInvestigator).filter_by(investigator_id=investigator_id).delete()
         session.query(Investigator).filter_by(id=investigator_id).delete()
         session.commit()
-        return None
+        return "", 204
 
     def put(self, investigator_id: int):
         request_data = request.get_json()
@@ -34,13 +33,13 @@ class InvestigatorEndpoint(flask_restful.Resource):
         except Exception as errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
 
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
         return self.schema.dump(updated)
 
 
-class InvestigatorListEndpoint(flask_restful.Resource):
+class InvestigatorListEndpoint(MethodView):
     investigatorsSchema = SchemaRegistry.InvestigatorSchema(many=True)
     investigatorSchema = SchemaRegistry.InvestigatorSchema()
 

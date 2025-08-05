@@ -1,7 +1,7 @@
 import datetime
 
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from marshmallow import EXCLUDE
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -25,7 +25,7 @@ from app.wrappers import requires_permission
 #   * When calling the endpoint, use the snakecase format of the name.
 
 
-class QuestionnaireEndpoint(flask_restful.Resource):
+class QuestionnaireEndpoint(MethodView):
     @auth.login_required
     def get(self, name, questionnaire_id: int):
         """
@@ -77,7 +77,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         finally:
             session.close()
 
-        return "", 200
+        return "", 204
 
     @auth.login_required
     def put(self, name, questionnaire_id: int):
@@ -133,7 +133,7 @@ class QuestionnaireEndpoint(flask_restful.Resource):
         return schema.dump(updated)
 
 
-class QuestionnaireListEndpoint(flask_restful.Resource):
+class QuestionnaireListEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.data_admin)
     def get(self, name):
@@ -144,7 +144,7 @@ class QuestionnaireListEndpoint(flask_restful.Resource):
         return schema.dump(questionnaires)
 
 
-class QuestionnaireListMetaEndpoint(flask_restful.Resource):
+class QuestionnaireListMetaEndpoint(MethodView):
     def get(self, name):
         """
         Retrieves metadata about the given questionnaire name. Includes JSON Formly field definition.
@@ -170,13 +170,13 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
         name = pascal_case_it(name)
         class_ref = get_class(name)
         questionnaire = class_ref()
-        meta = {"table": {}}
-        try:
+        meta = {"table": {}, "fields": []}
+
+        if hasattr(questionnaire, "__question_type__"):
             meta["table"]["question_type"] = questionnaire.__question_type__
-            meta["table"]["label"] = questionnaire.__label__
-        except:
-            pass  # If these fields don't exist, just keep going.
-        meta["fields"] = []
+
+        if hasattr(questionnaire, "__label__"):
+            meta["table"]["question_type"] = questionnaire.__label__
 
         # This will move fields referenced by the field groups into the group, but will otherwise add them
         # the base meta object if they are not contained within a group.
@@ -186,7 +186,14 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
                 c.info["key"] = c.name
                 meta["fields"].append(c.info)
             elif c.type.python_type == datetime.datetime:
-                meta["fields"].append({"name": c.name, "key": c.name, "display_order": 0, "type": "DATETIME"})
+                meta["fields"].append(
+                    {
+                        "name": c.name,
+                        "key": c.name,
+                        "display_order": 0,
+                        "type": "DATETIME",
+                    }
+                )
             else:
                 meta["fields"].append({"name": c.name, "key": c.name, "display_order": 0})
 
@@ -196,7 +203,7 @@ class QuestionnaireListMetaEndpoint(flask_restful.Resource):
         return meta
 
 
-class QuestionnaireInfoEndpoint(flask_restful.Resource):
+class QuestionnaireInfoEndpoint(MethodView):
     def get(self):
         """
         Lists available questionnaires. Used for data export to get meta without specifying flow and relationship.
@@ -217,7 +224,7 @@ class QuestionnaireInfoEndpoint(flask_restful.Resource):
         return SchemaRegistry.ExportInfoSchema(many=True).dump(info_list)
 
 
-class QuestionnaireDataExportEndpoint(flask_restful.Resource):
+class QuestionnaireDataExportEndpoint(MethodView):
     @staticmethod
     def request_wants_json():
         best = request.accept_mimetypes.best_match(["application/json", "text/html"])
@@ -236,7 +243,7 @@ class QuestionnaireDataExportEndpoint(flask_restful.Resource):
             return ExportXlsService.export_xls(name=name, app=current_app)
 
 
-class QuestionnaireUserDataExportEndpoint(flask_restful.Resource):
+class QuestionnaireUserDataExportEndpoint(MethodView):
     @staticmethod
     def request_wants_json():
         best = request.accept_mimetypes.best_match(["application/json", "text/html"])

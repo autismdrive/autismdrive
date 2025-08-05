@@ -27,6 +27,7 @@ from elasticsearch_dsl.query import MatchAll, MoreLikeThis, MultiMatch
 
 from app.database import session
 from app.enums import Permission
+from app.utils import utcnow
 from app.utils.category_utils import calculate_level, search_path
 from app.utils.resource_utils import DatabaseObjectDict, category_names, indexable_content
 from config.base import ElasticsearchSettings
@@ -137,8 +138,8 @@ class ElasticIndex(object):
             _instance.logger.info("Clearing the index.")
             _instance.index.delete(ignore_unavailable=True)
             _instance.index.create()
-        except:
-            _instance.logger.error("Failed to delete the indices. They might not exist.")
+        except Exception as e:
+            _instance.logger.error(f"Failed to delete the indices (Error: {e}). They might not exist.")
 
     @classmethod
     def refresh_and_flush(cls, es_index: Index, flush=True):
@@ -398,7 +399,7 @@ class ElasticIndex(object):
         return elastic_search.execute()
 
     @staticmethod
-    def _start_of_day(date=datetime.utcnow().date()) -> str:
+    def _start_of_day(date=utcnow().date()) -> str:
         return datetime(date.year, date.month, date.day, tzinfo=tz.tzutc()).isoformat()
 
     @staticmethod

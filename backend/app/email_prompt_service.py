@@ -1,12 +1,12 @@
-from datetime import datetime
 from typing import Callable
 
-from sqlalchemy import Integer, cast, select
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.database import session
 from app.email_service import EmailService
 from app.models import User
+from app.utils import utcnow
 from config.load import settings
 
 ONE_DAY = 86400
@@ -75,13 +75,11 @@ class EmailPromptService:
             # Determine when we last sent them an email.
             if len(email_logs) > 0:
                 most_recent = email_logs[-1]
-                days_since_most_recent = (datetime.utcnow() - most_recent.last_updated).total_seconds() / ONE_DAY
+                days_since_most_recent = (utcnow() - most_recent.last_updated).total_seconds() / ONE_DAY
 
             # Prompt user to complete registration/profile 2 days after last login
             if (len(email_logs) == 0) and (log_type != "confirm_email"):
-                if (rec.last_login is not None) and (
-                    (datetime.utcnow() - rec.last_login).total_seconds() > (2 * ONE_DAY)
-                ):
+                if (rec.last_login is not None) and ((utcnow() - rec.last_login).total_seconds() > (2 * ONE_DAY)):
                     self.__send_prompting_email(rec, send_method, log_type, "0days")
 
             # Prompt user 1 week and 2 weeks after last prompting email (if we haven't already sent them 2 emails)

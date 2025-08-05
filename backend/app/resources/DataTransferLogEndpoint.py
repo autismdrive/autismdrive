@@ -1,8 +1,8 @@
 import math
 
-import flask_restful
 from flask import request
-from sqlalchemy import desc, select
+from flask.views import MethodView
+from sqlalchemy import desc
 
 from app.auth import auth
 from app.database import session
@@ -12,7 +12,7 @@ from app.schemas import SchemaRegistry
 from app.wrappers import requires_roles
 
 
-class DataTransferLogEndpoint(flask_restful.Resource):
+class DataTransferLogEndpoint(MethodView):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self):

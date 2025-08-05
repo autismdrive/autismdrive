@@ -2,7 +2,6 @@ import json
 from dataclasses import KW_ONLY, dataclass
 from datetime import date, datetime
 from enum import Enum
-from typing import TypedDict, cast
 
 from marshmallow import Schema
 
@@ -83,8 +82,6 @@ class DatabaseObjectDict:
 
     @classmethod
     def from_dict(cls, d: dict) -> "DatabaseObjectDict":
-        import inspect
-
         field_names = cls.field_names()
 
         kw_dict = {k: v for k, v in d.items() if k in field_names}
@@ -160,10 +157,10 @@ def to_database_object_dict(schema: Schema = None, db_object: DatabaseObject = N
     from app.utils.category_utils import all_search_paths
 
     if schema is None:
-        raise ValueError(f"Invalid schema.")
+        raise ValueError("Invalid schema.")
 
     if db_object is None:
-        raise ValueError(f"Invalid db_object.")
+        raise ValueError("Invalid db_object.")
 
     category_search_paths = [all_search_paths(c.id) for c in db_object.categories]
     has_address = (

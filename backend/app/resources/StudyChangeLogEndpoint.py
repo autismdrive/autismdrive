@@ -1,4 +1,4 @@
-import flask_restful
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.auth import auth
@@ -9,7 +9,7 @@ from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission, requires_roles
 
 
-class StudyChangeLogListEndpoint(flask_restful.Resource):
+class StudyChangeLogListEndpoint(MethodView):
     studyChangeLogSchema = SchemaRegistry.StudyChangeLogSchema(many=True)
 
     @auth.login_required
@@ -19,7 +19,7 @@ class StudyChangeLogListEndpoint(flask_restful.Resource):
         return self.SchemaRegistry.studyChangeLogSchema.dump(study_change_logs)
 
 
-class StudyChangeLogByUserEndpoint(flask_restful.Resource):
+class StudyChangeLogByUserEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
@@ -28,7 +28,7 @@ class StudyChangeLogByUserEndpoint(flask_restful.Resource):
         return schema.dump(logs)
 
 
-class StudyChangeLogByStudyEndpoint(flask_restful.Resource):
+class StudyChangeLogByStudyEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.edit_study)
     def get(self, study_id: int):

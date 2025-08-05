@@ -1,4 +1,4 @@
-import flask_restful
+from flask.views import MethodView
 
 from app.database import session
 from app.models import ZipCode
@@ -6,7 +6,7 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
-class ZipCodeCoordsEndpoint(flask_restful.Resource):
+class ZipCodeCoordsEndpoint(MethodView):
     """Provides latitude and longitude coordinates for the given zip code."""
 
     schema = SchemaRegistry.ZipCodeSchema()

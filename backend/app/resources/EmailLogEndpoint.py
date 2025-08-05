@@ -1,4 +1,4 @@
-import flask_restful
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.auth import auth
@@ -9,7 +9,7 @@ from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission, requires_roles
 
 
-class EmailLogListEndpoint(flask_restful.Resource):
+class EmailLogListEndpoint(MethodView):
     emailLogsSchema = SchemaRegistry.EmailLogSchema(many=True)
 
     @auth.login_required
@@ -19,7 +19,7 @@ class EmailLogListEndpoint(flask_restful.Resource):
         return self.emailLogsSchema.dump(email_logs)
 
 
-class EmailLogEndpoint(flask_restful.Resource):
+class EmailLogEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):

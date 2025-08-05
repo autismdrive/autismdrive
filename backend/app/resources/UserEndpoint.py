@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import g, request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import Select, desc, exists, select
 from sqlalchemy.exc import IntegrityError
@@ -17,12 +15,17 @@ from app.enums import Permission, Role
 from app.models import EmailLog, EventUser, Study, StudyUser, User, UserFavorite
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.wrappers import requires_permission
 from config.load import settings
 
 
-def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
-    from app.resources.ParticipantEndpoint import add_joins_to_statement as add_participant_joins
+def add_joins_to_statement(
+    statement: Select | ExecutableOption,
+) -> Select | LoaderOption:
+    from app.resources.ParticipantEndpoint import (
+        add_joins_to_statement as add_participant_joins,
+    )
 
     return statement.options(
         add_participant_joins(joinedload(User.participants)),
@@ -64,7 +67,7 @@ def get_user_by_id(user_id: int, with_joins=False) -> User | None:
     return session.execute(statement).unique().scalar_one_or_none()
 
 
-class UserEndpoint(flask_restful.Resource):
+class UserEndpoint(MethodView):
     schema = SchemaRegistry.UserSchema()
 
     @auth.login_required
@@ -89,7 +92,7 @@ class UserEndpoint(flask_restful.Resource):
         session.query(UserFavorite).filter_by(user_id=user_id).delete()
         session.query(User).filter_by(id=user_id).delete()
         session.commit()
-        return None
+        return "", 204
 
     @auth.login_required
     def put(self, user_id: int):
@@ -106,7 +109,7 @@ class UserEndpoint(flask_restful.Resource):
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
 
@@ -114,7 +117,7 @@ class UserEndpoint(flask_restful.Resource):
         return self.schema.dump(db_user)
 
 
-class UserListEndpoint(flask_restful.Resource):
+class UserListEndpoint(MethodView):
     users_schema = SchemaRegistry.UserSchema(many=True)
     user_schema = SchemaRegistry.UserSchema()
     search_schema = SchemaRegistry.UserSearchSchema()
@@ -189,7 +192,7 @@ class UserListEndpoint(flask_restful.Resource):
         session.commit()
 
 
-class UserRegistrationEndpoint(flask_restful.Resource):
+class UserRegistrationEndpoint(MethodView):
     def post(self):
         request_data = request.get_json()
         if "_links" in request_data:

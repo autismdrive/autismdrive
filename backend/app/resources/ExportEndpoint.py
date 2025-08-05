@@ -1,7 +1,7 @@
 import datetime
 
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import desc
 
 from app.auth import auth
@@ -10,7 +10,7 @@ from app.enums import Role
 from app.export_service import ExportService
 from app.models import DataTransferLog, DataTransferLogDetail, User
 from app.schemas import SchemaRegistry
-from app.utils import pascal_case_it
+from app.utils import pascal_case_it, utcnow
 from app.wrappers import requires_roles
 
 
@@ -27,7 +27,7 @@ def get_date_arg():
     )
 
 
-class ExportEndpoint(flask_restful.Resource):
+class ExportEndpoint(MethodView):
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self, name):
@@ -44,13 +44,13 @@ class ExportEndpoint(flask_restful.Resource):
         return schema.dump(query.all())
 
 
-class ExportListEndpoint(flask_restful.Resource):
+class ExportListEndpoint(MethodView):
     schema = SchemaRegistry.ExportInfoSchema(many=True)
 
     @auth.login_required
     @requires_roles(Role.admin)
     def get(self):
-        date_started = datetime.datetime.utcnow()
+        date_started = utcnow()
         info_list = ExportService.get_table_info(get_date_arg())
 
         # Remove items that are not exportable, or that are identifying
@@ -64,7 +64,10 @@ class ExportListEndpoint(flask_restful.Resource):
             total_records_for_export += item.size
             if item.size > 0:
                 log_detail = DataTransferLogDetail(
-                    date_started=date_started, class_name=item.class_name, successful=True, success_count=item.size
+                    date_started=date_started,
+                    class_name=item.class_name,
+                    successful=True,
+                    success_count=item.size,
                 )
                 log.details.append(log_detail)
         log.total_records = total_records_for_export
@@ -80,7 +83,7 @@ class ExportListEndpoint(flask_restful.Resource):
             )
             if log is None:
                 log = DataTransferLog(type="exporting", total_records=0)
-            log.last_updated = datetime.datetime.utcnow()
+            log.last_updated = utcnow()
         session.add(log)
         session.commit()
 

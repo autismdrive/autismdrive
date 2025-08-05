@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 
 from app.database import session
 from app.elastic_index import elastic_index
@@ -9,7 +9,7 @@ from app.schemas import EventSchema, SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
 
 
-class EventByCategoryEndpoint(flask_restful.Resource):
+class EventByCategoryEndpoint(MethodView):
     schema = SchemaRegistry.CategoryEventsSchema()
 
     def get(self, category_id: int):
@@ -23,7 +23,7 @@ class EventByCategoryEndpoint(flask_restful.Resource):
         return self.schema.dump(event_categories, many=True)
 
 
-class CategoryByEventEndpoint(flask_restful.Resource):
+class CategoryByEventEndpoint(MethodView):
     schema = SchemaRegistry.EventCategoriesSchema()
 
     def get(self, event_id: int):
@@ -52,7 +52,7 @@ class CategoryByEventEndpoint(flask_restful.Resource):
         return self.get(event_id)
 
 
-class EventCategoryEndpoint(flask_restful.Resource):
+class EventCategoryEndpoint(MethodView):
     schema = SchemaRegistry.EventCategorySchema()
 
     def get(self, resource_category_id: int):
@@ -64,10 +64,10 @@ class EventCategoryEndpoint(flask_restful.Resource):
     def delete(self, resource_category_id: int):
         session.query(ResourceCategory).filter_by(id=resource_category_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class EventCategoryListEndpoint(flask_restful.Resource):
+class EventCategoryListEndpoint(MethodView):
     schema = SchemaRegistry.EventCategorySchema()
 
     def post(self):

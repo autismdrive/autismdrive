@@ -1,13 +1,13 @@
 import copy
+import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Literal, Optional, TypedDict
 
 import googlemaps
 import jwt
 from sqlalchemy import ARRAY, TEXT, Boolean, ForeignKey, Integer, String, cast, func, select
-from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, backref, column_property, declared_attr, mapped_column, relationship
 
@@ -1341,6 +1341,11 @@ class User(Base):
         self_participant = self.self_participant()
         if self_participant is not None:
             return self_participant.get_percent_complete() == 1
+        else:
+            logging.getLogger("User").warning(
+                f"User {self.id} does not have a self-participant. "
+                "This is unexpected and may indicate a data integrity issue."
+            )
 
     @hybrid_property
     def password(self):
@@ -1392,9 +1397,9 @@ class User(Base):
     def encode_auth_token(cls, user_id: int):
         try:
             payload = {
-                "exp": datetime.utcnow() + timedelta(hours=2, minutes=0, seconds=0),
-                "iat": datetime.utcnow(),
-                "sub": user_id,
+                "exp": datetime.now(tz=timezone.utc) + timedelta(hours=2, minutes=0, seconds=0),
+                "iat": datetime.now(tz=timezone.utc),
+                "sub": f"{user_id}",
             }
             return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
         except Exception as e:

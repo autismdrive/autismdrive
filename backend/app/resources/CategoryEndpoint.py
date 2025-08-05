@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Select, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
@@ -9,13 +9,20 @@ from sqlalchemy.sql.base import ExecutableOption
 from app.auth import auth
 from app.database import session
 from app.enums import Permission
-from app.models import Category, Resource, ResourceCategory, Study, StudyCategory, UserFavorite
+from app.models import (
+    Category,
+    ResourceCategory,
+    StudyCategory,
+    UserFavorite,
+)
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission
 
 
-def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+def add_joins_to_statement(
+    statement: Select | ExecutableOption,
+) -> Select | LoaderOption:
     return statement.options(
         joinedload(Category.parent),
         joinedload(Category.children),
@@ -39,7 +46,7 @@ def get_category_by_id(category_id: int, with_joins=False) -> Category | None:
     return session.execute(statement).unique().scalar_one_or_none()
 
 
-class CategoryEndpoint(flask_restful.Resource):
+class CategoryEndpoint(MethodView):
     schema = SchemaRegistry.CategorySchema()
 
     def get(self, category_id: int):
@@ -59,7 +66,7 @@ class CategoryEndpoint(flask_restful.Resource):
             session.commit()
         except IntegrityError as error:
             raise RestException(RestException.CAN_NOT_DELETE, details=error)
-        return
+        return "", 204
 
     @auth.login_required
     @requires_permission(Permission.taxonomy_admin)
@@ -86,7 +93,7 @@ class CategoryEndpoint(flask_restful.Resource):
         return self.schema.dump(db_updated)
 
 
-class CategoryListEndpoint(flask_restful.Resource):
+class CategoryListEndpoint(MethodView):
     category_schema = SchemaRegistry.CategorySchema()
     categories_schema = SchemaRegistry.ParentCategorySchema(many=True)
 
@@ -109,7 +116,7 @@ class CategoryListEndpoint(flask_restful.Resource):
         return self.category_schema.dump(db_cat)
 
 
-class RootCategoryListEndpoint(flask_restful.Resource):
+class RootCategoryListEndpoint(MethodView):
     categories_schema = SchemaRegistry.CategorySchema(many=True)
 
     def get(self):
@@ -125,7 +132,7 @@ class RootCategoryListEndpoint(flask_restful.Resource):
         return self.categories_schema.dump(categories)
 
 
-class CategoryNamesListEndpoint(flask_restful.Resource):
+class CategoryNamesListEndpoint(MethodView):
     def get(self):
         statement = add_joins_to_statement(select(Category))
         categories = (

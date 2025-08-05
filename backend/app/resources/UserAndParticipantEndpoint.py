@@ -1,5 +1,5 @@
-import flask_restful
 from flask import g, request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import Integer, cast, exc, select
 from sqlalchemy.orm import joinedload
@@ -12,7 +12,7 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
-class ParticipantBySessionEndpoint(flask_restful.Resource):
+class ParticipantBySessionEndpoint(MethodView):
     schema = SchemaRegistry.ParticipantSchema()
 
     @auth.login_required
@@ -31,7 +31,8 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
         if "relationship" in request_data:
             if not Relationship.has_name(request_data["relationship"]):
                 raise RestException(
-                    RestException.UNKNOWN_RELATIONSHIP, details="Valid Options:" + ",".join(Relationship.options())
+                    RestException.UNKNOWN_RELATIONSHIP,
+                    details="Valid Options:" + ",".join(Relationship.options()),
                 )
             else:
                 relationship = request_data["relationship"]
@@ -55,7 +56,8 @@ class ParticipantBySessionEndpoint(flask_restful.Resource):
 
             if db_user is None:
                 raise RestException(
-                    RestException.NOT_FOUND, details=f"User with id {request_data['user_id']} not found."
+                    RestException.NOT_FOUND,
+                    details=f"User with id {request_data['user_id']} not found.",
                 )
 
             load_result.user_id = db_user.id

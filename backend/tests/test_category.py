@@ -186,7 +186,7 @@ class TestCategory(BaseTest):
         c1 = self.construct_category()
         c2 = self.construct_category(name="I'm the kid", parent_id=c1.id)
         c3 = self.construct_category(name="I'm the grand kid", parent_id=c2.id)
-        c4 = self.construct_category(name="I'm the great grand kid", parent_id=c3.id)
+        self.construct_category(name="I'm the great grand kid", parent_id=c3.id)
 
         rv = self.client.get("/api/category", follow_redirects=True, content_type="application/json")
 

@@ -1,4 +1,4 @@
-import flask_restful
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.auth import auth
@@ -9,7 +9,7 @@ from app.schemas import SchemaRegistry
 from app.wrappers import requires_permission, requires_roles
 
 
-class StepLogListEndpoint(flask_restful.Resource):
+class StepLogListEndpoint(MethodView):
     stepLogsSchema = SchemaRegistry.StepLogSchema(many=True)
 
     @auth.login_required
@@ -19,7 +19,7 @@ class StepLogListEndpoint(flask_restful.Resource):
         return self.stepLogsSchema.dump(step_logs)
 
 
-class StepLogEndpoint(flask_restful.Resource):
+class StepLogEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, participant_id):

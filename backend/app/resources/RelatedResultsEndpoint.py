@@ -1,6 +1,6 @@
 import elasticsearch
-import flask_restful
 from flask import json, jsonify, request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast, select
 
 from app.database import session
@@ -12,7 +12,7 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
-class RelatedResultsEndpoint(flask_restful.Resource):
+class RelatedResultsEndpoint(MethodView):
     resources_schema = SchemaRegistry.ResourceSchema(many=True)
     studies_schema = SchemaRegistry.StudySchema(many=True)
 

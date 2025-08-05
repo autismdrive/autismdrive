@@ -1,3 +1,4 @@
+import datetime
 import re
 from random import randint
 
@@ -48,3 +49,13 @@ def pascal_case_it(name: str) -> str:
 def snake_case_it(name: str) -> str:
     """Returns the given string as snake_case string"""
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
+
+
+def utcnow() -> datetime.datetime:
+    """
+    Returns the current UTC time as a naive datetime object (without timezone info)
+
+    Replacement for datetime.datetime.utcnow(), which is now deprecated.
+    """
+    utc_datetime = datetime.datetime.now(datetime.timezone.utc)
+    return utc_datetime.replace(tzinfo=None)  # Remove timezone info to make it naive

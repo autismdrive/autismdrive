@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.database import session
@@ -8,7 +8,7 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
-class EventByUserEndpoint(flask_restful.Resource):
+class EventByUserEndpoint(MethodView):
     schema = SchemaRegistry.EventUserSchema()
 
     def get(self, user_id):
@@ -22,7 +22,7 @@ class EventByUserEndpoint(flask_restful.Resource):
         return self.schema.dump(event_users, many=True)
 
 
-class UserByEventEndpoint(flask_restful.Resource):
+class UserByEventEndpoint(MethodView):
     schema = SchemaRegistry.EventUserSchema()
 
     def get(self, event_id: int):
@@ -36,7 +36,7 @@ class UserByEventEndpoint(flask_restful.Resource):
         return self.schema.dump(event_users, many=True)
 
 
-class EventUserEndpoint(flask_restful.Resource):
+class EventUserEndpoint(MethodView):
     schema = SchemaRegistry.EventUserSchema()
 
     def get(self, event_user_id: int):
@@ -48,10 +48,10 @@ class EventUserEndpoint(flask_restful.Resource):
     def delete(self, event_user_id: int):
         session.query(EventUser).filter_by(id=event_user_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class EventUserListEndpoint(flask_restful.Resource):
+class EventUserListEndpoint(MethodView):
     schema = SchemaRegistry.EventUserSchema()
 
     def post(self):

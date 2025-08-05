@@ -6,10 +6,11 @@ import typing
 from flask import url_for
 from sqlalchemy import desc, func, select
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import ColumnElement
 
 from app.database import Base, get_class, get_class_for_table, session
 from app.email_service import email_service
-from app.utils import snake_case_it
+from app.utils import snake_case_it, utcnow
 
 
 class ExportService:
@@ -62,12 +63,12 @@ class ExportService:
 
         if last_updated:
             select_with_joins = select_with_joins.where(
-                typing.cast("ColumnElement[bool]", model_class.last_updated > last_updated)
+                typing.cast(ColumnElement[bool], model_class.last_updated > last_updated)
             )
         if hasattr(model_class, "__mapper_args__") and "polymorphic_identity" in model_class.__mapper_args__:
             select_with_joins = select_with_joins.where(
                 typing.cast(
-                    "ColumnElement[bool]", model_class.type == model_class.__mapper_args__["polymorphic_identity"]
+                    ColumnElement[bool], model_class.type == model_class.__mapper_args__["polymorphic_identity"]
                 )
             )
         select_with_joins = select_with_joins.order_by(model_class.id)
@@ -75,7 +76,7 @@ class ExportService:
             if hasattr(model_class, "user_id"):
                 user_id = int(user_id)
                 select_with_joins = select_with_joins.where(
-                    typing.cast("ColumnElement[bool]", model_class.user_id == user_id)
+                    typing.cast(ColumnElement[bool], model_class.user_id == user_id)
                 )
             else:
                 return []
@@ -129,13 +130,13 @@ class ExportService:
 
     @staticmethod
     def get_meta(questionnaire, relationship):
-        meta = {"table": {}}
-        try:
+        meta = {"table": {}, "fields": []}
+
+        if hasattr(questionnaire, "__question_type__"):
             meta["table"]["question_type"] = questionnaire.__question_type__
+
+        if hasattr(questionnaire, "__label__"):
             meta["table"]["label"] = questionnaire.__label__
-        except:
-            pass  # If these fields don't exist, just keep going.
-        meta["fields"] = []
 
         groups = questionnaire.get_field_groups()
         if groups is None:
@@ -252,7 +253,7 @@ class ExportService:
         else:
             msg = None
             subject = "Autism DRIVE: Error - "
-            time_difference = datetime.datetime.utcnow() - last_log.last_updated
+            time_difference = utcnow() - last_log.last_updated
             hours = int(time_difference.total_seconds() / 3600)
             minutes = int(time_difference.total_seconds() / 60)
             if hours >= 24 and hours % 4 == 0 and last_log.alerts_sent < (hours / 4 + 12):

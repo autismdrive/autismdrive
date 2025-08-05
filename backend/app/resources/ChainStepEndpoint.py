@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 from sqlalchemy.exc import IntegrityError
 
@@ -11,10 +9,11 @@ from app.enums import Permission
 from app.models import ChainSessionStep, ChainStep
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.wrappers import requires_permission
 
 
-class ChainStepEndpoint(flask_restful.Resource):
+class ChainStepEndpoint(MethodView):
     """SkillSTAR Chain Step"""
 
     schema = SchemaRegistry.ChainStepSchema()
@@ -40,7 +39,7 @@ class ChainStepEndpoint(flask_restful.Resource):
                 updated_step = self.schema.load(request_data, instance=instance, session=session)
         except Exception as e:
             raise RestException(RestException.INVALID_OBJECT, details=e)
-        updated_step.last_updated = datetime.datetime.utcnow()
+        updated_step.last_updated = utcnow()
         session.add(updated_step)
         session.commit()
         return self.schema.dump(updated_step)
@@ -64,12 +63,12 @@ class ChainStepEndpoint(flask_restful.Resource):
         try:
             session.query(ChainStep).filter_by(id=cast(chain_step_id, Integer)).delete()
             session.commit()
-        except IntegrityError as error:
+        except IntegrityError:
             raise RestException(RestException.CAN_NOT_DELETE)
-        return
+        return "", 204
 
 
-class ChainStepListEndpoint(flask_restful.Resource):
+class ChainStepListEndpoint(MethodView):
     """SkillSTAR Chain Steps"""
 
     schema = SchemaRegistry.ChainStepSchema(many=True)

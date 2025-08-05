@@ -1,11 +1,11 @@
 from typing import Literal
 
 import elasticsearch
-import flask_restful
 from elasticsearch_dsl.response import AggResponse
 from elasticsearch_dsl.response import Response as ElasticsearchResponse
 from elasticsearch_dsl.utils import HitMeta
 from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import select
 
@@ -18,7 +18,7 @@ from app.utils.category_utils import search_path
 ResultType = Literal["resource", "location", "event", "study"]
 
 
-class SearchEndpoint(flask_restful.Resource):
+class SearchEndpoint(MethodView):
     def __post__(self, result_types: list[ResultType] = None) -> Search:
         request_data = request.get_json()
 
@@ -79,7 +79,12 @@ class SearchEndpoint(flask_restful.Resource):
         for bucket in aggregations.ages.buckets:
             search.add_aggregation("ages", bucket.key, bucket.doc_count, bucket.key in search.ages)
         for bucket in aggregations.languages.buckets:
-            search.add_aggregation("languages", bucket.key, bucket.doc_count, bucket.key in search.languages)
+            search.add_aggregation(
+                "languages",
+                bucket.key,
+                bucket.doc_count,
+                bucket.key in search.languages,
+            )
         for bucket in aggregations.type.buckets:
             search.add_aggregation("types", bucket.key, bucket.doc_count, bucket.key in search.types)
 
@@ -93,7 +98,10 @@ class SearchEndpoint(flask_restful.Resource):
         """
 
         from app.database import session
-        from app.resources.CategoryEndpoint import add_joins_to_statement, get_category_by_id
+        from app.resources.CategoryEndpoint import (
+            add_joins_to_statement,
+            get_category_by_id,
+        )
 
         # Make a fake category to hold all the other categories.
         topic_category = Category(id=99999, name="Topics", children=[], parent=None)

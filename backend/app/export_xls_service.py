@@ -1,8 +1,6 @@
 # Thanks to https://gist.github.com/piersstorey/b32583f0cc5cba0a38a11c2b123af687
 import io
-import os
 import re
-from datetime import datetime
 
 import xlsxwriter
 from flask import Response
@@ -10,7 +8,7 @@ from werkzeug.datastructures import Headers
 
 from app.database import get_class
 from app.export_service import ExportService
-from app.utils import pascal_case_it
+from app.utils import utcnow
 
 
 class ExportXlsService:
@@ -110,7 +108,7 @@ class ExportXlsService:
         response.data = output.read()
 
         # Set filename
-        file_name = "export_{}_{}.xlsx".format(name, datetime.utcnow())
+        file_name = "export_{}_{}.xlsx".format(name, utcnow())
 
         # HTTP headers for forcing file download
         response_headers = Headers(

@@ -1,17 +1,17 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.auth import auth
 from app.database import session
-from app.enums import Permission, Role
+from app.enums import Permission
 from app.models import Investigator, Study, StudyInvestigator
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_permission, requires_roles
+from app.wrappers import requires_permission
 
 
-class StudyByInvestigatorEndpoint(flask_restful.Resource):
+class StudyByInvestigatorEndpoint(MethodView):
     schema = SchemaRegistry.InvestigatorStudiesSchema()
 
     def get(self, investigator_id):
@@ -25,7 +25,7 @@ class StudyByInvestigatorEndpoint(flask_restful.Resource):
         return self.schema.dump(study_investigators, many=True)
 
 
-class InvestigatorByStudyEndpoint(flask_restful.Resource):
+class InvestigatorByStudyEndpoint(MethodView):
     schema = SchemaRegistry.StudyInvestigatorSchema()
 
     def get(self, study_id: int):
@@ -54,7 +54,7 @@ class InvestigatorByStudyEndpoint(flask_restful.Resource):
         return self.get(study_id)
 
 
-class StudyInvestigatorEndpoint(flask_restful.Resource):
+class StudyInvestigatorEndpoint(MethodView):
     schema = SchemaRegistry.StudyInvestigatorSchema()
 
     def get(self, study_investigator_id: int):
@@ -68,10 +68,10 @@ class StudyInvestigatorEndpoint(flask_restful.Resource):
     def delete(self, study_investigator_id: int):
         session.query(StudyInvestigator).filter_by(id=study_investigator_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class StudyInvestigatorListEndpoint(flask_restful.Resource):
+class StudyInvestigatorListEndpoint(MethodView):
     schema = SchemaRegistry.StudyInvestigatorSchema()
 
     @auth.login_required

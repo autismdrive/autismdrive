@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.auth import auth
@@ -9,7 +9,7 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
-class FavoritesByUserEndpoint(flask_restful.Resource):
+class FavoritesByUserEndpoint(MethodView):
     schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required
@@ -18,7 +18,7 @@ class FavoritesByUserEndpoint(flask_restful.Resource):
         return self.schema.dump(user_favorites, many=True)
 
 
-class FavoritesByUserAndTypeEndpoint(flask_restful.Resource):
+class FavoritesByUserAndTypeEndpoint(MethodView):
     schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required
@@ -32,7 +32,7 @@ class FavoritesByUserAndTypeEndpoint(flask_restful.Resource):
         return self.schema.dump(user_favorites, many=True)
 
 
-class UserFavoriteEndpoint(flask_restful.Resource):
+class UserFavoriteEndpoint(MethodView):
     schema = SchemaRegistry.UserFavoriteSchema()
 
     @auth.login_required
@@ -46,10 +46,10 @@ class UserFavoriteEndpoint(flask_restful.Resource):
     def delete(self, user_favorite_id: int):
         session.query(UserFavorite).filter_by(id=user_favorite_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class UserFavoriteListEndpoint(flask_restful.Resource):
+class UserFavoriteListEndpoint(MethodView):
     schema = SchemaRegistry.UserFavoriteSchema(many=True)
 
     @auth.login_required

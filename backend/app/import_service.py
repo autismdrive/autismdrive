@@ -1,7 +1,6 @@
 # Fire off the scheduler
 # The Data Importer should run on the MIRROR, and will make calls to the primary server to download
 # data, store it locally, and remove it from the master when necessary.
-import datetime
 import logging
 
 import requests
@@ -15,6 +14,7 @@ from app.log_service import LogService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from config.load import settings
 
 
@@ -32,7 +32,7 @@ class ImportService:
     import_interval_minutes = settings.IMPORT_INTERVAL_MINUTES
 
     def run_backup(self, load_admin=True, full_backup=False):
-        date_started = datetime.datetime.utcnow()
+        date_started = utcnow()
         exportables = self.get_export_list(full_backup)
         # Note:  We request data THEN create the next log.  We depend on this order to get data since
         # the last log was recorded, but be sure and set the start date from the moment this was called.
@@ -162,7 +162,8 @@ class ImportService:
         for item in export_info.json_data:
             item_copy = dict(item)
             if "_links" in item_copy:
-                links = item_copy.pop("_links")
+                # Remove _links to avoid issues with deserialization.
+                item_copy.pop("_links")
 
             existing_model = session.query(model_class).filter_by(id=item["id"]).first()
             try:
@@ -212,7 +213,7 @@ class ImportService:
         return num_items
 
     def delete_record(self, item):
-        if not "_links" in item or not "self" in item["_links"]:
+        if "_links" not in item or "self" not in item["_links"]:
             raise Exception("No link available to delete " + item.__class__.__name__)
         if not settings.DELETE_RECORDS:
             self.logger.info("DELETE is off in the configuration.  So not deleting.")
@@ -227,7 +228,7 @@ class ImportService:
         try:
             response = requests.get(url)
             return response.json()
-        except requests.exceptions.ConnectionError as err:
+        except requests.exceptions.ConnectionError:
             self.logger.error("Unable to contact the master instance at " + url)
 
     def load_admin(self):

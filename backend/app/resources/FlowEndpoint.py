@@ -1,8 +1,7 @@
 import copy
-import datetime
 
-import flask_restful
 from flask import g, request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -13,10 +12,10 @@ from app.export_service import ExportService
 from app.models import Flows, Participant, StepLog
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
-from app.utils import pascal_case_it
+from app.utils import pascal_case_it, utcnow
 
 
-class FlowEndpoint(flask_restful.Resource):
+class FlowEndpoint(MethodView):
     schema = SchemaRegistry.FlowSchema()
 
     @auth.login_required
@@ -38,14 +37,14 @@ class FlowEndpoint(flask_restful.Resource):
         return self.schema.dump(flow)
 
 
-class FlowListEndpoint(flask_restful.Resource):
+class FlowListEndpoint(MethodView):
     flows_schema = SchemaRegistry.FlowSchema(many=True)
 
     def get(self):
         return self.flows_schema.dump(Flows.get_all_flows())
 
 
-class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
+class FlowQuestionnaireMetaEndpoint(MethodView):
     def get(self, flow_name: str, questionnaire_name: str):
         questionnaire_name = pascal_case_it(questionnaire_name)
         flow = Flows.get_flow_by_name(flow_name)
@@ -58,7 +57,7 @@ class FlowQuestionnaireMetaEndpoint(flask_restful.Resource):
     #        return schema.dump(questionnaire)
 
 
-class FlowQuestionnaireEndpoint(flask_restful.Resource):
+class FlowQuestionnaireEndpoint(MethodView):
     @auth.login_required
     def post(self, flow_name: str, questionnaire_name: str):
         flow = Flows.get_flow_by_name(flow_name)
@@ -82,11 +81,17 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
 
         if hasattr(new_quest, "participant_id"):
             if new_quest.participant_id is None:
-                raise RestException(RestException.INVALID_OBJECT, details="You must supply a participant id.")
+                raise RestException(
+                    RestException.INVALID_OBJECT,
+                    details="You must supply a participant id.",
+                )
             if not g.user.related_to_participant(new_quest.participant_id):
                 raise RestException(RestException.UNRELATED_PARTICIPANT)
         else:
-            raise RestException(RestException.INVALID_OBJECT, details="You must supply a participant id.")
+            raise RestException(
+                RestException.INVALID_OBJECT,
+                details="You must supply a participant id.",
+            )
 
         session.add(new_quest)
         session.commit()
@@ -112,7 +117,7 @@ class FlowQuestionnaireEndpoint(flask_restful.Resource):
             flow=flow.name,
             participant_id=questionnaire.participant_id,
             user_id=g.user.id,
-            date_completed=datetime.datetime.utcnow(),
+            date_completed=utcnow(),
             time_on_task_ms=questionnaire.time_on_task_ms,
         )
         session.add(log)

@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.auth import auth
@@ -10,7 +10,7 @@ from app.models import EmailLog, Study, StudyUser, User
 from app.rest_exception import RestException
 
 
-class StudyInquiryEndpoint(flask_restful.Resource):
+class StudyInquiryEndpoint(MethodView):
     @auth.login_required
     def post(self):
         request_data = request.get_json()

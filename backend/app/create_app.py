@@ -1,14 +1,12 @@
 import json
 import logging.config
-import re
 from inspect import currentframe, getargvalues, getouterframes
 
 import click
-import flask_restful
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Blueprint, jsonify
+from flask.views import MethodView
 from flask_cors import CORS
-from flask_restful.reqparse import RequestParser
 
 from app.api_app import APIApp
 from app.data_loader import data_loader
@@ -41,12 +39,15 @@ def create_app(settings=None):
     # Enable CORS
     if _settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
-        origins_re = re.compile(
-            r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS])
-        )
+        origins_re = r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS])
+
         logging.getLogger("flask_cors").level = logging.DEBUG
 
-        CORS(_app, origins=origins_re)
+        CORS(
+            _app,
+            origins=origins_re,
+            allow_headers=["Authorization", "Content-Type"],
+        )
 
     # Database
     from app.database import session
@@ -84,6 +85,10 @@ def create_app(settings=None):
     @_app.errorhandler(RestException)
     def handle_invalid_usage(error):
         error_dict = {}
+        error_location = None
+        error_context = None
+        frame = None
+        outer_frames = None
 
         try:
             if hasattr(error, "to_dict"):
@@ -102,9 +107,6 @@ def create_app(settings=None):
 
             error_dict = {"details": traceback_with_variables.format_exc(error)}
 
-        error_location = None
-        error_context = None
-
         # if settings.ENV_NAME in ["local", "dev", "testing"]:
         try:
             frame = currentframe()
@@ -115,18 +117,25 @@ def create_app(settings=None):
                     arg_vals = getargvalues(frame_info.frame)
                     error_location = f"{frame_info.filename}:{frame_info.lineno}"
                     error_context = json.loads(
-                        json.dumps(arg_vals.locals, ensure_ascii=True, indent=4, sort_keys=True, default=str)
+                        json.dumps(
+                            arg_vals.locals,
+                            ensure_ascii=True,
+                            indent=4,
+                            sort_keys=True,
+                            default=str,
+                        )
                     )
-        finally:
-            # Prevent memory leak (https://docs.python.org/3/library/inspect.html#:~:text=handle_stackframe_without_leak)
-            del outer_frames
-            del frame
 
-        if error_location and error_context:
-            error_dict = error_dict | {
-                "error_location": error_location or None,
-                "error_context": error_context or None,
-            }
+                    error_dict = error_dict | {
+                        "error_location": error_location or None,
+                        "error_context": error_context or None,
+                    }
+        except Exception as e:
+            _app.logger.error(f"Error while trying to get error context: {e}")
+
+        # Prevent memory leak (https://docs.python.org/3/library/inspect.html#:~:text=handle_stackframe_without_leak)
+        del outer_frames
+        del frame
 
         response = jsonify(json.loads(json.dumps(error_dict, ensure_ascii=True, indent=4, sort_keys=True, default=str)))
         response.status_code = error.status_code
@@ -203,7 +212,8 @@ def create_app(settings=None):
     def resourcereset():
         """Used for Staging updates where we don't want to do a full reset and wipe away all user data.
         Does not clear and rebuild index because that is a separate step of the prod update.
-        Remove all data about resources, studies, and trainings, and recreate it from the example data files"""
+        Remove all data about resources, studies, and trainings, and recreate it from the example data files
+        """
         click.echo("Re-populating resources, studies, and trainings from the example data files")
 
         data_loader.clear_resources()
@@ -258,7 +268,11 @@ def create_app(settings=None):
         scheduler.start()
         if settings.MIRRORING:
             import_service = ImportService()
-            scheduler.add_job(import_service.run_backup, "interval", minutes=import_service.import_interval_minutes)
+            scheduler.add_job(
+                import_service.run_backup,
+                "interval",
+                minutes=import_service.import_interval_minutes,
+            )
             scheduler.add_job(import_service.run_full_backup, "interval", days=1)
         else:
             email_prompt_service = EmailPromptService(EmailLog, Study, User)
@@ -284,30 +298,38 @@ def create_app(settings=None):
             )
 
     api_blueprint = Blueprint("api", __name__, url_prefix="/api")
-    api = flask_restful.Api(api_blueprint)
-    _app.register_blueprint(api_blueprint)
     _app.register_blueprint(auth_blueprint)
     _app.register_blueprint(tracking_blueprint)
-
-    parser = RequestParser()
-    parser.add_argument("resource")
 
     @_app.route("/", methods=["GET"])
     def root():
         output = {}
+
         for rule in _app.url_map.iter_rules():
             options = {}
             for arg in rule.arguments:
                 options[arg] = "<{0}>".format(arg)
 
-            methods = ",".join(rule.methods)
-            output[rule.endpoint] = rule.rule
+            output[rule.endpoint] = f"{rule.rule}"
 
         return jsonify(output)
 
     # Add all endpoints to the API
-    for endpoint in endpoints:
-        api.add_resource(endpoint[0], endpoint[1])
+    for endpoint_class, url_rule in endpoints:
+        name = endpoint_class.__name__
+
+        if not issubclass(endpoint_class, MethodView):
+            raise TypeError(f"Endpoint class {endpoint_class.__name__} must inherit from MethodView")
+
+        if not isinstance(url_rule, str):
+            raise TypeError(f"URL rule for endpoint {endpoint_class.__name__} must be a string")
+
+        api_blueprint.add_url_rule(
+            rule=url_rule,
+            view_func=endpoint_class.as_view(str.lower(name)),
+        )
+
+    _app.register_blueprint(api_blueprint)
 
     @_app.teardown_appcontext
     def shutdown_session(exception=None):
@@ -317,6 +339,8 @@ def create_app(settings=None):
         from app.database import session
 
         session.remove()
+        if exception:
+            _app.logger.error(f"Exception during shutdown: {exception}")
 
     # Schedule Tasks
     _app.schedule_tasks = schedule_tasks

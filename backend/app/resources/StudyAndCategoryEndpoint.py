@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 
 from app.database import session
 from app.models import Category, Study, StudyCategory
@@ -7,7 +7,7 @@ from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 
 
-class StudyByCategoryEndpoint(flask_restful.Resource):
+class StudyByCategoryEndpoint(MethodView):
     schema = SchemaRegistry.CategoryStudiesSchema()
 
     def get(self, category_id: int):
@@ -21,7 +21,7 @@ class StudyByCategoryEndpoint(flask_restful.Resource):
         return self.schema.dump(study_categories, many=True)
 
 
-class CategoryByStudyEndpoint(flask_restful.Resource):
+class CategoryByStudyEndpoint(MethodView):
     schema = SchemaRegistry.StudyCategoriesSchema()
 
     def get(self, study_id: int):
@@ -48,7 +48,7 @@ class CategoryByStudyEndpoint(flask_restful.Resource):
         return self.get(study_id)
 
 
-class StudyCategoryEndpoint(flask_restful.Resource):
+class StudyCategoryEndpoint(MethodView):
     schema = SchemaRegistry.StudyCategorySchema()
 
     def get(self, study_category_id: int):
@@ -60,10 +60,10 @@ class StudyCategoryEndpoint(flask_restful.Resource):
     def delete(self, study_category_id: int):
         session.query(StudyCategory).filter_by(id=study_category_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class StudyCategoryListEndpoint(flask_restful.Resource):
+class StudyCategoryListEndpoint(MethodView):
     schema = SchemaRegistry.StudyCategorySchema()
 
     def post(self):

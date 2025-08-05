@@ -1,11 +1,11 @@
-import flask_restful
 from flask import jsonify
+from flask.views import MethodView
 
 from app.models import FrontendConfig
 from app.schemas import SchemaRegistry
 
 
-class ConfigEndpoint(flask_restful.Resource):
+class ConfigEndpoint(MethodView):
     """Provides a way to get configuration information about the currently running backend."""
 
     schema = SchemaRegistry.FrontendConfigSchema()

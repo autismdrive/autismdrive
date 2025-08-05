@@ -1,11 +1,11 @@
-import flask_restful
 from flask import g, jsonify
+from flask.views import MethodView
 
 from app.auth import auth
 from app.schemas import SchemaRegistry
 
 
-class SessionEndpoint(flask_restful.Resource):
+class SessionEndpoint(MethodView):
     """Provides a way to get the current user, and to delete the user."""
 
     schema = SchemaRegistry.UserSchema()
@@ -24,5 +24,5 @@ class SessionEndpoint(flask_restful.Resource):
     def delete():
         if "user" in g:
             g.user = None
-        else:
-            return None
+
+        return "", 204

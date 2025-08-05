@@ -5,8 +5,8 @@ from tests.base_test import BaseTest
 class TestAdminNote(BaseTest):
     def test_admin_note_basics(self):
         u = self.construct_user()
-        l = self.construct_location()
-        an = self.construct_admin_note(user=u, resource=l, note="This resource is related to an event record")
+        loc = self.construct_location()
+        an = self.construct_admin_note(user=u, resource=loc, note="This resource is related to an event record")
         self.assertIsNotNone(an)
 
         db_an = self.session.query(AdminNote).first()

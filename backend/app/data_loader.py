@@ -1,15 +1,12 @@
 import csv
 import datetime
 import os
-import re
 from typing import Optional
 
-import googlemaps
 from sqlalchemy import func, select
 
 from app.elastic_index import elastic_index
 from app.enums import Status
-from config.load import settings
 
 from .database import engine, get_all_db_objects, session
 from .models import LatLng

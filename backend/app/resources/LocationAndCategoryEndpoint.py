@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.database import session
@@ -10,7 +10,7 @@ from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
 
 
-class LocationByCategoryEndpoint(flask_restful.Resource):
+class LocationByCategoryEndpoint(MethodView):
     schema = SchemaRegistry.CategoryLocationsSchema()
 
     def get(self, category_id):
@@ -18,14 +18,17 @@ class LocationByCategoryEndpoint(flask_restful.Resource):
         location_categories = (
             session.query(ResourceCategory)
             .join(ResourceCategory.resource)
-            .filter(ResourceCategory.category_id == c_id, ResourceCategory.type == "location")
+            .filter(
+                ResourceCategory.category_id == c_id,
+                ResourceCategory.type == "location",
+            )
             .order_by(Location.title)
             .all()
         )
         return self.schema.dump(location_categories, many=True)
 
 
-class CategoryByLocationEndpoint(flask_restful.Resource):
+class CategoryByLocationEndpoint(MethodView):
     schema = SchemaRegistry.LocationCategoriesSchema()
 
     def get(self, location_id):
@@ -54,7 +57,7 @@ class CategoryByLocationEndpoint(flask_restful.Resource):
         return self.get(location_id)
 
 
-class LocationCategoryEndpoint(flask_restful.Resource):
+class LocationCategoryEndpoint(MethodView):
     schema = SchemaRegistry.LocationCategorySchema()
 
     def get(self, location_category_id: int):
@@ -66,10 +69,10 @@ class LocationCategoryEndpoint(flask_restful.Resource):
     def delete(self, location_category_id: int):
         session.query(ResourceCategory).filter_by(id=location_category_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class LocationCategoryListEndpoint(flask_restful.Resource):
+class LocationCategoryListEndpoint(MethodView):
     schema = SchemaRegistry.LocationCategorySchema()
 
     def post(self):

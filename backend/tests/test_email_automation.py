@@ -34,29 +34,34 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         u1 = self.construct_user(email="test1@sartography.com", last_login="12/4/19 10:00")
         p1 = self.construct_participant(user_id=u1.id, relationship=Relationship.self_guardian)
         q1 = {"user_id": u1.id, "participant_id": p1.id}
-        self.client.post(
+        jq1 = self.jsonify(q1)
+        headers = self.logged_in_headers(u1.id)
+        r1 = self.client.post(
             "api/flow/guardian_intake/identification_questionnaire",
-            data=self.jsonify(q1),
+            data=jq1,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1.id),
+            headers=headers,
         )
+        self.assert_success(r1, "create_complete_guardian > r1")
 
-        self.client.post(
+        r2 = self.client.post(
             "api/flow/guardian_intake/contact_questionnaire",
-            data=self.jsonify(q1),
+            data=jq1,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1.id),
+            headers=headers,
         )
+        self.assert_success(r2, "create_complete_guardian > r2")
 
-        self.client.post(
+        r3 = self.client.post(
             "api/flow/guardian_intake/demographics_questionnaire",
-            data=self.jsonify(q1),
+            data=jq1,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(u1.id),
+            headers=headers,
         )
+        self.assert_success(r3, "create_complete_guardian > r3")
 
         db_user = (
             self.session.execute(select(User).options(joinedload(User.participants)).filter_by(id=u1.id))

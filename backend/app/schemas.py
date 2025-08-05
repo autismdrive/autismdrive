@@ -1220,8 +1220,8 @@ class ChainSessionSchema(ModelSchema):
         sorted_sessions = sorted(obj.chain_questionnaire.sessions, key=lambda k: k.date)
 
         # Find this session and return its index, incremented.
-        for i, session in enumerate(sorted_sessions):
-            if obj.id == session.id:
+        for i, _session in enumerate(sorted_sessions):
+            if obj.id == _session.id:
                 return i + 1
 
         # Session not found.
@@ -1288,8 +1288,8 @@ class ChainSessionStepSchema(ModelSchema):
         sorted_sessions = sorted(obj.chain_session.chain_questionnaire.sessions, key=lambda k: k.date)
 
         # Find this session and return its index, incremented.
-        for i, session in enumerate(sorted_sessions):
-            if obj.chain_session.id == session.id:
+        for i, _session in enumerate(sorted_sessions):
+            if obj.chain_session.id == _session.id:
                 return i + 1
 
         # Session not found.

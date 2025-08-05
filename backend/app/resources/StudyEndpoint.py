@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
-from flask import g, request
+from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import Select, select
 from sqlalchemy.orm import joinedload
@@ -11,20 +9,20 @@ from sqlalchemy.sql.base import ExecutableOption
 from app.auth import auth
 from app.database import session
 from app.elastic_index import elastic_index
-from app.enums import Permission, Role
+from app.enums import Permission
 from app.log_service import LogService
 from app.models import (
     Study,
     StudyCategory,
-    StudyChangeLog,
     StudyInvestigator,
     StudyUser,
 )
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.utils.resource_utils import to_database_object_dict
-from app.wrappers import requires_permission, requires_roles
+from app.wrappers import requires_permission
 
 
 def add_joins_to_statement(
@@ -33,9 +31,7 @@ def add_joins_to_statement(
     return statement.options(
         joinedload(Study.study_categories).joinedload(StudyCategory.category),
         add_cat_joins(joinedload(Study.categories)),
-        joinedload(Study.study_investigators).joinedload(
-            StudyInvestigator.investigator
-        ),
+        joinedload(Study.study_investigators).joinedload(StudyInvestigator.investigator),
         joinedload(Study.investigators),
     )
 
@@ -67,7 +63,7 @@ def get_study_by_id(study_id: int, with_joins=False) -> Study:
     return session.execute(statement).unique().scalar_one_or_none()
 
 
-class StudyEndpoint(flask_restful.Resource):
+class StudyEndpoint(MethodView):
     schema = SchemaRegistry.StudySchema()
 
     def get(self, study_id: int):
@@ -95,10 +91,8 @@ class StudyEndpoint(flask_restful.Resource):
         session.query(Study).filter_by(id=study_id).delete()
         session.commit()
 
-        LogService.log_study_change(
-            study_id=study_id, study_title=study_title, change_type="delete"
-        )
-        return None
+        LogService.log_study_change(study_id=study_id, study_title=study_title, change_type="delete")
+        return "", 204
 
     @auth.login_required
     @requires_permission(Permission.edit_study)
@@ -109,31 +103,22 @@ class StudyEndpoint(flask_restful.Resource):
             updated = self.schema.load(request_data, instance=instance)
         except Exception as errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
-        elastic_index.update_document(
-            document=to_database_object_dict(self.schema, updated)
-        )
+        elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
         db_study = get_study_by_id(study_id, with_joins=True)
 
-        LogService.log_study_change(
-            study_id=study_id, study_title=db_study.title, change_type="edit"
-        )
+        LogService.log_study_change(study_id=study_id, study_title=db_study.title, change_type="edit")
         return self.schema.dump(db_study)
 
 
-class StudyListEndpoint(flask_restful.Resource):
+class StudyListEndpoint(MethodView):
     studies_schema = SchemaRegistry.StudySchema(many=True)
     study_schema = SchemaRegistry.StudySchema()
 
     def get(self):
-        studies = (
-            session.execute(add_joins_to_statement(select(Study)))
-            .unique()
-            .scalars()
-            .all()
-        )
+        studies = session.execute(add_joins_to_statement(select(Study))).unique().scalars().all()
         return self.studies_schema.dump(studies)
 
     @auth.login_required
@@ -148,32 +133,24 @@ class StudyListEndpoint(flask_restful.Resource):
             session.close()
 
             db_study = get_study_by_id(study_id, with_joins=True)
-            elastic_index.add_document(
-                document=to_database_object_dict(self.study_schema, db_study)
-            )
-            LogService.log_study_change(
-                study_id=study_id, study_title=db_study.title, change_type="create"
-            )
+            elastic_index.add_document(document=to_database_object_dict(self.study_schema, db_study))
+            LogService.log_study_change(study_id=study_id, study_title=db_study.title, change_type="create")
 
             return self.study_schema.dump(db_study)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
 
 
-class StudyByStatusListEndpoint(flask_restful.Resource):
+class StudyByStatusListEndpoint(MethodView):
     studiesSchema = SchemaRegistry.StudySchema(many=True)
 
     def get(self, status):
-        statement = (
-            add_joins_to_statement(select(Study))
-            .filter_by(status=status)
-            .order_by(Study.last_updated.desc())
-        )
+        statement = add_joins_to_statement(select(Study)).filter_by(status=status).order_by(Study.last_updated.desc())
         studies = session.execute(statement).unique().scalars().all()
         return self.studiesSchema.dump(studies)
 
 
-class StudyByAgeEndpoint(flask_restful.Resource):
+class StudyByAgeEndpoint(MethodView):
     studiesSchema = SchemaRegistry.StudySchema(many=True)
 
     def get(self, status, age):

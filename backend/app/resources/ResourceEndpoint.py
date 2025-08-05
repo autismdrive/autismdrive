@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import Select, select
 from sqlalchemy.orm import joinedload
@@ -13,15 +11,25 @@ from app.database import session
 from app.elastic_index import elastic_index
 from app.enums import Permission
 from app.log_service import LogService
-from app.models import AdminNote, Event, Location, Resource, ResourceCategory, UserFavorite
+from app.models import (
+    AdminNote,
+    Event,
+    Location,
+    Resource,
+    ResourceCategory,
+    UserFavorite,
+)
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.utils.resource_utils import to_database_object_dict
 from app.wrappers import requires_permission
 
 
-def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+def add_joins_to_statement(
+    statement: Select | ExecutableOption,
+) -> Select | LoaderOption:
     return statement.options(
         joinedload(Resource.resource_categories).joinedload(ResourceCategory.category),
         add_cat_joins(joinedload(Resource.categories)),
@@ -55,7 +63,7 @@ def get_resource_by_id(resource_id: int, with_joins=False) -> Resource:
     return session.execute(statement).unique().scalar_one_or_none()
 
 
-class ResourceEndpoint(flask_restful.Resource):
+class ResourceEndpoint(MethodView):
     schema = SchemaRegistry.ResourceSchema()
 
     def get(self, resource_id: int):
@@ -84,7 +92,7 @@ class ResourceEndpoint(flask_restful.Resource):
         session.query(Resource).filter_by(id=resource_id).delete()
         session.commit()
         LogService.log_resource_change(resource_id=resource_id, resource_title=resource_title, change_type="delete")
-        return None
+        return "", 204
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
@@ -95,7 +103,7 @@ class ResourceEndpoint(flask_restful.Resource):
             updated = self.schema.load(request_data, instance=instance, session=session)
         except Exception as e:
             raise RestException(RestException.INVALID_OBJECT, details=e)
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
         elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
@@ -103,7 +111,7 @@ class ResourceEndpoint(flask_restful.Resource):
         return self.schema.dump(updated)
 
 
-class ResourceListEndpoint(flask_restful.Resource):
+class ResourceListEndpoint(MethodView):
     resources_schema = SchemaRegistry.ResourceSchema(many=True)
     resource_schema = SchemaRegistry.ResourceSchema()
 
@@ -125,14 +133,16 @@ class ResourceListEndpoint(flask_restful.Resource):
 
             elastic_index.add_document(document=to_database_object_dict(self.resource_schema, db_resource))
             LogService.log_resource_change(
-                resource_id=db_resource.id, resource_title=db_resource.title, change_type="create"
+                resource_id=db_resource.id,
+                resource_title=db_resource.title,
+                change_type="create",
             )
             return self.resource_schema.dump(db_resource)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)
 
 
-class EducationResourceListEndpoint(flask_restful.Resource):
+class EducationResourceListEndpoint(MethodView):
     resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
 
     def get(self):
@@ -151,7 +161,7 @@ class EducationResourceListEndpoint(flask_restful.Resource):
         return self.resourcesSchema.dump(resources)
 
 
-class Covid19ResourceListEndpoint(flask_restful.Resource):
+class Covid19ResourceListEndpoint(MethodView):
     resourcesSchema = SchemaRegistry.ResourceSchema(many=True)
 
     def get(self, category):

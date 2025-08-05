@@ -1,4 +1,3 @@
-from math import floor
 from unittest import TestCase
 
 from app.utils import get_random_integer, pascal_case_it, snake_case_it

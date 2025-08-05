@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import exc
 
@@ -10,9 +8,10 @@ from app.database import session
 from app.models import UserMeta
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 
 
-class UserMetaEndpoint(flask_restful.Resource):
+class UserMetaEndpoint(MethodView):
     schema = SchemaRegistry.UserMetaSchema()
 
     @auth.login_required
@@ -25,7 +24,7 @@ class UserMetaEndpoint(flask_restful.Resource):
     @auth.login_required
     def delete(self, user_id: int):
         session.query(UserMeta).filter_by(id=user_id).delete()
-        return None
+        return "", 204
 
     @auth.login_required
     def post(self, user_id: int):
@@ -34,7 +33,7 @@ class UserMetaEndpoint(flask_restful.Resource):
         try:
             existing = session.query(UserMeta).filter(UserMeta.id == user_id).first()
             new_meta = self.schema.load(request_data, instance=existing)
-            new_meta.last_updated = datetime.datetime.utcnow()
+            new_meta.last_updated = utcnow()
             session.add(new_meta)
             session.commit()
             return self.schema.dump(new_meta)

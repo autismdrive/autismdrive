@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 
 from app.auth import auth
@@ -12,11 +10,12 @@ from app.log_service import LogService
 from app.models import Event, EventUser, Geocode
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.utils.resource_utils import to_database_object_dict
 from app.wrappers import requires_permission
 
 
-class EventEndpoint(flask_restful.Resource):
+class EventEndpoint(MethodView):
     schema = SchemaRegistry.EventSchema()
 
     def get(self, event_id: int):
@@ -42,7 +41,7 @@ class EventEndpoint(flask_restful.Resource):
         session.commit()
 
         LogService.log_resource_change(resource_id=event_id, resource_title=event_title, change_type="delete")
-        return None
+        return "", 204
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
@@ -67,7 +66,7 @@ class EventEndpoint(flask_restful.Resource):
             updated = self.schema.load(data=request_data, instance=instance, session=session)
         except Exception as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.args[0])
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
         elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
@@ -75,7 +74,7 @@ class EventEndpoint(flask_restful.Resource):
         return self.schema.dump(updated)
 
 
-class EventListEndpoint(flask_restful.Resource):
+class EventListEndpoint(MethodView):
     events_schema = SchemaRegistry.EventSchema(many=True)
     event_schema = SchemaRegistry.EventSchema()
 
@@ -103,7 +102,11 @@ class EventListEndpoint(flask_restful.Resource):
 
             obj_dict = to_database_object_dict(self.event_schema, load_result)
             elastic_index.add_document(document=obj_dict)
-            LogService.log_resource_change(resource_id=obj_dict.id, resource_title=obj_dict.title, change_type="create")
+            LogService.log_resource_change(
+                resource_id=obj_dict.id,
+                resource_title=obj_dict.title,
+                change_type="create",
+            )
             return self.event_schema.dump(load_result)
         except ValidationError as err:
             raise RestException(RestException.INVALID_OBJECT, details=err)

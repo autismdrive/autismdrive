@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import g, request
+from flask.views import MethodView
 from sqlalchemy import Select, func, select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.interfaces import LoaderOption
@@ -13,10 +11,13 @@ from app.enums import Permission, Role
 from app.models import Participant, User
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.wrappers import requires_permission, requires_roles
 
 
-def add_joins_to_statement(statement: Select | ExecutableOption) -> Select | LoaderOption:
+def add_joins_to_statement(
+    statement: Select | ExecutableOption,
+) -> Select | LoaderOption:
     return statement.options(
         joinedload(Participant.user),
         joinedload(Participant.identification),
@@ -39,7 +40,7 @@ def get_participant_by_id(participant_id: int, with_joins=False) -> Participant 
     return session.execute(statement).unique().scalar_one_or_none()
 
 
-class ParticipantEndpoint(flask_restful.Resource):
+class ParticipantEndpoint(MethodView):
     schema = SchemaRegistry.ParticipantSchema()
 
     @auth.login_required
@@ -65,7 +66,7 @@ class ParticipantEndpoint(flask_restful.Resource):
     @requires_roles(Role.admin)
     def delete(self, participant_id: int):
         session.query(Participant).filter_by(id=participant_id).delete()
-        return None
+        return "", 204
 
     @auth.login_required
     def put(self, participant_id: int):
@@ -81,7 +82,7 @@ class ParticipantEndpoint(flask_restful.Resource):
         except Exception as errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
 
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
         session.close()
@@ -92,7 +93,7 @@ class ParticipantEndpoint(flask_restful.Resource):
         return self.schema.dump(updated_db_participant) if updated_db_participant else None
 
 
-class ParticipantListEndpoint(flask_restful.Resource):
+class ParticipantListEndpoint(MethodView):
     schema = SchemaRegistry.ParticipantSchema(many=True)
 
     @auth.login_required
@@ -104,7 +105,7 @@ class ParticipantListEndpoint(flask_restful.Resource):
         return self.schema.dump(participants)
 
 
-class ParticipantAdminListEndpoint(flask_restful.Resource):
+class ParticipantAdminListEndpoint(MethodView):
     def count_participants(self, relationship, filter_out_test=False):
         if filter_out_test:
             query = session.query(Participant).filter(

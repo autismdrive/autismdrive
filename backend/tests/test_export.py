@@ -13,7 +13,8 @@ from app.export_service import ExportService
 from app.import_service import ImportService
 from app.models import DataTransferLog, IdentificationQuestionnaire, Participant, User
 from app.resources.UserEndpoint import get_user_by_id
-from app.schemas import ParticipantSchema, SchemaRegistry
+from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 os.environ["ENV_NAME"] = "testing"
@@ -86,7 +87,7 @@ class TestExportService(BaseTestQuestionnaire):
 
     def test_user_with_participant_properly_exported(self):
         u = self.construct_user()
-        p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
+        self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         self.session.commit()
         rv = self.client.get("/api/export/user", headers=self.logged_in_headers())
         self.assert_success(rv)
@@ -115,7 +116,7 @@ class TestExportService(BaseTestQuestionnaire):
         response = rv.json
         exports = SchemaRegistry.ExportInfoSchema(many=True).load(response)
         importer = ImportService()
-        log = importer.log_for_export(exports, datetime.datetime.utcnow())
+        log = importer.log_for_export(exports, utcnow())
         results = {}
         for export in exports:
             export.json_data = all_data[export.class_name]
@@ -215,7 +216,7 @@ class TestExportService(BaseTestQuestionnaire):
         u_id = u.id
         p = self.construct_participant(user_id=u_id, relationship=Relationship.self_participant)
         p_id = p.id
-        iq = self.construct_identification_questionnaire(user_id=u_id, participant_id=p_id)
+        self.construct_identification_questionnaire(user_id=u_id, participant_id=p_id)
         self.session.commit()
         data = self.get_export()
 
@@ -234,25 +235,26 @@ class TestExportService(BaseTestQuestionnaire):
     def test_all_sensitive_exports_have_links_to_self(self):
         self.construct_everything()
         exports = ExportService.get_table_info()
+        headers = self.logged_in_headers()
         for export in exports:
             if export.question_type != ExportService.TYPE_SENSITIVE:
                 continue
-            rv = self.client.get(
-                export.url, follow_redirects=True, content_type="application/json", headers=self.logged_in_headers()
-            )
+            rv = self.client.get(export.url, follow_redirects=True, content_type="application/json", headers=headers)
             data = rv.json
             for d in data:
                 self.assertTrue("_links" in d, msg="%s should have links in json." % export.class_name)
                 self.assertTrue("self" in d["_links"])
-                self.assert_success(self.client.get(d["_links"]["self"], headers=self.logged_in_headers()))
+                self.assert_success(self.client.get(d["_links"]["self"], headers=headers))
 
                 rv_link = self.client.get(
                     d["_links"]["self"],
                     follow_redirects=True,
                     content_type="application/json",
-                    headers=self.logged_in_headers(),
+                    headers=headers,
                 )
                 rv_link_data = json.loads(rv_link.get_data(as_text=True))
+
+                self.assertEqual(d, rv_link_data, msg="Data returned from link does not match original data.")
 
     def test_sensitive_records_returned_can_be_deleted(self):
         self.construct_all_questionnaires()
@@ -269,7 +271,7 @@ class TestExportService(BaseTestQuestionnaire):
 
     def test_retrieve_records_later_than(self):
         self.construct_everything()
-        date = datetime.datetime.utcnow() + datetime.timedelta(seconds=1)  # One second in the future
+        date = utcnow() + datetime.timedelta(seconds=1)  # One second in the future
         exports = ExportService.get_table_info()
         params = "?after=" + date.strftime(ExportService.DATE_FORMAT)
         headers = self.logged_in_headers()
@@ -286,7 +288,7 @@ class TestExportService(BaseTestQuestionnaire):
 
     def test_export_list_count_is_date_based(self):
         self.construct_everything()
-        future_date = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        future_date = utcnow() + datetime.timedelta(days=1)
         params = "?after=" + future_date.strftime(ExportService.DATE_FORMAT)
 
         rv = self.client.get("/api/export", headers=self.logged_in_headers())
@@ -364,9 +366,7 @@ class TestExportService(BaseTestQuestionnaire):
     def test_exporter_sends_no_email_alert_if_less_than_30_minutes_pass_without_export(self):
         message_count = len(EmailService.TEST_MESSAGES)
 
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=28), total_records=2, type="exporting"
-        )
+        log = DataTransferLog(last_updated=utcnow() - datetime.timedelta(minutes=28), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -379,9 +379,7 @@ class TestExportService(BaseTestQuestionnaire):
         """
         message_count = len(EmailService.TEST_MESSAGES)
 
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=45), total_records=2, type="exporting"
-        )
+        log = DataTransferLog(last_updated=utcnow() - datetime.timedelta(minutes=45), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
 
@@ -404,9 +402,7 @@ class TestExportService(BaseTestQuestionnaire):
         """
         message_count = len(EmailService.TEST_MESSAGES)
 
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(minutes=30), total_records=2, type="exporting"
-        )
+        log = DataTransferLog(last_updated=utcnow() - datetime.timedelta(minutes=30), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -417,7 +413,7 @@ class TestExportService(BaseTestQuestionnaire):
             self.decode(EmailService.TEST_MESSAGES[-1]["subject"]),
         )
 
-        log.last_updated = datetime.datetime.utcnow() - datetime.timedelta(minutes=120)
+        log.last_updated = utcnow() - datetime.timedelta(minutes=120)
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()
@@ -434,7 +430,7 @@ class TestExportService(BaseTestQuestionnaire):
         sent to an administrative email address at the 30 minute and then every 2 hours after that.
         """
         message_count = len(EmailService.TEST_MESSAGES)
-        last_updated = datetime.datetime.utcnow() - datetime.timedelta(hours=22)
+        last_updated = utcnow() - datetime.timedelta(hours=22)
         log = DataTransferLog(last_updated=last_updated, total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
@@ -447,9 +443,7 @@ class TestExportService(BaseTestQuestionnaire):
 
     def test_exporter_sends_20_emails_over_first_48_hours(self):
         message_count = len(EmailService.TEST_MESSAGES)
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(days=2), total_records=2, type="exporting"
-        )
+        log = DataTransferLog(last_updated=utcnow() - datetime.timedelta(days=2), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         for i in range(20):
@@ -458,9 +452,7 @@ class TestExportService(BaseTestQuestionnaire):
 
     def test_exporter_notifies_PI_after_24_hours(self):
         message_count = len(EmailService.TEST_MESSAGES)
-        log = DataTransferLog(
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(hours=24), total_records=2, type="exporting"
-        )
+        log = DataTransferLog(last_updated=utcnow() - datetime.timedelta(hours=24), total_records=2, type="exporting")
         self.session.add(log)
         self.session.commit()
         ExportService.send_alert_if_exports_not_running()

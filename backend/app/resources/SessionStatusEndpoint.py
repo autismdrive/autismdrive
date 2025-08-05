@@ -1,12 +1,12 @@
-import flask_restful
 import jwt
 from flask import g, request
+from flask.views import MethodView
 
 from app.auth import auth
 from config.load import settings
 
 
-class SessionStatusEndpoint(flask_restful.Resource):
+class SessionStatusEndpoint(MethodView):
     """
     Returns the timecode (in seconds) when the current session expires,
     or 0 if there is no current session.
@@ -21,7 +21,7 @@ class SessionStatusEndpoint(flask_restful.Resource):
             try:
                 payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms="HS256")
                 return payload["exp"]
-            except Exception as e:
+            except Exception:
                 return 0
         else:
             return 0

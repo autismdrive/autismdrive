@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.database import session
@@ -10,7 +10,7 @@ from app.schemas import ResourceSchema, SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
 
 
-class ResourceByCategoryEndpoint(flask_restful.Resource):
+class ResourceByCategoryEndpoint(MethodView):
     schema = SchemaRegistry.CategoryResourcesSchema()
 
     def get(self, category_id):
@@ -24,7 +24,7 @@ class ResourceByCategoryEndpoint(flask_restful.Resource):
         return self.schema.dump(resource_categories, many=True)
 
 
-class CategoryByResourceEndpoint(flask_restful.Resource):
+class CategoryByResourceEndpoint(MethodView):
     schema = SchemaRegistry.ResourceCategoriesSchema()
 
     def get(self, resource_id):
@@ -53,7 +53,7 @@ class CategoryByResourceEndpoint(flask_restful.Resource):
         return self.get(resource_id)
 
 
-class ResourceCategoryEndpoint(flask_restful.Resource):
+class ResourceCategoryEndpoint(MethodView):
     schema = SchemaRegistry.ResourceCategorySchema()
 
     def get(self, resource_category_id: int):
@@ -65,10 +65,10 @@ class ResourceCategoryEndpoint(flask_restful.Resource):
     def delete(self, resource_category_id: int):
         session.query(ResourceCategory).filter_by(id=resource_category_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class ResourceCategoryListEndpoint(flask_restful.Resource):
+class ResourceCategoryListEndpoint(MethodView):
     schema = SchemaRegistry.ResourceCategorySchema()
 
     def post(self):

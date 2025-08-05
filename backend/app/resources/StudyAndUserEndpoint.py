@@ -1,5 +1,5 @@
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from sqlalchemy import Integer, cast, select
 from sqlalchemy.orm import joinedload
 
@@ -12,7 +12,7 @@ from app.schemas import SchemaRegistry
 from app.wrappers import requires_roles
 
 
-class StudyInquiryByUserEndpoint(flask_restful.Resource):
+class StudyInquiryByUserEndpoint(MethodView):
     schema = SchemaRegistry.UserStudiesSchema()
 
     @auth.login_required
@@ -28,7 +28,7 @@ class StudyInquiryByUserEndpoint(flask_restful.Resource):
         return self.schema.dump(study_users, many=True)
 
 
-class StudyEnrolledByUserEndpoint(flask_restful.Resource):
+class StudyEnrolledByUserEndpoint(MethodView):
     schema = SchemaRegistry.UserStudiesSchema()
 
     @auth.login_required
@@ -44,7 +44,7 @@ class StudyEnrolledByUserEndpoint(flask_restful.Resource):
         return self.schema.dump(study_users, many=True)
 
 
-class UserByStudyEndpoint(flask_restful.Resource):
+class UserByStudyEndpoint(MethodView):
     schema = SchemaRegistry.StudyUsersSchema()
 
     @auth.login_required
@@ -85,7 +85,7 @@ class UserByStudyEndpoint(flask_restful.Resource):
         return self.get(s_id)
 
 
-class StudyUserEndpoint(flask_restful.Resource):
+class StudyUserEndpoint(MethodView):
     schema = SchemaRegistry.StudyUserSchema()
 
     @auth.login_required
@@ -99,10 +99,10 @@ class StudyUserEndpoint(flask_restful.Resource):
     def delete(self, study_user_id: int):
         session.query(StudyUser).filter_by(id=study_user_id).delete()
         session.commit()
-        return None
+        return "", 204
 
 
-class StudyUserListEndpoint(flask_restful.Resource):
+class StudyUserListEndpoint(MethodView):
     schema = SchemaRegistry.StudyUserSchema()
 
     @auth.login_required

@@ -52,6 +52,7 @@ from app.resources.CategoryEndpoint import get_category_by_id
 from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.ResourceEndpoint import get_resource_by_id
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.utils.resource_utils import to_database_object_dict
 
 os.environ.setdefault("ENV_NAME", "testing")
@@ -225,7 +226,7 @@ class BaseTest(TestCase):
                 200 <= rv.status_code < 300,
                 f"BAD Response: {rv.status_code}. \n {self.jsonify(data)}. {msg}",
             )
-        except:
+        except Exception as _:
             self.assertTrue(200 <= rv.status_code < 300, f"BAD Response: {rv.status_code}. {msg}")
 
     def construct_user(
@@ -535,9 +536,7 @@ class BaseTest(TestCase):
 
         return self.session.query(ChainStep).all()
 
-    def construct_chain_step(
-        self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=datetime.datetime.utcnow()
-    ):
+    def construct_chain_step(self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=utcnow()):
         self.session.add(ChainStep(id=id, name=name, instruction=instruction, last_updated=last_updated))
         self.session.commit()
         return self.session.query(ChainStep).filter(ChainStep.id == cast(id, Integer)).first()

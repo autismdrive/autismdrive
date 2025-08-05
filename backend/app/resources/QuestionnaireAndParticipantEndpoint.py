@@ -1,4 +1,4 @@
-import flask_restful
+from flask.views import MethodView
 from sqlalchemy import Integer, cast
 
 from app.auth import auth
@@ -16,7 +16,7 @@ from app.wrappers import requires_permission
 #   * When calling the endpoint, use the snakecase format of the name.
 
 
-class QuestionnaireByParticipantEndpoint(flask_restful.Resource):
+class QuestionnaireByParticipantEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, name, participant_id):

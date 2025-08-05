@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import Integer, cast, select
 from sqlalchemy.orm import joinedload
@@ -12,6 +10,7 @@ from app.enums import Permission
 from app.models import AdminNote, Resource, User
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.wrappers import requires_permission
 
 select_admin_notes_with_joins = select(AdminNote).options(
@@ -20,7 +19,7 @@ select_admin_notes_with_joins = select(AdminNote).options(
 )
 
 
-class AdminNoteEndpoint(flask_restful.Resource):
+class AdminNoteEndpoint(MethodView):
     schema = SchemaRegistry.AdminNoteSchema()
 
     @auth.login_required
@@ -36,7 +35,7 @@ class AdminNoteEndpoint(flask_restful.Resource):
     def delete(self, admin_note_id: int):
         session.query(AdminNote).filter(AdminNote.id == admin_note_id).delete()
         session.commit()
-        return None
+        return "", 204
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
@@ -47,13 +46,13 @@ class AdminNoteEndpoint(flask_restful.Resource):
             updated = self.schema.load(data=request_data, instance=instance, session=session)
         except ValidationError as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.messages)
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
         return self.schema.dump(updated)
 
 
-class AdminNoteListEndpoint(flask_restful.Resource):
+class AdminNoteListEndpoint(MethodView):
     adminNotesSchema = SchemaRegistry.AdminNoteSchema(many=True)
     adminNoteSchema = SchemaRegistry.AdminNoteSchema()
 
@@ -81,7 +80,7 @@ class AdminNoteListEndpoint(flask_restful.Resource):
         return self.adminNoteSchema.dump(db_note)
 
 
-class AdminNoteListByUserEndpoint(flask_restful.Resource):
+class AdminNoteListByUserEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.user_detail_admin)
     def get(self, user_id):
@@ -95,7 +94,7 @@ class AdminNoteListByUserEndpoint(flask_restful.Resource):
         return schema.dump(logs)
 
 
-class AdminNoteListByResourceEndpoint(flask_restful.Resource):
+class AdminNoteListByResourceEndpoint(MethodView):
     @auth.login_required
     @requires_permission(Permission.edit_resource)
     def get(self, resource_id):

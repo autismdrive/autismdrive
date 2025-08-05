@@ -1,5 +1,4 @@
 import datetime
-import random
 from unittest.mock import MagicMock, call, patch
 
 import requests

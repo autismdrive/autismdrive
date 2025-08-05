@@ -1,15 +1,15 @@
 import datetime
-import random
 
 from fixtures.fixture_utils import fake, fake_password, fake_user_id
 from flask import json
-from sqlalchemy import Integer, cast, select
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.email_service import EmailService
 from app.enums import Permission, Relationship, Role, StudyUserStatus
 from app.models import EmailLog, StudyUser, User, UserFavorite
 from app.rest_exception import RestException
+from app.utils import utcnow
 from tests.base_test import BaseTest
 
 
@@ -447,7 +447,7 @@ class TestUser(BaseTest):
         user_email = fake.email()
         user_password = fake_password()
         user_id = fake_user_id()
-        time_before_create = datetime.datetime.utcnow()
+        time_before_create = utcnow()
         user = self.test_create_user_with_password(user_id=user_id, email=user_email, password=user_password)
         last_login = user.last_login
         self.assertAlmostEqual(time_before_create, last_login, delta=datetime.timedelta(seconds=10))

@@ -1,5 +1,5 @@
 import copy
-from datetime import datetime, timedelta
+from datetime import timedelta
 from math import floor
 
 import dateutil.parser
@@ -15,6 +15,7 @@ from app.models import Category, Resource
 from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joins
 from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
 from app.resources.StudyEndpoint import get_study_by_id
+from app.utils import utcnow
 from tests.base_test import BaseTest
 
 
@@ -589,7 +590,7 @@ class TestSearch(BaseTest):
         self.assertNotEqual(title2, title3)
 
     def test_search_sort_by_date_filters_out_past_events(self):
-        now = datetime.utcnow()
+        now = utcnow()
         last_year = self.construct_event(title="A year ago", date=now + timedelta(days=-365))
         last_week = self.construct_event(title="A week ago", date=now + timedelta(days=-7))
         yesterday = self.construct_event(title="Yesterday", date=now + timedelta(days=-1))
@@ -611,7 +612,7 @@ class TestSearch(BaseTest):
         self.assertEqual(search_results["hits"][4]["title"], next_year.title)
 
     def test_search_filters_out_past_events(self):
-        now = datetime.utcnow()
+        now = utcnow()
         self.construct_resource(title="How to style unicorn hair", is_draft=False)
         self.construct_resource(title="Rainbow-emitting capabilities of unicorn horns", is_draft=False)
         self.construct_resource(title="Tips for time travel with a unicorn", is_draft=False)

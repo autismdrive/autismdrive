@@ -23,7 +23,7 @@ def _create_db(engine_: Engine):
     from sqlalchemy_utils import create_database
 
     try:
-        click.secho(f"Recreating database...")
+        click.secho("Recreating database...")
         create_database(engine_.url)
         click.secho(f"\n*** Database {engine_.url.database} created. ***\n")
 
@@ -33,11 +33,11 @@ def _create_db(engine_: Engine):
 
 def _create_tables(base_metadata: MetaData, engine_: Engine):
     try:
-        click.secho(f"Adding tables from the model...")
+        click.secho("Adding tables from the model...")
         with engine_.begin() as conn:
-            click.secho(f"Creating tables...")
+            click.secho("Creating tables...")
             base_metadata.create_all(bind=conn)
-            click.secho(f"Done.")
+            click.secho("Done.")
     except Exception as e:
         click.secho(f"Error connecting to database: {e}")
 

@@ -1,7 +1,5 @@
-import datetime
-
-import flask_restful
 from flask import request
+from flask.views import MethodView
 from marshmallow import ValidationError
 
 from app.auth import auth
@@ -12,11 +10,12 @@ from app.log_service import LogService
 from app.models import Event, Geocode, Location
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
+from app.utils import utcnow
 from app.utils.resource_utils import to_database_object_dict
 from app.wrappers import requires_permission
 
 
-class LocationEndpoint(flask_restful.Resource):
+class LocationEndpoint(MethodView):
     schema = SchemaRegistry.LocationSchema()
 
     def get(self, location_id: int):
@@ -41,7 +40,7 @@ class LocationEndpoint(flask_restful.Resource):
         session.query(Location).filter_by(id=location_id).delete()
         session.commit()
         LogService.log_resource_change(resource_id=location_id, resource_title=location_title, change_type="delete")
-        return "", 200
+        return "", 204
 
     @auth.login_required
     @requires_permission(Permission.edit_resource)
@@ -68,7 +67,7 @@ class LocationEndpoint(flask_restful.Resource):
         except Exception as errors:
             raise RestException(RestException.INVALID_OBJECT, details=errors)
 
-        updated.last_updated = datetime.datetime.utcnow()
+        updated.last_updated = utcnow()
         session.add(updated)
         session.commit()
         elastic_index.update_document(document=to_database_object_dict(self.schema, updated))
@@ -76,7 +75,7 @@ class LocationEndpoint(flask_restful.Resource):
         return self.schema.dump(updated)
 
 
-class LocationListEndpoint(flask_restful.Resource):
+class LocationListEndpoint(MethodView):
     locations_schema = SchemaRegistry.LocationSchema(many=True)
     location_schema = SchemaRegistry.LocationSchema()
 
@@ -106,7 +105,9 @@ class LocationListEndpoint(flask_restful.Resource):
             elastic_index.add_document(document=obj_dict)
 
             LogService.log_resource_change(
-                resource_id=load_result.id, resource_title=load_result.title, change_type="create"
+                resource_id=load_result.id,
+                resource_title=load_result.title,
+                change_type="create",
             )
             return self.location_schema.dump(load_result)
         except ValidationError as err:
