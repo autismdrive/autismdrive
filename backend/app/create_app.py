@@ -27,7 +27,7 @@ def create_app(settings=None):
 
     click.secho(f"\n*** create_app > _settings.ENV_NAME = {_settings.ENV_NAME} ***\n")
 
-    logging_config["loggers"][""]["level"] = "DEBUG" if _settings.FLASK_DEBUG else "INFO"
+    logging_config["loggers"][""]["level"] = "DEBUG" if _settings.FLASK_DEBUG else "WARN"
     logging.config.dictConfig(logging_config)
 
     _app = APIApp(__name__, instance_relative_config=True)

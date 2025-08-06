@@ -47,7 +47,6 @@ services:
       - es
       - db
 
-
   frontend:
     image: autismdrive-test-frontend:latest
     environment:

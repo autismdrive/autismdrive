@@ -105,9 +105,8 @@ class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
         from config.testing import settings
-
-        cls.reset_db()
-        cls.reset_indices()
+        # cls.reset_db()
+        # cls.reset_indices()
 
         _app = create_app(settings)
 

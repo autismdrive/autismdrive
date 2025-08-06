@@ -4,7 +4,7 @@ logging_config = {
     "loggers": {
         "": {  # root logger
             "handlers": ["console", "file"],
-            "level": "INFO",
+            "level": "WARN",
             "propagate": True,
         },
         "alembic.runtime.migration": {"handlers": ["console", "file"], "level": "WARN", "propagate": False},
@@ -14,7 +14,7 @@ logging_config = {
     },
     "formatters": {"simple": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"}},
     "root": {
-        "level": "DEBUG",
+        "level": "WARN",
         "handlers": [
             "console",
             "file",
@@ -25,8 +25,8 @@ logging_config = {
             "formatter": "simple",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
-            "level": "DEBUG",
+            "level": "WARN",
         },
-        "file": {"level": "DEBUG", "formatter": "simple", "class": "logging.FileHandler", "filename": "star_drive.log"},
+        "file": {"level": "WARN", "formatter": "simple", "class": "logging.FileHandler", "filename": "star_drive.log"},
     },
 }
