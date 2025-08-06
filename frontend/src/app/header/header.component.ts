@@ -39,14 +39,14 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         'visible-collapsed-sm',
         style({
           top: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
         'visible-expanded-sm',
         style({
           top: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       transition('* => *', animate('0.5s ease-in-out')),
@@ -68,7 +68,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -76,7 +76,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -84,7 +84,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -92,7 +92,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -100,7 +100,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -108,7 +108,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '40px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -116,7 +116,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -124,7 +124,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '40px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -132,7 +132,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -140,7 +140,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '40px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -148,7 +148,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -156,7 +156,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '40px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       transition('* => *', animate('0.5s ease-in-out')),
@@ -167,7 +167,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -175,7 +175,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '104px',
           height: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -183,7 +183,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -191,7 +191,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '104px',
           height: '40px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -199,7 +199,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -207,7 +207,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '104px',
           height: '40px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -215,7 +215,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -223,7 +223,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '104px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -231,7 +231,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -239,7 +239,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '104px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -247,7 +247,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -255,7 +255,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '104px',
           height: '40px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       transition('* => *', animate('0.5s ease-in-out')),
@@ -311,7 +311,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -319,7 +319,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -327,7 +327,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -335,7 +335,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '40px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       state(
@@ -343,7 +343,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '0px',
           height: '64px',
-          'box-shadow': '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0px 5px 5px 0px rgba(0, 0, 0, 0.3)',
         }),
       ),
       state(
@@ -351,7 +351,7 @@ import {filter, map, pairwise, share, throttleTime} from 'rxjs/operators';
         style({
           top: '40px',
           height: '64px',
-          'box-shadow': 'none',
+          boxShadow: 'none',
         }),
       ),
       transition('* => *', animate('0.5s ease-in-out')),
