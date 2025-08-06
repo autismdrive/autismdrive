@@ -41,7 +41,7 @@ def create_app(settings=None):
         # Convert list of allowed origins to list of regexes
         origins_re = r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS])
 
-        logging.getLogger("flask_cors").level = logging.DEBUG
+        logging.getLogger("flask_cors").level = logging.WARN
 
         CORS(
             _app,

@@ -65,7 +65,7 @@ We are currently using version 6, and should look at upgrading this in the futur
 
 
 #### Angular
-You will need the angular command line utilities to run the front end.
+You will need the angular command line utilities to run the frontend.
 ```BASH
 npm install -g @angular/cli
 ```
@@ -111,9 +111,10 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 ```
 
 ### Update Data Models
-Each time you modify your data models you will need to create new migrations. The following command will compare the database to the code and create new migrations as needed.  You can edit this newly generated file - it will show up under migrations/versions
+Any time you modify the data model for any table in `backend/app/models.py` you will need to create new migrations. The following command will compare the database to the code and create new migrations as needed.  You can edit this newly generated file - it will show up under `backend/migrations/versions`.
 ```BASH
-flask db migrate
+cd backend/migrations
+alembic revision --autogenerate -m "describe your changes here"
 ```
 
 ### Load in the seed data
@@ -196,28 +197,15 @@ models.Resrouce.query( ...
 
 
 ### Security / Authentication
-This will become increasingly complicated, so check back here often.
-At present the system can handle single sign on (SSO) authentication through Shibboleth via a
-connector on the apache web server that looks for headers we know are provided by the University
-of Virginia.  This will change in the future as we migrate to using a OnConnect which will allow
-connections with more institutions.  We'll also need to offer direct log-ins for community users.
+At present the system only supports username/password authentication. The frontend (Angular) and backend (Flask) use a JWT token ([via Bearer authentication Authorization HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication#bearer)).
 
-Once credentials are established, the front end (Angular) and backend (Flask/Python) will use a JWT
-token.
+The user enters their credentials via the Angular frontend UI. Angular sends those credentials to the Flask backend. Once verified, the backend sends a JWT authentication token to the frontend, and the user is redirected to a frontend route that stores the JWT in LocalStorage and finally redirects the user to the frontend page they were on when they clicked the "Login" button.
+
 
 #### Develoment Mode
-The SSO aspect is bypassed in Development mode.  Clicking the log in button will immediately
-log you in as the user specified in your instance/instance_config.py.
-```
-SSO_DEVELOPMENT_UID = 'dhf8r'
-```
-I've created users for primary developers in our example_data, and that information is loaded
-into the database automatically with a *flask reset*  Add yourself there if needed.
+In local dev environments, the database is populated with fake users from `backend/example_data/users.csv`, and that information is loaded
+into the database automatically with the `flask reset` CLI command. This will NOT work in production environments.
 
-#### Production Mode
-In production, the redirect on the front end needs to point to the url that will direct us out to
-Shibboleth.  The account we use will send the user back to an API endpoint that will generate a JWT
-token, and then redirect again to the front end, passing that token along as a GET parameter.
 
 
 ## Testing
