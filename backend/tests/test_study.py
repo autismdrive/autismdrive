@@ -1,3 +1,4 @@
+from tests.base_test import BaseTest  #isort:skip
 from fixtures.study import MockStudy, MockStudyWithMoreFields
 from sqlalchemy import Integer, cast
 
@@ -11,7 +12,6 @@ from app.models import (
     StudyCategory,
     StudyInvestigator,
 )
-from tests.base_test import BaseTest
 
 
 class TestStudy(BaseTest):

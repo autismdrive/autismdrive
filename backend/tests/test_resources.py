@@ -1,3 +1,4 @@
+from tests.base_test import BaseTest  #isort:skip
 from collections import Counter
 
 from fixtures.fixture_utils import fake
@@ -8,7 +9,6 @@ from app.elastic_index import elastic_index
 from app.enums import Role
 from app.models import Resource, ResourceCategory, ResourceChangeLog
 from app.resources.ResourceEndpoint import get_resource_by_id
-from tests.base_test import BaseTest
 
 
 class TestResources(BaseTest):

@@ -11,4 +11,4 @@ star_drive.log
 *.egg-info
 dist/
 .venv/
-
+.coverage

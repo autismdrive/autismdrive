@@ -1,8 +1,8 @@
+from tests.base_test import BaseTest  #isort:skip
 from sqlalchemy import Integer, cast, select
 
 from app.models import Category
 from app.utils.category_utils import all_search_paths
-from tests.base_test import BaseTest
 
 
 class TestCategory(BaseTest):

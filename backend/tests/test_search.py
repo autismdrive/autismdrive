@@ -1,3 +1,4 @@
+from tests.base_test import BaseTest  #isort:skip
 import copy
 from datetime import timedelta
 from math import floor
@@ -16,7 +17,6 @@ from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joi
 from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
 from app.resources.StudyEndpoint import get_study_by_id
 from app.utils import utcnow
-from tests.base_test import BaseTest
 
 
 def fake_params(kw):

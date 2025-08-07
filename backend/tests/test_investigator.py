@@ -1,5 +1,5 @@
+from tests.base_test import BaseTest  #isort:skip
 from app.models import Investigator, StudyInvestigator
-from tests.base_test import BaseTest
 
 
 class TestInvestigator(BaseTest):

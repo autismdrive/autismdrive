@@ -1,5 +1,5 @@
+from tests.base_test import BaseTest  #isort:skip
 from app.models import ChainSessionStep, ChainStep
-from tests.base_test import BaseTest
 
 
 class TestChainStep(BaseTest):

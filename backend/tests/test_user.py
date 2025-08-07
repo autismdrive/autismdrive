@@ -1,3 +1,4 @@
+from tests.base_test import BaseTest  #isort:skip
 import datetime
 
 from fixtures.fixture_utils import fake, fake_password, fake_user_id
@@ -10,7 +11,6 @@ from app.enums import Permission, Relationship, Role, StudyUserStatus
 from app.models import EmailLog, StudyUser, User, UserFavorite
 from app.rest_exception import RestException
 from app.utils import utcnow
-from tests.base_test import BaseTest
 
 
 class TestUser(BaseTest):

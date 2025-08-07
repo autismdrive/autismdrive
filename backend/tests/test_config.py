@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest
+from tests.base_test import BaseTest  #isort:skip
 
 
 class TestConfig(BaseTest):

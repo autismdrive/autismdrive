@@ -1,3 +1,4 @@
+from tests.base_test import BaseTest  #isort:skip
 import random
 import string
 
@@ -37,7 +38,6 @@ from app.models import (
 )
 from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.UserEndpoint import get_user_by_id
-from tests.base_test import BaseTest
 
 
 class BaseTestQuestionnaire(BaseTest):

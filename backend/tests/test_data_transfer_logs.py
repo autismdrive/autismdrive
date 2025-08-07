@@ -1,6 +1,6 @@
+from tests.base_test import BaseTest  #isort:skip
 from app.models import DataTransferLog, DataTransferLogDetail
 from app.schemas import SchemaRegistry
-from tests.base_test import BaseTest
 
 
 class TestDataTransferLogs(BaseTest):

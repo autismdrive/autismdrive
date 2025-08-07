@@ -1,3 +1,4 @@
+from tests.base_test import BaseTest  #isort:skip
 import math
 from datetime import datetime
 from typing import Callable
@@ -20,7 +21,6 @@ from app.models import (
     User,
     ZipCode,
 )
-from tests.base_test import BaseTest
 
 
 class TestDataLoader(BaseTest):

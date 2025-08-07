@@ -1,3 +1,4 @@
+from tests.base_test import BaseTest  #isort:skip
 from unittest.mock import patch
 
 from fixtures.event import MockEvent
@@ -5,7 +6,6 @@ from utils import MockGoogleMapsClient
 
 from app.enums import Role
 from app.models import Event, ResourceCategory, ResourceChangeLog
-from tests.base_test import BaseTest
 
 
 class TestEvents(BaseTest):
