@@ -6,14 +6,14 @@ from app.database import session
 from app.enums import Permission, Role
 from app.models import ResourceChangeLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_permission, requires_roles
+from app.wrappers import requires_permission, requires_role
 
 
 class ResourceChangeLogListEndpoint(MethodView):
     resourceChangeLogSchema = SchemaRegistry.ResourceChangeLogSchema(many=True)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self):
         resource_change_logs = session.query(ResourceChangeLog).all()
         return self.SchemaRegistry.resourceChangeLogSchema.dump(resource_change_logs)

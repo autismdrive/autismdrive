@@ -222,15 +222,6 @@ class ImportService:
         response = requests.delete(url, headers=self.get_headers())
         assert response.status_code == 200
 
-    # Takes the partial path of an endpoint, and returns json.  Logging any errors.
-    def __get_json(self, path):
-        url = self.master_url + path
-        try:
-            response = requests.get(url)
-            return response.json()
-        except requests.exceptions.ConnectionError:
-            self.logger.error("Unable to contact the master instance at " + url)
-
     def load_admin(self):
         url = self.master_url + self.EXPORT_ADMIN_ENDPOINT
         response = requests.get(url, headers=self.get_headers())

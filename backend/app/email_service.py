@@ -16,7 +16,6 @@ class EmailService:
     site_url: str = settings.SITE_URL
     admin_email: str = settings.ADMIN_EMAIL
     principal_investigator_email: str = settings.PRINCIPAL_INVESTIGATOR_EMAIL
-    TEST_MESSAGES = []
 
     def tracking_code(self):
         return str(uuid.uuid4())[:16]
@@ -56,11 +55,6 @@ class EmailService:
             ical_attachment.add_header("Filename", "event.ics")
             ical_attachment.add_header("Content-Disposition", "attachment; filename=event.ics")
             msg_root.attach(ical_attachment)
-
-        if settings.TESTING:
-            print("TEST:  Recording Emails, not sending - %s - to:%s" % (subject, recipients))
-            self.TEST_MESSAGES.append(msg_root)
-            return
 
         server = self.email_server()
         server.sendmail(sender, recipients, msg_root.as_bytes())

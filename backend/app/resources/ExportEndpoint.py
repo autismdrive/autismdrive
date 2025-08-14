@@ -11,7 +11,7 @@ from app.export_service import ExportService
 from app.models import DataTransferLog, DataTransferLogDetail, User
 from app.schemas import SchemaRegistry
 from app.utils import pascal_case_it, utcnow
-from app.wrappers import requires_roles
+from app.wrappers import requires_role
 
 
 def get_date_arg():
@@ -29,7 +29,7 @@ def get_date_arg():
 
 class ExportEndpoint(MethodView):
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self, name):
         if name == "admin":
             return self.get_admin()
@@ -48,7 +48,7 @@ class ExportListEndpoint(MethodView):
     schema = SchemaRegistry.ExportInfoSchema(many=True)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self):
         date_started = utcnow()
         info_list = ExportService.get_table_info(get_date_arg())

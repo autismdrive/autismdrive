@@ -9,7 +9,7 @@ from app.enums import Role, StudyUserStatus
 from app.models import Study, StudyUser, User
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_roles
+from app.wrappers import requires_role
 
 
 class StudyInquiryByUserEndpoint(MethodView):
@@ -48,7 +48,7 @@ class UserByStudyEndpoint(MethodView):
     schema = SchemaRegistry.StudyUsersSchema()
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self, study_id):
         s_id = cast(study_id, Integer)
         study_users = (
@@ -69,7 +69,7 @@ class UserByStudyEndpoint(MethodView):
         return self.schema.dump(study_users, many=True)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def post(self, study_id):
         request_data = request.get_json()
         s_id = int(study_id)

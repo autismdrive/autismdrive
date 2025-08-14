@@ -1,3 +1,6 @@
+from app.utils import utcnow
+
+from tests.base_test_questionnaire import BaseTestQuestionnaire  # isort:skip
 import datetime
 from unittest.mock import MagicMock, call, patch
 
@@ -12,7 +15,6 @@ from app.import_service import ImportService
 from app.models import DataTransferLog, DataTransferLogDetail, ExportInfo, User
 from app.schemas import SchemaRegistry
 from config.load import settings
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 fake_token = fake.md5()
 fake_headers = {"Authorization": f"Bearer {fake_token}", "Accept": "application/json"}
@@ -92,7 +94,7 @@ class TestImportCase(BaseTestQuestionnaire):
 
         user = User(
             id=user_id,
-            last_updated=datetime.datetime.now(),
+            last_updated=utcnow(),
             email=fake.email(),
             role=Role.user,
             email_verified=True,
@@ -177,7 +179,7 @@ class TestImportCase(BaseTestQuestionnaire):
         ]
 
         data_importer = self.get_data_importer_setup_auth()
-        date = datetime.datetime.now()
+        date = utcnow()
         export_list = data_importer.get_export_list()
         log = data_importer.log_for_export(export_list, date)
         data = data_importer.request_data(export_list)
@@ -217,7 +219,7 @@ class TestImportCase(BaseTestQuestionnaire):
         mock_get.return_value = MockRequestsResponse({}, 200)
 
         # log a previous success
-        last_date = datetime.datetime.now() - datetime.timedelta(days=1)
+        last_date = utcnow() - datetime.timedelta(days=1)
         log = DataTransferLog(date_started=last_date, last_updated=last_date)
         log.details.append(DataTransferLogDetail(date_started=last_date, class_name="User"))
         self.session.add(log)
@@ -266,7 +268,7 @@ class TestImportCase(BaseTestQuestionnaire):
                 email=a["email"],
                 role=Role.admin,
                 email_verified=True,
-                last_updated=datetime.datetime.now(),
+                last_updated=utcnow(),
             )
             admin_user.password = a["password"]
             admin_user.token = User.encode_auth_token(user_id=admin_user.id)
@@ -310,7 +312,7 @@ class TestImportCase(BaseTestQuestionnaire):
         ]
         mock_delete.return_value = MockRequestsResponse(json_q, 200)
 
-        date = datetime.datetime.now()
+        date = utcnow()
         data = data_importer.request_data(export_list)
         log = data_importer.log_for_export(data, date)
         data_importer.load_all_data(data, log)
@@ -347,7 +349,7 @@ class TestImportCase(BaseTestQuestionnaire):
         mock_delete.return_value = MockRequestsResponse(json_q, 200)
 
         data_importer = self.get_data_importer_setup_auth()
-        date = datetime.datetime.now()
+        date = utcnow()
         data = data_importer.request_data(export_list)
         log = data_importer.log_for_export(data, date)
         data_importer.load_all_data(data, log)

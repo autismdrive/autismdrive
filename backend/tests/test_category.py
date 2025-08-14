@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 from sqlalchemy import Integer, cast, select
 
 from app.models import Category
@@ -52,7 +52,7 @@ class TestCategory(BaseTest):
             data=self.jsonify(child_dict),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv2)
 
@@ -75,7 +75,7 @@ class TestCategory(BaseTest):
         self.assertEqual(3, len(response))
 
         rv = self.client.delete(
-            "api/category/%i" % c_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/category/%i" % c_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
@@ -107,7 +107,7 @@ class TestCategory(BaseTest):
         self.assertEqual(5, len(response))
 
         rv = self.client.delete(
-            "api/category/%i" % wool.id, content_type="application/json", headers=self.logged_in_headers()
+            "api/category/%i" % wool.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assertEqual(400, rv.status_code)
         response = rv.json
@@ -122,7 +122,7 @@ class TestCategory(BaseTest):
             data=self.jsonify(category),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json

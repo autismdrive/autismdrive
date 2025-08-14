@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 import copy
 from datetime import timedelta
 from math import floor
@@ -84,14 +84,14 @@ class TestSearch(BaseTest):
     def test_search_has_counts_by_type(self):
         kw = fake.word()
         basic_query = {"words": kw}
-        search_results = self.search(basic_query)
-        self.assertEqual(0, len(search_results["hits"]))
+        search_results_before = self.search(basic_query)
+        num_results_before = len(search_results_before["hits"])
 
         content = self.construct_content(kw)
         expected_num_hits = len(content.keys())
 
         search_results = self.search(basic_query)
-        self.assertEqual(expected_num_hits, len(search_results["hits"]))
+        self.assertEqual(num_results_before + expected_num_hits, len(search_results["hits"]))
 
         locations = next(x for x in search_results["type_counts"] if x["value"] == "location")
         resources = next(x for x in search_results["type_counts"] if x["value"] == "resource")
@@ -300,7 +300,7 @@ class TestSearch(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
@@ -654,53 +654,51 @@ class TestSearch(BaseTest):
             self.assertGreaterEqual(hit_date, now)
 
     def test_search_for_map_points_only(self):
-        # Add some locations with coordinates, and some without.
-        location_near = self.construct_location(
-            title="local unicorn",
-            description="delivering rainbows within the orbit of Uranus",
-            latitude=38.149595,
-            longitude=-79.072557,
-            is_draft=False,
-        )
-        location_far = self.construct_location(
-            title="distant unicorn",
-            description="delivering rainbows to the greater Trans-Neptunian Region",
-            latitude=-38.149595,
-            longitude=100.927443,
-            is_draft=False,
-        )
-        location_mid = self.construct_location(
-            title="middle unicorn",
-            description="delivering rainbows somewhere in between",
-            latitude=37.5246403,
-            longitude=-77.5633015,
-            is_draft=False,
-        )
-        self.construct_resource(title="Rainbow with a bad hair day and no place to be.", is_draft=False)
-        self.construct_resource(title="A non-rainbow blue sky that covers nearly all locations.", is_draft=False)
-        self.construct_resource(
-            title="A very very tiny rainbow in a sprinkler, that occurs in various places.", is_draft=False
-        )
+        kw1 = fake.company()
+        kw2 = fake.company()
+        self.assertNotEqual(kw1, kw2)
 
-        query = {"words": "rainbows"}
-        search_results = self.search(query)
-        self.assertEqual(6, len(search_results["hits"]))
+        query = {"words": kw1}
+        search_results_before = self.search(query)
+        num_results_before = len(search_results_before["hits"])
+        num_to_generate = 3
 
-        query = {"words": "rainbows", "map_data_only": True}
-        search_results = self.search(query)
-        self.assertEqual(3, len(search_results["hits"]))
-        self.assertTrue("latitude" in search_results["hits"][0])
-        self.assertTrue("longitude" in search_results["hits"][0])
-        self.assertFalse("content" in search_results["hits"][0])
-        self.assertFalse("description" in search_results["hits"][0])
-        self.assertFalse("highlights" in search_results["hits"][0])
+        for i in range(num_to_generate):
+            # Generate random coordinates within ~70 miles of geographic center of Virginia
+            self.construct_location(
+                title=f"{fake.catch_phrase()} {kw2} {fake.catch_phrase()}",
+                description=f"{fake.sentence()} {kw1} {fake.sentence()}",
+                latitude=fake.coordinate(center=37.926868, radius=1),
+                longitude=fake.coordinate(center=-78.024902, radius=1.7),
+                is_draft=False,
+            )
+            self.construct_resource(
+                title=f"{fake.catch_phrase()} {kw1} {fake.catch_phrase()}",
+                is_draft=False
+            )
+
+        query = {"words": kw1}
+        search_results_all = self.search(query)
+        self.assertEqual(num_results_before + num_to_generate * 2, len(search_results_all["hits"]))
+
+        query = {"words": kw1, "map_data_only": True}
+        search_results_map_only = self.search(query)
+        self.assertEqual(num_results_before + num_to_generate, len(search_results_map_only["hits"]))
+
+        for hit in search_results_map_only["hits"]:
+            self.assertEqual(hit["type"], "location")
+            self.assertIn("latitude", hit)
+            self.assertIn("longitude", hit)
+            self.assertNotIn("content", hit)
+            self.assertNotIn("description", hit)
+            self.assertNotIn("highlights", hit)
 
     def test_study_search_record_updates(self):
         from fixtures.fixture_utils import fake
 
         keyword = fake.word()
         kw_query = {"words": keyword}
-        headers = self.logged_in_headers()
+        headers = self.default_logged_in_headers
 
         # test that elastic resource is created with post
         study = MockStudy(

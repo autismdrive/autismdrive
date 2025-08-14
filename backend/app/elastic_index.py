@@ -191,11 +191,6 @@ class ElasticIndex(object):
         doc_fields = {field: _get(field) for field in fields}
         # Remove all the None values
         doc_fields_dict = {k: v for k, v in doc_fields.items() if v is not None}
-
-        if "geo_point" in doc_fields_dict or "latitude" in doc_fields_dict or "longitude" in doc_fields_dict:
-            print(doc_fields_dict["latitude"], doc_fields_dict["longitude"])
-            print(doc_fields_dict["geo_point"])
-
         doc = StarDocument(**doc_fields_dict)
         doc.meta.id = cls._instance.get_id(document)
 

@@ -59,7 +59,7 @@ icon = "https://autismdrive.virginia.edu/favicon.ico"
 [dependency-groups]
 dev = [
     "coverage",
-    "faker",
+    "Faker",
     "faker-biology",
     "gevent",
     "ruff",

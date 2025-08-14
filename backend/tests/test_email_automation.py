@@ -1,28 +1,57 @@
+import smtplib
+from typing import Literal
+from unittest.mock import MagicMock, patch
+
+from app.utils import utcnow
+
+from tests.base_test_questionnaire import BaseTestQuestionnaire  # isort:skip
 import datetime
 import uuid
 
 from fixtures.fixture_utils import fake
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, make_transient
 
 from app.email_prompt_service import EmailPromptService
-from app.email_service import EmailService
 from app.enums import Relationship
 from app.models import EmailLog, Study, User
 from app.resources.UserEndpoint import get_user_by_id
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
 class TestEmailPromptService(BaseTestQuestionnaire):
     email_prompt_service = EmailPromptService(EmailLog, Study, User)
 
-    def create_email_log_records(self, num_records, days_removed, log_type, user=None):
+    def create_email_log_records(
+        self,
+        num_records: int,
+        days_removed: int,
+        log_type: Literal["confirm_email", "complete_registration_prompt", "dependent_profile_prompt"],
+        user=None,
+    ):
+        """
+        Adds the given number of past email log records, 2 days apart, with the given initial offset,
+        to the database for testing purposes.
+
+        :param num_records: Number of past email log records to create.
+        :param days_removed: Number of days before the first record.
+        :param log_type: Type of email log ("confirm_email" or "dependent_profile_prompt").
+        :param user: User object to associate with the email logs. If None, uses the default user.
+
+        Example:
+        The following would create 3 email log records, each 2 days apart, with an initial offset
+        of 10 days (i.e., 10, 12, & 14 days ago):
+        ``create_email_log_records(3, 10, "confirm_email", user)``
+        """
+
         if user is None:
-            user = self.construct_user()
+            user = self.default_user
+
+        u_id = int(f"{user.id}")
+
         for _ in range(num_records):
             log = EmailLog(
-                last_updated=datetime.datetime.now() - datetime.timedelta(days=days_removed),
-                user_id=user.id,
+                last_updated=utcnow() - datetime.timedelta(days=days_removed),
+                user_id=u_id,
                 type=log_type,
                 tracking_code=str(uuid.uuid4())[:16],
             )
@@ -31,7 +60,7 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             days_removed += 2
 
     def create_complete_guardian(self):
-        u1 = self.construct_user(email="test1@sartography.com", last_login="12/4/19 10:00")
+        u1 = self.construct_user(email=fake.email(), last_login=fake.past_datetime())
         p1 = self.construct_participant(user_id=u1.id, relationship=Relationship.self_guardian)
         q1 = {"user_id": u1.id, "participant_id": p1.id}
         jq1 = self.jsonify(q1)
@@ -69,106 +98,126 @@ class TestEmailPromptService(BaseTestQuestionnaire):
             .scalar_one()
         )
         self.assertTrue(db_user.self_registration_complete())
+        make_transient(db_user)
         self.session.close()
         return db_user
 
-    def test_prompting_emails_sent_after_7_days(self):
-        message_count = len(EmailService.TEST_MESSAGES)
+    @patch("smtplib.SMTP", autospec=True)
+    def test_prompting_emails_sent_after_7_days(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
 
-        self.create_email_log_records(1, 6, "confirm_email")
+        # Create a new user who just logged in today.
+        user = self.construct_user(email=fake.email())
 
-        # Prompting email should not be sent before 7 days.
+        mock_sendmail.assert_not_called()
+
+        # If we sent the user an email 6 days ago, prompting email should NOT be sent.
+        self.create_email_log_records(num_records=1, days_removed=6, log_type="confirm_email", user=user)
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
+
         self.session.query(EmailLog).delete()
         self.session.commit()
 
-        self.create_email_log_records(1, 8, "confirm_email")
-
+        # If we sent the user an email 8 days ago, a prompting email should be sent.
+        self.create_email_log_records(num_records=1, days_removed=8, log_type="confirm_email", user=user)
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
+        self.assert_email_sent(mock_sendmail, user.email, "Autism DRIVE: Confirm Email")
 
-    def test_prompting_emails_sent_after_14_days(self):
-        message_count = len(EmailService.TEST_MESSAGES)
+    @patch("smtplib.SMTP", autospec=True)
+    def test_prompting_emails_sent_after_14_days(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        user = self.construct_user(email=fake.email())
 
-        self.create_email_log_records(2, 6, "confirm_email")
-
-        # Prompting email should not be sent between 7 and 14 days.
+        # If we already sent the user 2 emails 6 & 8 days ago, prompting email should NOT be sent.
+        self.create_email_log_records(2, 6, "confirm_email", user=user)
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
+
         self.session.query(EmailLog).delete()
         self.session.commit()
 
-        self.create_email_log_records(2, 8, "confirm_email")
-
+        # If we already sent the user 2 emails 8 & 10 days ago, prompting email should be sent.
+        self.create_email_log_records(2, 8, "confirm_email", user=user)
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
+        self.assert_email_sent(
+            mock_sendmail=mock_sendmail,
+            expected_recipient=user.email,
+            expected_subject="Autism DRIVE: Confirm Email",
+        )
 
-    def test_prompting_emails_sent_after_30_days(self):
-        message_count = len(EmailService.TEST_MESSAGES)
+    @patch("smtplib.SMTP", autospec=True)
+    def test_prompting_emails_sent_after_30_days(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        user = self.construct_user(email=fake.email())
 
-        self.create_email_log_records(3, 12, "confirm_email")
-
-        # Prompting email should not be sent between 14 and 30 days.
-
+        # With 3 records at 10, 12, and 14 days ago, prompting email should NOT be sent.
+        self.create_email_log_records(3, 10, "confirm_email", user=user)
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
         self.session.query(EmailLog).delete()
         self.session.commit()
 
-        self.create_email_log_records(3, 17, "confirm_email")
-
+        # With 3 records at 17, 19, and 21 days ago, prompting email should be sent.
+        self.create_email_log_records(3, 17, "confirm_email", user=user)
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
+        self.assert_email_sent(
+            mock_sendmail=mock_sendmail,
+            expected_recipient=user.email,
+            expected_subject="Autism DRIVE: Confirm Email",
+        )
 
-    def test_prompting_emails_sent_after_60_days(self):
-        message_count = len(EmailService.TEST_MESSAGES)
+    @patch("smtplib.SMTP", autospec=True)
+    def test_prompting_emails_sent_after_60_days(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        user = self.construct_user(email=fake.email())
 
-        self.create_email_log_records(4, 28, "confirm_email")
+        self.create_email_log_records(4, 28, "confirm_email", user=user)
 
         # Prompting email should not be sent between 30 and 60 days.
 
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
         self.session.query(EmailLog).delete()
         self.session.commit()
 
-        self.create_email_log_records(4, 31, "confirm_email")
+        self.create_email_log_records(4, 31, "confirm_email", user=user)
 
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
+        self.assert_email_sent(mock_sendmail, user.email, "Autism DRIVE: Confirm Email")
 
-    def test_prompting_emails_sent_after_90_days(self):
-        message_count = len(EmailService.TEST_MESSAGES)
+    @patch("smtplib.SMTP", autospec=True)
+    def test_prompting_emails_sent_after_90_days(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        user = self.construct_user(email=fake.email())
 
-        self.create_email_log_records(5, 28, "confirm_email")
+        self.create_email_log_records(5, 28, "confirm_email", user)
 
         # Prompting email should not be sent between 60 and 90 days.
 
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
         self.session.query(EmailLog).delete()
         self.session.commit()
 
-        self.create_email_log_records(5, 31, "confirm_email")
+        self.create_email_log_records(5, 31, "confirm_email", user=user)
 
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
+        self.assert_email_sent(mock_sendmail, user.email, "Autism DRIVE: Confirm Email")
 
-    def test_prompting_emails_do_not_send_more_than_5_times_total(self):
-        message_count = len(EmailService.TEST_MESSAGES)
+    @patch("smtplib.SMTP", autospec=True)
+    def test_prompting_emails_do_not_send_more_than_5_times_total(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        user = self.construct_user(email=fake.email())
 
         self.create_email_log_records(6, 31, "confirm_email")
 
         self.email_prompt_service.send_confirm_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
 
-    def test_self_registration_prompting_email(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_self_registration_prompting_email(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
         u1 = self.construct_user(email=fake.email())
         u1_id = u1.id
         headers_u1 = self.logged_in_headers(user_id=u1_id)
@@ -230,57 +279,49 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         self.assertFalse(db_u2.self_registration_complete())
         self.session.close()
 
-        message_count = len(EmailService.TEST_MESSAGES)
-
         # Set the users' last login dates to 2 days ago.
         self._back_date_last_login(u1_id, 2)
         self._back_date_last_login(u2_id, 2)
 
+        mock_sendmail.reset_mock()
         self.email_prompt_service.send_complete_registration_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual(
-            "Autism DRIVE: Complete Your Registration", self.decode(EmailService.TEST_MESSAGES[-1]["subject"])
-        )
-        self.assertEqual("test2@sartography.com", EmailService.TEST_MESSAGES[-1]["To"])
+        self.assert_email_sent(mock_sendmail, f"{db_u2.email}", "Autism DRIVE: Complete Your Registration")
 
-    def test_dependent_profile_sends_prompt_with_no_dependent(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_dependent_profile_sends_prompt_with_no_dependent(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
         u1 = self.create_complete_guardian()
-
-        message_count = len(EmailService.TEST_MESSAGES)
 
         # Set the user's last login date to 2 days ago.
         self._back_date_last_login(u1.id, 2)
 
+        mock_sendmail.reset_mock()
         self.email_prompt_service.send_dependent_profile_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual(
-            "Autism DRIVE: Complete Your Dependent's Profile", self.decode(EmailService.TEST_MESSAGES[-1]["subject"])
-        )
-        self.assertEqual(u1.email, EmailService.TEST_MESSAGES[-1]["To"])
+        self.assert_email_sent(mock_sendmail, f"{u1.email}", "Autism DRIVE: Complete Your Dependent's Profile")
 
-    def test_dependent_profile_sends_scheduled_prompt_with_no_dependent(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_dependent_profile_sends_scheduled_prompt_with_no_dependent(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
         u1 = self.create_complete_guardian()
-        message_count = len(EmailService.TEST_MESSAGES)
 
         self.create_email_log_records(5, 28, "dependent_profile_prompt", user=u1)
 
         # Prompting email should not be sent between 60 and 90 days.
 
         self.email_prompt_service.send_dependent_profile_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
         self.session.query(EmailLog).delete()
         self.session.commit()
 
         self.create_email_log_records(5, 31, "dependent_profile_prompt", user=u1)
 
+        mock_sendmail.reset_mock()
         self.email_prompt_service.send_dependent_profile_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual(
-            "Autism DRIVE: Complete Your Dependent's Profile", self.decode(EmailService.TEST_MESSAGES[-1]["subject"])
-        )
-        self.assertEqual(u1.email, EmailService.TEST_MESSAGES[-1]["To"])
+        self.assert_email_sent(mock_sendmail, f"{u1.email}", "Autism DRIVE: Complete Your Dependent's Profile")
 
-    def test_dependent_profile_sends_prompt_with_incomplete_dependent(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_dependent_profile_sends_prompt_with_incomplete_dependent(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
         u1 = self.create_complete_guardian()
         u1_id = u1.id
         d1 = self.construct_participant(user_id=u1_id, relationship=Relationship.dependent)
@@ -295,19 +336,18 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
 
-        message_count = len(EmailService.TEST_MESSAGES)
+        user = self.construct_user(email=fake.email())
 
         # Set the user's last login date to 2 days ago.
         self._back_date_last_login(u1_id, 2)
 
+        mock_sendmail.reset_mock()
         self.email_prompt_service.send_dependent_profile_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count + 1)
-        self.assertEqual(
-            "Autism DRIVE: Complete Your Dependent's Profile", self.decode(EmailService.TEST_MESSAGES[-1]["subject"])
-        )
-        self.assertEqual(u1.email, EmailService.TEST_MESSAGES[-1]["To"])
+        self.assert_email_sent(mock_sendmail, f"{u1.email}", "Autism DRIVE: Complete Your Dependent's Profile")
 
-    def test_dependent_profile_does_not_send_prompt_with_complete_dependent(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_dependent_profile_does_not_send_prompt_with_complete_dependent(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
         u1 = self.create_complete_guardian()
         u1_id = u1.id
         d1 = self.construct_participant(user_id=u1.id, relationship=Relationship.dependent)
@@ -388,29 +428,28 @@ class TestEmailPromptService(BaseTestQuestionnaire):
         )
         self.assert_success(rv)
 
-        message_count_before = len(EmailService.TEST_MESSAGES)
-
+        mock_sendmail.reset_mock()
         self.email_prompt_service.send_dependent_profile_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count_before)
+        mock_sendmail.assert_not_called()
 
-    def test_self_participants_that_are_not_their_own_legal_guardians_do_not_get_reminders(self):
-        u2 = self.construct_user(email="test2@sartography.com", last_login="12/4/19 10:00")
-        u2._password = b"123412"
+    @patch("smtplib.SMTP", autospec=True)
+    def test_self_participants_that_are_not_their_own_legal_guardians_do_not_get_reminders(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        u2 = self.construct_user(email=fake.email(), last_login=fake.past_datetime())
+        u2._password = bytes(fake.password(), "utf-8")
         user_meta = self.construct_user_meta(user_id=u2.id)
-
         user_meta.self_participant = True
         user_meta.self_has_guardian = True
-        self.session.add(user_meta)
+        self.session.merge(user_meta)
         self.session.commit()
         self.session.close()
 
         # Assure no new messages to go out to this individual who is not their own legal guardian.
-        message_count = len(EmailService.TEST_MESSAGES)
         self.email_prompt_service.send_complete_registration_prompting_emails()
-        self.assertEqual(len(EmailService.TEST_MESSAGES), message_count)
+        mock_sendmail.assert_not_called()
 
     def _back_date_last_login(self, user_id, days):
         db_user = get_user_by_id(user_id)
-        db_user.last_login = datetime.datetime.now() - datetime.timedelta(days=days)
+        db_user.last_login = utcnow() - datetime.timedelta(days=days)
         self.session.commit()
         self.session.close()

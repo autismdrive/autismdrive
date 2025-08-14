@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 import random
 import string
 

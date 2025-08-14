@@ -48,6 +48,13 @@ class Relationship(enum.Enum):
         return [item.name for item in cls]
 
 
+class ParticipantRelationship(enum.StrEnum):
+    bio_mother = "bioMother"
+    bio_father = "bioFather"
+    adopt_mother = "adoptMother"
+    adopt_father = "adoptFather"
+    other = "other"
+
 class Status(enum.StrEnum):
     currently_enrolling = "Currently enrolling"
     study_in_progress = "Study in progress"

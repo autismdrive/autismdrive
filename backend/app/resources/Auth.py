@@ -6,6 +6,7 @@ from functools import wraps
 
 from flask import Blueprint, g, has_request_context, jsonify, request
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+from sqlalchemy.orm import make_transient
 
 from app.auth import auth
 from app.database import session
@@ -177,6 +178,7 @@ def verify_token(token):
         session.close()
 
         updated_user = get_user_by_id(user_id, with_joins=True)
+        make_transient(updated_user)
         g.user = updated_user
 
     return "user" in g and g.user

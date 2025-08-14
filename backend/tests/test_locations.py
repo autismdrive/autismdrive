@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 from unittest.mock import patch
 
 from fixtures.location import MockLocation
@@ -45,7 +45,7 @@ class TestLocations(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/location/%i" % r_id, content_type="application/json")
@@ -65,7 +65,7 @@ class TestLocations(BaseTest):
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/location/%i" % r_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/location/%i" % r_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
@@ -81,7 +81,7 @@ class TestLocations(BaseTest):
             data=self.jsonify(location),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -94,7 +94,7 @@ class TestLocations(BaseTest):
         c = self.construct_location_category(loc.id, "c1")
 
         rv = self.client.get(
-            "/api/category/%i/location" % c.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/location" % c.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -108,7 +108,7 @@ class TestLocations(BaseTest):
         c2 = self.construct_location_category(loc.id, "c2")
 
         rv = self.client.get(
-            "/api/category/%i/location" % c1.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/location" % c1.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -127,7 +127,7 @@ class TestLocations(BaseTest):
     def test_get_category_by_location(self):
         c = self.construct_category()
         loc = self.construct_location()
-        rc = ResourceCategory(resource_id=loc.id, category=c, type="location")
+        rc = ResourceCategory(resource_id=loc.id, category_id=c.id, type="location")
         self.session.add(rc)
         self.session.commit()
         rv = self.client.get("/api/location/%i/category" % loc.id, content_type="application/json")
@@ -246,7 +246,7 @@ class TestLocations(BaseTest):
             data=self.jsonify(location),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -262,7 +262,7 @@ class TestLocations(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/location/%i" % location_id, content_type="application/json")
@@ -276,7 +276,7 @@ class TestLocations(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/location/%i" % location_id, content_type="application/json")

@@ -6,14 +6,14 @@ from app.database import session
 from app.enums import Permission, Role
 from app.models import EmailLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_permission, requires_roles
+from app.wrappers import requires_permission, requires_role
 
 
 class EmailLogListEndpoint(MethodView):
     emailLogsSchema = SchemaRegistry.EmailLogSchema(many=True)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self):
         email_logs = session.query(EmailLog).all()
         return self.emailLogsSchema.dump(email_logs)

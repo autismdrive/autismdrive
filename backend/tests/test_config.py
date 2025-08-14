@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 
 
 class TestConfig(BaseTest):
@@ -9,3 +9,4 @@ class TestConfig(BaseTest):
         self.assertEqual(response["mirroring"], False)
         self.assertEqual(response["testing"], True)
         self.assertEqual(response["development"], False)
+

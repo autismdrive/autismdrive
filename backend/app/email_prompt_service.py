@@ -22,7 +22,7 @@ class EmailPromptService:
 
     def send_confirm_prompting_emails(self):
         recipients = session.query(self.user_model).filter_by(password=None).all()
-        self.__send_prompts(recipients, self.email_service.async_confirm_email, "confirm_email")
+        self._send_prompts(recipients, self.email_service.async_confirm_email, "confirm_email")
 
     def send_complete_registration_prompting_emails(self):
         confirmed_users = (
@@ -33,7 +33,7 @@ class EmailPromptService:
         )
         recipients = [u for u in confirmed_users if u.self_registration_complete() is False]
         session.close()
-        self.__send_prompts(
+        self._send_prompts(
             recipients, self.email_service.complete_registration_prompt_email, "complete_registration_prompt"
         )
 
@@ -55,12 +55,22 @@ class EmailPromptService:
                 incomplete_dependents = [p for p in dependents if p.get_percent_complete() < 1]
                 if (len(dependents) == 0) or (len(incomplete_dependents) > 0):
                     recipients.append(u)
-        self.__send_prompts(
+        self._send_prompts(
             recipients, self.email_service.complete_dependent_profile_prompt_email, "dependent_profile_prompt"
         )
 
-    def __send_prompts(self, recipients: list[User], send_method: Callable, log_type: str):
-        """Send prompting emails to recipients who have not completed the specified action."""
+    def _send_prompts(self, recipients: list[User], send_method: Callable, log_type: str):
+        """
+        Schedules prompting emails to recipients who have not yet completed the specified action.
+
+        The frequency of the emails is determined based on the number of previous emails sent and the time since
+        the last email was sent:
+
+        - If no emails have been sent and the user logged in more than 2 days ago, send an email.
+        - If 1 or 2 emails have already been sent, schedule a reminder email at 7 or 14 days, respectively.
+        - If 3 emails have already been sent and more than 16 days have passed since the last email, remind them at 30 days.
+        - If 4 or 5 emails have already been sent and more than 30 days have passed since the last email, remind them at 60 or 90 days, respectively.
+        """
 
         for rec in recipients:
             email_logs = (
@@ -77,29 +87,33 @@ class EmailPromptService:
                 most_recent = email_logs[-1]
                 days_since_most_recent = (utcnow() - most_recent.last_updated).total_seconds() / ONE_DAY
 
-            # Prompt user to complete registration/profile 2 days after last login
+            # If we've never emailed them AND they haven't completed their registration/profile yet,
+            # send them a reminder email 2 days after their last login
             if (len(email_logs) == 0) and (log_type != "confirm_email"):
                 if (rec.last_login is not None) and ((utcnow() - rec.last_login).total_seconds() > (2 * ONE_DAY)):
-                    self.__send_prompting_email(rec, send_method, log_type, "0days")
+                    self._send_prompting_email(rec, send_method, log_type, "0days")
 
-            # Prompt user 1 week and 2 weeks after last prompting email (if we haven't already sent them 2 emails)
+            # If we've already sent them 1 or 2 emails, schedule a reminder for
+            # 1 week or 2 weeks (respectively) after the last prompting email.
             elif 0 < len(email_logs) <= 2:
                 days = "7days" if len(email_logs) == 1 else "14days"
                 if days_since_most_recent > 7:
-                    self.__send_prompting_email(rec, send_method, log_type, days)
+                    self._send_prompting_email(rec, send_method, log_type, days)
 
-            # Prompt user 1 month after last prompting email if we've already sent them 3 emails
+            # If we've already sent them 3 emails AND it's been over 16 days since we last sent a reminder,
+            # schedule another reminder for 30 days after the last prompting email.
             elif len(email_logs) == 3:
                 if days_since_most_recent > 16:
-                    self.__send_prompting_email(rec, send_method, log_type, "30days")
+                    self._send_prompting_email(rec, send_method, log_type, "30days")
 
-            # Prompt user once a month if we've already sent them 4-5 emails
+            # If we've already sent them 4 or 5 emails AND it's been over 30 days since we last sent a reminder,
+            # schedule another reminder for 60 or 90 days (respectively) after the last prompting email.
             elif 3 < len(email_logs) < 6:
                 if days_since_most_recent > 30:
                     days = str((len(email_logs) - 2) * 30) + "days"
-                    self.__send_prompting_email(rec, send_method, log_type, days)
+                    self._send_prompting_email(rec, send_method, log_type, days)
 
-    def __send_prompting_email(self, user, send_method, log_type, days):
+    def _send_prompting_email(self, user, send_method, log_type, days):
         match log_type:
             case "confirm_email":
                 campaign = "reset_password"

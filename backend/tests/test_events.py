@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 from unittest.mock import patch
 
 from fixtures.event import MockEvent
@@ -39,7 +39,7 @@ class TestEvents(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/event/%i" % r_id, content_type="application/json")
@@ -57,7 +57,7 @@ class TestEvents(BaseTest):
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/event/%i" % r_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/event/%i" % r_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
@@ -73,7 +73,7 @@ class TestEvents(BaseTest):
             data=self.jsonify(event),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -86,12 +86,12 @@ class TestEvents(BaseTest):
     def test_get_event_by_category(self):
         c = self.construct_category()
         event = self.construct_event()
-        rc = ResourceCategory(resource_id=event.id, category=c, type="event")
+        rc = ResourceCategory(resource_id=event.id, category_id=c.id, type="event")
         self.session.add(rc)
         self.session.commit()
 
         rv = self.client.get(
-            "/api/category/%i/resource" % c.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/resource" % c.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -101,27 +101,31 @@ class TestEvents(BaseTest):
 
     def test_get_event_by_category_includes_category_details(self):
         c = self.construct_category(name="c1")
+        c_id = c.id
         c2 = self.construct_category(name="c2")
         event = self.construct_event()
-        rc = ResourceCategory(resource_id=event.id, category=c, type="event")
-        rc2 = ResourceCategory(resource_id=event.id, category=c2, type="event")
+        e_id = event.id
+        rc = ResourceCategory(resource_id=e_id, category_id=c.id, type="event")
+        rc2 = ResourceCategory(resource_id=e_id, category_id=c2.id, type="event")
         self.session.add_all([rc, rc2])
         self.session.commit()
+        self.session.close()
+
         rv = self.client.get(
-            "/api/category/%i/resource" % c.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/resource" % c_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(event.id, response[0]["resource_id"])
+        self.assertEqual(e_id, response[0]["resource_id"])
         self.assertEqual(2, len(response[0]["resource"]["resource_categories"]))
         self.assertEqual("c1", response[0]["resource"]["resource_categories"][0]["category"]["name"])
 
     def test_category_event_count(self):
         c = self.construct_category()
-        event = self.construct_event()
-        revcat = self.construct_resource()
-        rc = ResourceCategory(resource_id=event.id, category=c, type="event")
-        rc2 = ResourceCategory(resource_id=revcat.id, category=c, type="resource")
+        e = self.construct_event()
+        r = self.construct_resource()
+        rc = ResourceCategory(resource_id=e.id, category_id=c.id, type="event")
+        rc2 = ResourceCategory(resource_id=r.id, category_id=c.id, type="resource")
         self.session.add_all([rc, rc2])
         self.session.commit()
         rv = self.client.get("/api/category/%i" % c.id, content_type="application/json")
@@ -132,7 +136,7 @@ class TestEvents(BaseTest):
     def test_get_category_by_event(self):
         c = self.construct_category()
         event = self.construct_event()
-        rc = ResourceCategory(resource_id=event.id, category=c, type="event")
+        rc = ResourceCategory(resource_id=event.id, category_id=c.id, type="event")
         self.session.add(rc)
         self.session.commit()
 
@@ -198,7 +202,7 @@ class TestEvents(BaseTest):
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
         u_id = u.id
         headers = self.logged_in_headers(user_id=u_id)
-        admin_headers = self.logged_in_headers()
+        admin_headers = self.default_logged_in_headers
 
         rv = self.client.get("api/event/%i" % event_id, content_type="application/json")
         self.assert_success(rv)

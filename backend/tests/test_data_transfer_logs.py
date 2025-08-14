@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 from app.models import DataTransferLog, DataTransferLogDetail
 from app.schemas import SchemaRegistry
 
@@ -21,7 +21,7 @@ class TestDataTransferLogs(BaseTest):
             "/api/data_transfer_log?pageSize=10",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json

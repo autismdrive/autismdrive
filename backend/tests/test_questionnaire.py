@@ -1,3 +1,6 @@
+from app.utils import utcnow
+
+from tests.base_test_questionnaire import BaseTestQuestionnaire  # isort:skip
 import datetime
 import io
 import json
@@ -33,7 +36,6 @@ from app.models import (
     StepLog,
     SupportsQuestionnaire,
 )
-from tests.base_test_questionnaire import BaseTestQuestionnaire
 
 
 class TestQuestionnaire(BaseTestQuestionnaire):
@@ -78,7 +80,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(evaluation_history_self_questionnaire),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(
             404,
@@ -98,7 +100,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(evaluation_history_self_questionnaire),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(
             400,
@@ -118,7 +120,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(cq),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(
             400, rv.status_code, "This endpoint should require a participant id that is associated with current user."
@@ -132,7 +134,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         )
 
     def test_questionnionare_post_creates_log_record(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -162,7 +164,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/clinical_diagnoses_questionnaire/%i" % cq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -179,7 +181,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/clinical_diagnoses_questionnaire/%i" % cq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -192,13 +194,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/clinical_diagnoses_questionnaire/%i" % cq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -213,26 +215,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/clinical_diagnoses_questionnaire/%i" % cq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/clinical_diagnoses_questionnaire/%i" % cq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/clinical_diagnoses_questionnaire/%i" % cq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_clinical_diagnoses_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -262,7 +264,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/contact_questionnaire/%i" % cq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -277,7 +279,9 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertIsNotNone(cq)
         cq_id = cq.id
         rv = self.client.get(
-            "/api/q/contact_questionnaire/%i" % cq_id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/q/contact_questionnaire/%i" % cq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["phone"] = "123-456-7890"
@@ -289,11 +293,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
-            "/api/q/contact_questionnaire/%i" % cq_id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/q/contact_questionnaire/%i" % cq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -306,22 +312,28 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         cq = self.construct_contact_questionnaire()
         cq_id = cq.id
         rv = self.client.get(
-            "api/q/contact_questionnaire/%i" % cq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/contact_questionnaire/%i" % cq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/q/contact_questionnaire/%i" % cq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/contact_questionnaire/%i" % cq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
-            "api/q/contact_questionnaire/%i" % cq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/contact_questionnaire/%i" % cq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_contact_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -351,7 +363,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/current_behaviors_dependent_questionnaire/%i" % cbdq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -368,7 +380,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/current_behaviors_dependent_questionnaire/%i" % cbdq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["dependent_verbal_ability"] = "nonVerbal"
@@ -380,13 +392,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/current_behaviors_dependent_questionnaire/%i" % cbdq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -401,26 +413,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/current_behaviors_dependent_questionnaire/%i" % cbdq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/current_behaviors_dependent_questionnaire/%i" % cbdq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/current_behaviors_dependent_questionnaire/%i" % cbdq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_current_behaviors_dependent_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
@@ -454,7 +466,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/current_behaviors_self_questionnaire/%i" % cbsq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -470,7 +482,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/current_behaviors_self_questionnaire/%i" % cbsq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["self_verbal_ability"] = ["nonVerbal"]
@@ -482,13 +494,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/current_behaviors_self_questionnaire/%i" % cbsq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -503,26 +515,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/current_behaviors_self_questionnaire/%i" % cbsq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/current_behaviors_self_questionnaire/%i" % cbsq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/current_behaviors_self_questionnaire/%i" % cbsq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_current_behaviors_self_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -556,7 +568,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/demographics_questionnaire/%i" % dq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -573,7 +585,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/demographics_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["gender_identity"] = "genderOther"
@@ -586,13 +598,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/demographics_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -607,26 +619,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/demographics_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/demographics_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/demographics_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_demographics_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -656,7 +668,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/developmental_questionnaire/%i" % dq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -673,7 +685,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/developmental_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["when_motor_milestones"] = "notYet"
@@ -687,13 +699,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/developmental_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -709,26 +721,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/developmental_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/developmental_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/developmental_questionnaire/%i" % dq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_developmental_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
@@ -762,7 +774,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/education_dependent_questionnaire/%i" % eq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -779,7 +791,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/education_dependent_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["school_name"] = "Sesame School"
@@ -793,13 +805,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/education_dependent_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -815,26 +827,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/education_dependent_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/education_dependent_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/education_dependent_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_education_dependent_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -868,7 +880,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/education_self_questionnaire/%i" % eq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -885,7 +897,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/education_self_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["school_name"] = "Sesame School"
@@ -899,13 +911,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/education_self_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -921,26 +933,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/education_self_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/education_self_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/education_self_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_education_self_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -974,7 +986,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/employment_questionnaire/%i" % eq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -992,7 +1004,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/employment_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["is_currently_employed"] = False
@@ -1006,13 +1018,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/employment_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1028,26 +1040,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/employment_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/employment_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/employment_questionnaire/%i" % eq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_employment_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -1081,7 +1093,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/evaluation_history_dependent_questionnaire/%i" % ehq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1098,7 +1110,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/evaluation_history_dependent_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["self_identifies_autistic"] = False
@@ -1110,13 +1122,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/evaluation_history_dependent_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1131,26 +1143,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/evaluation_history_dependent_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/evaluation_history_dependent_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/evaluation_history_dependent_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_evaluation_history_dependent_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
@@ -1184,7 +1196,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/evaluation_history_self_questionnaire/%i" % ehq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1201,7 +1213,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/evaluation_history_self_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["self_identifies_autistic"] = False
@@ -1213,13 +1225,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/evaluation_history_self_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1234,26 +1246,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/evaluation_history_self_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/evaluation_history_self_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/evaluation_history_self_questionnaire/%i" % ehq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_evaluation_history_self_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
@@ -1291,7 +1303,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/home_dependent_questionnaire/%i" % hq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1311,12 +1323,12 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/home_dependent_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         from app.enums import Relationship
 
-        u = self.construct_user()
+        u = self.default_user
         response["participant_id"] = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
         response["dependent_living_situation"] = ["caregiver"]
         response["struggle_to_afford"] = True
@@ -1326,14 +1338,14 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         self.construct_housemate(name="Debbie Danger", home_dependent_questionnaire=hq)
         rv = self.client.get(
             "/api/q/home_dependent_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1348,26 +1360,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/home_dependent_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/home_dependent_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/home_dependent_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_home_dependent_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -1405,7 +1417,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/home_self_questionnaire/%i" % hq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1425,12 +1437,12 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/home_self_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         from app.enums import Relationship
 
-        u = self.construct_user()
+        u = self.default_user
         response["participant_id"] = self.construct_participant(
             user_id=u.id, relationship=Relationship.self_participant
         ).id
@@ -1442,14 +1454,14 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         self.construct_housemate(name="Debbie Danger", home_self_questionnaire=hq)
         rv = self.client.get(
             "/api/q/home_self_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1464,26 +1476,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/home_self_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/home_self_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/home_self_questionnaire/%i" % hq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_home_self_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -1524,7 +1536,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/identification_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv_meta)
 
@@ -1535,7 +1547,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/identification_questionnaire/%i" % iq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1553,7 +1565,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/identification_questionnaire/%i" % iq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["first_name"] = "Helga"
@@ -1567,13 +1579,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get(
             "/api/q/identification_questionnaire/%i" % iq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1589,26 +1601,26 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "api/q/identification_questionnaire/%i" % iq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
             "api/q/identification_questionnaire/%i" % iq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
             "api/q/identification_questionnaire/%i" % iq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_identification_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -1644,7 +1656,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/supports_questionnaire/%i" % sq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1664,12 +1676,12 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/supports_questionnaire/%i" % sq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         from app.enums import Relationship
 
-        u = self.construct_user()
+        u = self.default_user
         response["participant_id"] = self.construct_participant(
             user_id=u.id, relationship=Relationship.self_participant
         ).id
@@ -1679,7 +1691,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         self.construct_medication(name=fake.enzyme(), supports_questionnaire_id=sq.id)
@@ -1694,7 +1706,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         rv = self.client.get(
             "/api/q/supports_questionnaire/%i" % sq_id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1708,22 +1720,28 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         sq = self.construct_supports_questionnaire()
         sq_id = sq.id
         rv = self.client.get(
-            "api/q/supports_questionnaire/%i" % sq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/supports_questionnaire/%i" % sq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/q/supports_questionnaire/%i" % sq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/supports_questionnaire/%i" % sq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
-            "api/q/supports_questionnaire/%i" % sq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/supports_questionnaire/%i" % sq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_supports_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -1754,7 +1772,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/chain_step/%i" % chain_step_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1772,7 +1790,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/chain_questionnaire/%i" % cq_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -1789,7 +1807,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         self.assertIsNotNone(response["sessions"][0]["step_attempts"][0]["chain_step"]["name"])
 
     def test_modify_chain_session_questionnaire_basics(self):
-        user = self.construct_user()
+        user = self.default_user
         from app.enums import Relationship
 
         participant = self.construct_participant(user_id=user.id, relationship=Relationship.self_participant)
@@ -1797,13 +1815,15 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         cq_id = cq.id
 
         response_1 = self.client.get(
-            "/api/q/chain_questionnaire/%i" % cq_id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/q/chain_questionnaire/%i" % cq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         data_before = json.loads(response_1.get_data(as_text=True))
 
         data_before["user_id"] = user.id
         data_before["participant_id"] = participant.id
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        now = utcnow()
         later_1 = now + datetime.timedelta(minutes=1)
         later_2 = now + datetime.timedelta(minutes=2)
         later_3 = now + datetime.timedelta(minutes=3)
@@ -1839,11 +1859,13 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             json=data_before,
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(response_2)
         response_3 = self.client.get(
-            "/api/q/chain_questionnaire/%i" % cq_id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/q/chain_questionnaire/%i" % cq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(response_3)
         data_after = json.loads(response_3.get_data(as_text=True))
@@ -1893,7 +1915,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/chain_questionnaire/export",
             follow_redirects=True,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv_export_q)
         wb_q = openpyxl.load_workbook(io.BytesIO(rv_export_q.data))
@@ -1905,7 +1927,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/chain_session/export",
             follow_redirects=True,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv_export_session)
         wb_session = openpyxl.load_workbook(io.BytesIO(rv_export_session.data))
@@ -1917,7 +1939,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/chain_session_step/export",
             follow_redirects=True,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv_export_step)
         wb_step = openpyxl.load_workbook(io.BytesIO(rv_export_step.data))
@@ -1929,22 +1951,28 @@ class TestQuestionnaire(BaseTestQuestionnaire):
         sq = self.construct_chain_session_questionnaire()
         sq_id = sq.id
         rv = self.client.get(
-            "api/q/chain_questionnaire/%i" % sq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/chain_questionnaire/%i" % sq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/q/chain_questionnaire/%i" % sq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/chain_questionnaire/%i" % sq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
         rv = self.client.get(
-            "api/q/chain_questionnaire/%i" % sq_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/q/chain_questionnaire/%i" % sq_id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(404, rv.status_code)
 
     def test_create_chain_session_questionnaire(self):
-        u = self.construct_user()
+        u = self.default_user
         from app.enums import Relationship
 
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
@@ -1965,7 +1993,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_flow_endpoint(self):
         # It should be possible to get a list of available flows
-        rv = self.client.get("api/flow", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get("api/flow", content_type="application/json", headers=self.default_logged_in_headers)
         self.assertEqual(200, rv.status_code)
         response = rv.json
         self.assertIsNotNone(response)
@@ -1973,7 +2001,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
 
     def test_intake_flows_endpoint(self):
         # Are the basics correct about the existing intake flows?
-        rv = self.client.get("api/flow", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get("api/flow", content_type="application/json", headers=self.default_logged_in_headers)
         self.assertEqual(200, rv.status_code)
         response = rv.json
         for i in response:
@@ -1991,7 +2019,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
                 self.assertEqual(i["steps"][1]["label"], "Contact Information")
 
     def test_self_intake_flow_with_user(self):
-        u = self.construct_user()
+        u = self.default_user
         u_id = u.id
         headers = self.logged_in_headers(user_id=u_id)
 
@@ -2032,7 +2060,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/identification_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2053,7 +2081,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/dependent_intake/identification_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2066,7 +2094,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/dependent_intake/identification_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2078,7 +2106,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/identification_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2090,7 +2118,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/dependent_intake/identification_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2102,7 +2130,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/home_self_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2114,7 +2142,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/supports_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2127,7 +2155,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/dependent_intake/evaluation_history_dependent_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2138,7 +2166,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/evaluation_history_self_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2149,7 +2177,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/dependent_intake/education_dependent_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2160,7 +2188,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/education_self_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2171,7 +2199,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/flow/self_intake/education_self_questionnaire/meta",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2219,7 +2247,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/current_behaviors_dependent_questionnaire",
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -2249,7 +2277,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/current_behaviors_dependent_questionnaire/export",
             follow_redirects=True,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
@@ -2276,7 +2304,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/all/export",
             follow_redirects=True,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
@@ -2334,7 +2362,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/all/export/user/%i" % u1_id,
             follow_redirects=True,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))
@@ -2374,7 +2402,7 @@ class TestQuestionnaire(BaseTestQuestionnaire):
             "/api/q/all/export/user/%i" % u2_id,
             follow_redirects=True,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         wb = openpyxl.load_workbook(io.BytesIO(rv.data))

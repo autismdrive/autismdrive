@@ -643,10 +643,11 @@ class ParticipantSchema(ModelSchema):
     contact = Nested("ContactQuestionnaireSchema", dump_only=True)
     identification = Nested("IdentificationQuestionnaireSchema", dump_only=True)
     _links = Hyperlinks(
-        {
+        schema={
             "self": url_for.Participant("id"),
             "user": url_for.User(),
-        }
+        },
+        dump_only=True,
     )
 
 

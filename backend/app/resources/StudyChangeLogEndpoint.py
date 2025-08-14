@@ -6,14 +6,14 @@ from app.database import session
 from app.enums import Permission, Role
 from app.models import StudyChangeLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_permission, requires_roles
+from app.wrappers import requires_permission, requires_role
 
 
 class StudyChangeLogListEndpoint(MethodView):
     studyChangeLogSchema = SchemaRegistry.StudyChangeLogSchema(many=True)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self):
         study_change_logs = session.query(StudyChangeLog).all()
         return self.SchemaRegistry.studyChangeLogSchema.dump(study_change_logs)

@@ -47,7 +47,7 @@ class AdminNoteEndpoint(MethodView):
         except ValidationError as e:
             raise RestException(RestException.INVALID_OBJECT, details=e.messages)
         updated.last_updated = utcnow()
-        session.add(updated)
+        session.merge(updated)
         session.commit()
         return self.schema.dump(updated)
 

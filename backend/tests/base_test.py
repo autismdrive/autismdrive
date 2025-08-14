@@ -1,12 +1,19 @@
+import os  # isort:skip
+os.environ.setdefault("ENV_NAME", "testing")  # isort:skip
+os.putenv("ENV_NAME", "testing")  # isort:skip
+assert os.getenv("ENV_NAME") == "testing", f"ENV_NAME is {os.getenv('ENV_NAME')} instead of 'testing'"  # isort:skip
+
 import base64
 import datetime
-import os
 import quopri
 import re
+from email import message_from_bytes
+from email.header import decode_header
 from inspect import getsourcefile
 from json import JSONEncoder
-from typing import MutableMapping, TypedDict, Unpack, get_type_hints
+from typing import MutableMapping, Unpack
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 from fixtures.fixture_utils import fake, fake_password
 from fixtures.location import MockLocationWithLatLong
@@ -16,7 +23,7 @@ from flask import json
 from flask.ctx import RequestContext
 from flask.testing import FlaskClient
 from sqlalchemy import Integer, cast, select
-from sqlalchemy.orm import close_all_sessions, joinedload, scoped_session
+from sqlalchemy.orm import close_all_sessions, joinedload, make_transient, scoped_session
 from werkzeug.test import TestResponse
 
 from app.api_app import APIApp
@@ -54,31 +61,7 @@ from app.resources.ResourceEndpoint import get_resource_by_id
 from app.schemas import SchemaRegistry
 from app.utils import utcnow
 from app.utils.resource_utils import to_database_object_dict
-
-os.environ.setdefault("ENV_NAME", "testing")
-os.putenv("ENV_NAME", "testing")
-
-
-class ResourceParams(TypedDict):
-    pass
-
-
-class EventParams(TypedDict):
-    pass
-
-
-class LocationParams(TypedDict):
-    pass
-
-
-class StudyParams(TypedDict):
-    pass
-
-
-ResourceParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Resource).items()}
-EventParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Event).items()}
-LocationParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Location).items()}
-StudyParams.__annotations__ = {k: v.__args__[0] for k, v in get_type_hints(Study).items()}
+from config.base import Settings
 
 
 class DateTimeEncoder(JSONEncoder):
@@ -101,16 +84,28 @@ class BaseTest(TestCase):
     client: FlaskClient
     session: scoped_session
     elastic_index: ElasticIndex
+    default_user: User
+    default_logged_in_headers: dict[str, str]
+    default_admin_user: User
+    default_admin_logged_in_headers: dict[str, str]
+    settings: Settings
 
     @classmethod
     def setUpClass(cls):
         from config.testing import settings
-        # cls.reset_db()
-        # cls.reset_indices()
-
+        cls.settings = settings
         _app = create_app(settings)
 
         cls.app = _app
+
+        assert _app.config["ENV_NAME"] == "testing"
+        assert _app.config["TESTING"]
+        assert "stardrive_test" in _app.config["SQLALCHEMY_DATABASE_URI"]
+        assert "stardrive_test" == _app.config["ELASTIC_SEARCH"].index_prefix
+
+        cls.reset_db()
+        cls.reset_indices()
+
         cls.ctx = _app.test_request_context()
         cls.ctx.push()
 
@@ -128,9 +123,20 @@ class BaseTest(TestCase):
         cls.ctx.pop()
 
     def setUp(self):
+        self.assertEqual(self.app.config["ENV_NAME"], "testing")
+        self.assertTrue(self.app.config["TESTING"])
+        self.assertIn("stardrive_test", self.app.config["SQLALCHEMY_DATABASE_URI"])
+        self.assertEqual("stardrive_test", self.app.config["ELASTIC_SEARCH"].index_prefix)
+
         self.reset_db()
         self.reset_indices()
         self.auths = {}
+
+        self.default_user = self.construct_user(role=Role.admin)
+        self.default_logged_in_headers = self.logged_in_headers(self.default_user.id)
+
+        self.default_admin_user = self.construct_user(role=Role.admin)
+        self.default_admin_logged_in_headers = self.logged_in_headers(self.default_admin_user.id)
 
     def tearDown(self):
         self.session.rollback()
@@ -141,6 +147,7 @@ class BaseTest(TestCase):
     def reset_indices(cls):
         cls.elastic_index = ElasticIndex.instance()
         cls.elastic_index.clear()
+        cls.elastic_index.refresh_and_flush(es_index=cls.elastic_index.index, flush=True)
 
     @classmethod
     def reset_db(cls):
@@ -152,6 +159,7 @@ class BaseTest(TestCase):
     def logged_in_headers(self, user_id: int = None, password: str = None) -> dict[str, str]:
         # If no user is provided, generate a dummy Admin user
         if user_id is not None and user_id in self.auths:
+            print(f"Reusing auth headers for user {user_id}: {self.auths[user_id]}")
             return self.auths[user_id]
 
         if user_id is None:
@@ -166,7 +174,7 @@ class BaseTest(TestCase):
         self.assertIsNotNone(db_user)
         self.session.close()
 
-        password = fake_password() if password is None else password
+        password = password or fake_password()
         token = self.login_user(user_id, password)
 
         self.auths[user_id] = dict(Authorization=f"Bearer {token}")
@@ -229,7 +237,7 @@ class BaseTest(TestCase):
             self.assertTrue(200 <= rv.status_code < 300, f"BAD Response: {rv.status_code}. {msg}")
 
     def construct_user(
-        self, email=None, role=Role.user, last_login: datetime.datetime | str = datetime.datetime.now()
+        self, email=None, role: Role = Role.user, last_login: datetime.datetime | str = utcnow()
     ) -> User:
         email = email or fake.email()
         if isinstance(last_login, str):
@@ -250,7 +258,7 @@ class BaseTest(TestCase):
             .scalar_one_or_none()
         )
         self.assertEqual(db_user.email, user.email)
-
+        make_transient(db_user)
         self.session.close()
         return db_user
 
@@ -262,8 +270,8 @@ class BaseTest(TestCase):
         participant_id = participant.id
         db_participant = get_participant_by_id(participant_id, with_joins=True)
         self.assertEqual(db_participant.relationship, participant.relationship)
+        make_transient(db_participant)
         self.session.close()
-
         return db_participant
 
     def construct_user_meta(self, user_id):
@@ -276,6 +284,8 @@ class BaseTest(TestCase):
 
         db_user_meta = self.session.query(UserMeta).filter_by(id=user_id).first()
         self.assertEqual(db_user_meta.id, user_id)
+        make_transient(db_user_meta)
+        self.session.close()
         return db_user_meta
 
     def construct_admin_note(
@@ -286,6 +296,8 @@ class BaseTest(TestCase):
         self.session.commit()
         db_admin_note = self.session.query(AdminNote).filter_by(id=admin_note.id).first()
         self.assertEqual(db_admin_note.note, admin_note.note)
+        make_transient(db_admin_note)
+        self.session.close()
         return db_admin_note
 
     def construct_category(self, name="Ultimakers", parent_id: int = None, display_order: int = None) -> Category:
@@ -300,17 +312,15 @@ class BaseTest(TestCase):
         db_category = get_category_by_id(category_id, with_joins=True)
         self.assertIsNotNone(db_category.id)
         self.assertEqual(db_category.name, name)
+        make_transient(db_category)
         self.session.close()
         return db_category
 
-    def construct_resource(
-        self,
-        **kwargs: Unpack[ResourceParams],
-    ):
+    def construct_resource(self, **kwargs: Unpack[Resource]):
         mock_resource = MockResource()
 
         # Override any fields that were passed in
-        for key in ResourceParams.__annotations__.keys():
+        for key in Resource.__annotations__.keys():
             if key in kwargs and kwargs[key] is not None:
                 mock_resource.__setattr__(key, kwargs[key])
 
@@ -330,21 +340,23 @@ class BaseTest(TestCase):
 
         db_resource = get_resource_by_id(resource_id, with_joins=True)
         self.assertEqual(db_resource.website, resource.website)
-        self.elastic_index.add_document(to_database_object_dict(SchemaRegistry.ResourceSchema(), db_resource))
+        self.elastic_index.add_document(to_database_object_dict(SchemaRegistry.ResourceSchema(), db_resource), flush=True)
+        make_transient(db_resource)
         self.session.close()
-
-        return get_resource_by_id(resource_id, with_joins=True)
+        return db_resource
 
     def construct_location(
         self,
-        **kwargs: Unpack[LocationParams],
+        **kwargs: Unpack[Location],
     ):
         mock_location = MockLocationWithLatLong()
 
         # Override any fields that were passed in
-        for key in LocationParams.__annotations__.keys():
+        keys = {*Resource.__annotations__.keys(), *Location.__annotations__.keys()}
+        for key in keys:
             if key in kwargs and kwargs[key] is not None:
                 mock_location.__setattr__(key, kwargs[key])
+                assert mock_location.__getattribute__(key) == kwargs[key]
 
         location = Location(**mock_location.__dict__)
         self.session.add(location)
@@ -370,8 +382,9 @@ class BaseTest(TestCase):
             .scalar_one()
         )
         self.assertEqual(db_location.website, location.website)
-
-        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.LocationSchema(), db_location))
+        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.LocationSchema(), db_location), flush=True)
+        make_transient(db_location)
+        self.session.close()
         return db_location
 
     def construct_location_category(self, location_id, category_name):
@@ -384,6 +397,7 @@ class BaseTest(TestCase):
 
         db_c = get_category_by_id(c_id, with_joins=True)
         self.assertEqual(db_c.name, category_name)
+        make_transient(db_c)
         self.session.close()
         return db_c
 
@@ -396,17 +410,15 @@ class BaseTest(TestCase):
 
         db_c = get_category_by_id(c_id, with_joins=True)
         self.assertEqual(db_c.name, category_name)
+        make_transient(db_c)
         self.session.close()
         return db_c
 
-    def construct_study(
-        self,
-        **kwargs: Unpack[StudyParams],
-    ):
+    def construct_study(self, **kwargs: Unpack[Study]):
         mock_study = MockStudy()
 
         # Override any fields that were passed in
-        for key in StudyParams.__annotations__.keys():
+        for key in Study.__annotations__.keys():
             if key in kwargs and kwargs[key] is not None:
                 mock_study.__setattr__(key, kwargs[key])
 
@@ -427,9 +439,10 @@ class BaseTest(TestCase):
         db_study: Study = self.session.execute(select(Study).filter(Study.id == study_id)).unique().scalars().first()
         self.assertEqual(db_study.eligibility_url, study.eligibility_url)
 
-        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.LocationSchema(), db_study))
+        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.StudySchema(), db_study), flush=True)
         self.assertEqual(len(db_study.categories), len(category_ids))
-
+        make_transient(db_study)
+        self.session.close()
         return db_study
 
     def construct_investigator(self, name: str = None, title="Ph.D., Assistant Professor of Mereology"):
@@ -444,8 +457,11 @@ class BaseTest(TestCase):
         assert i_id is not None
 
         db_inv = self.session.query(Investigator).filter_by(id=i_id).first()
+        assert db_inv is not None
         self.assertEqual(db_inv.name, name)
         self.assertEqual(db_inv.title, title)
+        make_transient(db_inv)
+        self.session.close()
         return db_inv
 
     def construct_event(
@@ -460,7 +476,7 @@ class BaseTest(TestCase):
         zip="99775",
         phone="555-555-5555",
         website="http://stardrive.org",
-        date=datetime.datetime.now() + datetime.timedelta(days=7),
+        date=utcnow() + datetime.timedelta(days=7),
         organization_name="Event Org",
         post_survey_link="http://stardrive.org/survey",
         webinar_link="http://stardrive.org/event",
@@ -510,7 +526,9 @@ class BaseTest(TestCase):
         self.session.close()
 
         db_event = self.session.query(Event).filter(Event.id == event.id).first()
-        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.EventSchema(), db_event))
+        self.elastic_index.add_document(document=to_database_object_dict(SchemaRegistry.EventSchema(), db_event), flush=True)
+        make_transient(db_event)
+        self.session.close()
         return db_event
 
     def construct_zip_code(self, id=24401, latitude=38.146216, longitude=-79.07625):
@@ -522,6 +540,8 @@ class BaseTest(TestCase):
         self.assertEqual(db_z.id, z.id)
         self.assertEqual(db_z.latitude, z.latitude)
         self.assertEqual(db_z.longitude, z.longitude)
+        make_transient(db_z)
+        self.session.close()
         return db_z
 
     def construct_chain_steps(self):
@@ -538,30 +558,33 @@ class BaseTest(TestCase):
     def construct_chain_step(self, id=0, name="time_warp_01", instruction="Jump to the left", last_updated=utcnow()):
         self.session.add(ChainStep(id=id, name=name, instruction=instruction, last_updated=last_updated))
         self.session.commit()
-        return self.session.query(ChainStep).filter(ChainStep.id == cast(id, Integer)).first()
+        db_chain_step = self.session.query(ChainStep).filter(ChainStep.id == cast(id, Integer)).first()
+        make_transient(db_chain_step)
+        self.session.close()
+        return db_chain_step
 
     def construct_everything(self):
         questionnaires = None
         if hasattr(self, "construct_all_questionnaires"):
             questionnaires = self.construct_all_questionnaires()
         cat = self.construct_category()
-        resource = self.construct_resource(**MockResource().__dict__, categories=[cat])
+        resource = self.construct_resource(categories=[cat])
         study = self.construct_study()
         location = self.construct_location()
-        user = self.construct_user()
+        user = self.construct_user(email=fake.email(), role=Role.user)
         participant = self.construct_participant(user.id, "self_participant")
         self.construct_event()
         self.construct_location_category(location.id, cat.name)
         self.construct_study_category(study.id, cat.name)
         self.construct_zip_code()
-        investigator = self.construct_investigator(name="Sam I am")
-        self.session.add(StudyInvestigator(study=study, investigator=investigator))
-        self.session.add(StudyUser(study=study, user=self.construct_user()))
-        self.session.add(AdminNote(user_id=self.construct_user().id, resource_id=self.construct_resource().id, note=""))
-        self.session.add(
-            UserFavorite(user_id=self.construct_user().id, type="resource", resource_id=self.construct_resource().id)
-        )
-        self.session.add(EmailLog(user_id=self.construct_user().id, type="test", tracking_code="test"))
+        investigator = self.construct_investigator(name=fake.name(), title=fake.profile()["job"])
+        self.session.add(StudyInvestigator(study_id=study.id, investigator_id=investigator.id))
+        self.session.add(StudyUser(study_id=study.id, user_id=self.default_user.id))
+        r1 = self.construct_resource()
+        r2 = self.construct_resource()
+        self.session.add(AdminNote(user_id=self.default_user.id, resource_id=r1.id, note=""))
+        self.session.add(UserFavorite(user_id=self.default_user.id, type="resource", resource_id=r2.id))
+        self.session.add(EmailLog(user_id=self.default_user.id, type="test", tracking_code="test"))
         self.session.add(
             ResourceChangeLog(
                 type="edit",
@@ -606,3 +629,18 @@ class BaseTest(TestCase):
             "is_english_primary": True,
             "participant_id": participant_id,
         }
+
+    def assert_email_headers(self, msg_bytes: bytes, expected_recipient: str, expected_subject: str):
+        msg = message_from_bytes(msg_bytes)
+        self.assertIn(expected_recipient, msg.get("To"))
+        subject, encoding = decode_header(msg.get("Subject"))[0]
+        self.assertEqual(expected_subject, subject.decode(encoding))
+
+    def assert_email_sent(self, mock_sendmail: MagicMock, expected_recipient: str, expected_subject: str):
+        mock_sendmail.assert_called_once()
+        self.assert_email_headers(mock_sendmail.mock_calls[0].args[2], expected_recipient, expected_subject)
+
+    def assert_emails_sent(self, mock_sendmail: MagicMock, expected_recipient: str, expected_subjects: list[str]):
+        self.assertEqual(mock_sendmail.call_count, len(expected_subjects))
+        for i, expected_subject in enumerate(expected_subjects):
+            self.assert_email_headers(mock_sendmail.mock_calls[i].args[2], expected_recipient, expected_subject)

@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 from collections import Counter
 
 from fixtures.fixture_utils import fake
@@ -38,7 +38,7 @@ class TestResources(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/resource/%i" % r_id, content_type="application/json")
@@ -56,7 +56,7 @@ class TestResources(BaseTest):
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/resource/%i" % r_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/resource/%i" % r_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
@@ -67,14 +67,14 @@ class TestResources(BaseTest):
         from app.schemas import SchemaRegistry
         from app.utils.resource_utils import to_database_object_dict
 
-        admin_headers = self.logged_in_headers()
+        admin_headers = self.default_logged_in_headers
 
         r = self.construct_resource()
         r_id = r.id
         rv = self.client.get("api/resource/%i" % r_id, content_type="application/json")
         self.assert_success(rv)
 
-        self.construct_admin_note(user=self.construct_user(), resource=r)
+        self.construct_admin_note(user=self.default_user, resource=r)
         db_r = get_resource_by_id(r_id, with_joins=True)
         resource_dict = to_database_object_dict(SchemaRegistry.ResourceSchema(), db_r)
 
@@ -95,7 +95,7 @@ class TestResources(BaseTest):
             data=self.jsonify(resource),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -106,11 +106,11 @@ class TestResources(BaseTest):
     def test_get_resource_by_category(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c, type="resource")
+        cr = ResourceCategory(resource_id=r.id, category_id=c.id, type="resource")
         self.session.add(cr)
         self.session.commit()
         rv = self.client.get(
-            "/api/category/%i/resource" % c.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/resource" % c.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -122,12 +122,12 @@ class TestResources(BaseTest):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c, type="resource")
-        cr2 = ResourceCategory(resource=r, category=c2, type="resource")
+        cr = ResourceCategory(resource_id=r.id, category_id=c.id, type="resource")
+        cr2 = ResourceCategory(resource_id=r.id, category_id=c2.id, type="resource")
         self.session.add_all([cr, cr2])
         self.session.commit()
         rv = self.client.get(
-            "/api/category/%i/resource" % c.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/resource" % c.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -138,7 +138,7 @@ class TestResources(BaseTest):
     def test_category_resource_count(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c, type="resource")
+        cr = ResourceCategory(resource_id=r.id, category_id=c.id, type="resource")
         self.session.add(cr)
         self.session.commit()
         rv = self.client.get("/api/category/%i" % c.id, content_type="application/json")
@@ -149,7 +149,7 @@ class TestResources(BaseTest):
     def test_get_category_by_resource(self):
         c = self.construct_category()
         r = self.construct_resource()
-        cr = ResourceCategory(resource=r, category=c, type="resource")
+        cr = ResourceCategory(resource_id=r.id, category_id=c.id, type="resource")
         self.session.add(cr)
         self.session.commit()
         rv = self.client.get("/api/resource/%i/category" % r.id, content_type="application/json")

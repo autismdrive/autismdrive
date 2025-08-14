@@ -1,6 +1,7 @@
-from tests.base_test import BaseTest  #isort:skip
+from app.utils import utcnow
+
+from tests.base_test import BaseTest  # isort:skip
 import math
-from datetime import datetime
 from typing import Callable
 from unittest.mock import patch
 
@@ -105,7 +106,7 @@ class TestDataLoader(BaseTest):
 
         # Get the number of items in the database
         num_db_resources = self.session.query(Resource).filter(Resource.type == "resource").count()
-        num_db_events = self.session.query(Event).filter(Event.date >= datetime.now()).count()
+        num_db_events = self.session.query(Event).filter(Event.date >= utcnow()).count()
         num_db_locations = self.session.query(Resource).filter(Resource.type == "location").count()
         num_db_studies = self.session.query(Study).count()
 

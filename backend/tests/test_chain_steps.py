@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 from app.models import ChainSessionStep, ChainStep
 
 
@@ -11,7 +11,7 @@ class TestChainStep(BaseTest):
             "/api/chain_step/%i" % chain_step.id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -22,7 +22,9 @@ class TestChainStep(BaseTest):
         chain_step = self.session.query(ChainStep).first()
         self.assertIsNotNone(chain_step)
         rv = self.client.get(
-            "/api/chain_step/%i" % chain_step.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/chain_step/%i" % chain_step.id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         response = rv.json
         response["instruction"] = "Take out the trash"
@@ -31,12 +33,14 @@ class TestChainStep(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         self.session.commit()
         rv = self.client.get(
-            "/api/chain_step/%i" % chain_step.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/chain_step/%i" % chain_step.id,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -49,7 +53,7 @@ class TestChainStep(BaseTest):
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/chain_step/%i" % chain_step_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/chain_step/%i" % chain_step_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
@@ -67,7 +71,7 @@ class TestChainStep(BaseTest):
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/chain_step/%i" % chain_step_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/chain_step/%i" % chain_step_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assertEqual(rv.status_code, 400)
         self.assertEqual(rv.json["code"], "can_not_delete")
@@ -76,7 +80,10 @@ class TestChainStep(BaseTest):
         chain_steps = self.construct_chain_steps()
         self.assertEqual(4, len(chain_steps))
         rv = self.client.get(
-            "/api/chain_step", follow_redirects=True, content_type="application/json", headers=self.logged_in_headers()
+            "/api/chain_step",
+            follow_redirects=True,
+            content_type="application/json",
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json

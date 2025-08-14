@@ -9,12 +9,12 @@ from app.database import session
 from app.enums import Role
 from app.models import DataTransferLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_roles
+from app.wrappers import requires_role
 
 
 class DataTransferLogEndpoint(MethodView):
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self):
         logs_schema = SchemaRegistry.DataTransferLogPageSchema()
 

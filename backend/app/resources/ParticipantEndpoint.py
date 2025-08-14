@@ -1,6 +1,10 @@
+from copy import deepcopy
+from http import HTTPStatus
+
 from flask import g, request
 from flask.views import MethodView
-from sqlalchemy import Select, func, select
+from marshmallow import ValidationError
+from sqlalchemy import Select, func, select, update
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.interfaces import LoaderOption
 from sqlalchemy.sql.base import ExecutableOption
@@ -12,7 +16,7 @@ from app.models import Participant, User
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
 from app.utils import utcnow
-from app.wrappers import requires_permission, requires_roles
+from app.wrappers import requires_permission, requires_role
 
 
 def add_joins_to_statement(
@@ -49,11 +53,13 @@ class ParticipantEndpoint(MethodView):
 
         u_id = g.user.id
         db_participant = get_participant_by_id(participant_id, with_joins=True)
-        db_user = get_user_by_id(u_id, with_joins=True)
 
         if db_participant is None:
             raise RestException(RestException.NOT_FOUND)
+        if not (g.user.related_to_participant(db_participant.id) or g.user.role == Role.admin):
+            raise RestException(RestException.UNRELATED_PARTICIPANT)
 
+        db_user = get_user_by_id(u_id, with_joins=True)
         is_related = db_user.related_to_participant(participant_id)
         is_admin = db_user.role == Role.admin
 
@@ -63,7 +69,7 @@ class ParticipantEndpoint(MethodView):
         raise RestException(RestException.UNRELATED_PARTICIPANT)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def delete(self, participant_id: int):
         session.query(Participant).filter_by(id=participant_id).delete()
         return "", 204
@@ -71,27 +77,30 @@ class ParticipantEndpoint(MethodView):
     @auth.login_required
     def put(self, participant_id: int):
         request_data = request.get_json()
-        db_participant = get_participant_by_id(participant_id, with_joins=False)
-        if db_participant is None:
+
+        old_participant = get_participant_by_id(participant_id, with_joins=False)
+
+        if old_participant is None:
             raise RestException(RestException.NOT_FOUND)
-        if not (g.user.related_to_participant(db_participant.id) or g.user.role == Role.admin):
+        if not (g.user.related_to_participant(old_participant.id) or g.user.role == Role.admin):
             raise RestException(RestException.UNRELATED_PARTICIPANT)
+        if "user_id" in request_data and g.user.role != Role.admin:
+            raise RestException(RestException.PERMISSION_DENIED, HTTPStatus.FORBIDDEN)
 
         try:
-            updated = self.schema.load(request_data, instance=db_participant)
-        except Exception as errors:
-            raise RestException(RestException.INVALID_OBJECT, details=errors)
+            updated_values = self.schema.load(data=request_data, partial=True, session=session)
+        except Exception as e:
+            raise RestException(RestException.INVALID_OBJECT, details=e)
 
-        updated.last_updated = utcnow()
-        session.add(updated)
+        filtered_dict = {k: request_data[k] for k in request_data if k in self.schema.load_fields}
+        updated_dict = {**filtered_dict, "last_updated": utcnow()}
+        update_statement = update(Participant).where(Participant.id == participant_id).values(updated_dict)
+        session.execute(update_statement)
         session.commit()
         session.close()
 
-        updated_db_participant = get_participant_by_id(participant_id, with_joins=True)
-
-        session.close()
-        return self.schema.dump(updated_db_participant) if updated_db_participant else None
-
+        db_updated = get_participant_by_id(participant_id, with_joins=True)
+        return self.schema.dump(db_updated)
 
 class ParticipantListEndpoint(MethodView):
     schema = SchemaRegistry.ParticipantSchema(many=True)

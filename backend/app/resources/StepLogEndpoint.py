@@ -6,14 +6,14 @@ from app.database import session
 from app.enums import Permission, Role
 from app.models import StepLog
 from app.schemas import SchemaRegistry
-from app.wrappers import requires_permission, requires_roles
+from app.wrappers import requires_permission, requires_role
 
 
 class StepLogListEndpoint(MethodView):
     stepLogsSchema = SchemaRegistry.StepLogSchema(many=True)
 
     @auth.login_required
-    @requires_roles(Role.admin)
+    @requires_role(Role.admin)
     def get(self):
         step_logs = session.query(StepLog).all()
         return self.stepLogsSchema.dump(step_logs)

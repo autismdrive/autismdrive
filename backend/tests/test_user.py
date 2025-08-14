@@ -1,4 +1,7 @@
-from tests.base_test import BaseTest  #isort:skip
+import smtplib
+from unittest.mock import MagicMock, patch
+
+from tests.base_test import BaseTest  # isort:skip
 import datetime
 
 from fixtures.fixture_utils import fake, fake_password, fake_user_id
@@ -6,7 +9,6 @@ from flask import json
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from app.email_service import EmailService
 from app.enums import Permission, Relationship, Role, StudyUserStatus
 from app.models import EmailLog, StudyUser, User, UserFavorite
 from app.rest_exception import RestException
@@ -22,10 +24,11 @@ class TestUser(BaseTest):
 
     def test_user_basics(self):
         u_email = fake.email()
-        self.construct_user(email=u_email)
-        u = self.session.query(User).first()
-        self.assertIsNotNone(u)
+        u = self.construct_user(email=u_email)
         u_id = u.id
+        db_u = self.session.query(User).filter(User.id == u_id).options(joinedload(User.participants)).first()
+        self.assertIsNotNone(db_u)
+        self.assertEqual(db_u.email, u_email)
         headers = self.logged_in_headers(u.id)
         rv = self.client.get(
             "/api/user/%i" % u_id, follow_redirects=True, content_type="application/json", headers=headers
@@ -37,15 +40,15 @@ class TestUser(BaseTest):
 
     def test_modify_user_basics(self):
         old_email = fake.email()
-        self.construct_user(email=old_email)
-        u = (
+        u = self.construct_user(email=old_email)
+        db_u = (
             self.session.execute(select(User).options(joinedload(User.participants)).filter(User.email == old_email))
             .unique()
             .scalar_one_or_none()
         )
-        self.assertIsNotNone(u)
+        self.assertIsNotNone(db_u)
         u_id = u.id
-        admin_headers = self.logged_in_headers()
+        admin_headers = self.default_logged_in_headers
         user_headers = self.logged_in_headers(u.id)
         self.session.close()
 
@@ -86,39 +89,47 @@ class TestUser(BaseTest):
         self.assertNotEqual(orig_date, response["last_updated"])
 
     def test_delete_user(self):
-        u = self.construct_user()
+        u = self.construct_user(email=fake.email())
         u_id = u.id
 
         rv = self.client.get("api/user/%i" % u_id, content_type="application/json")
         self.assertEqual(401, rv.status_code)
-        rv = self.client.get("api/user/%i" % u_id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/user/%i" % u_id, content_type="application/json", headers=self.default_admin_logged_in_headers
+        )
         self.assert_success(rv)
 
         rv = self.client.delete("api/user/%i" % u_id, content_type="application/json", headers=None)
         self.assertEqual(401, rv.status_code)
-        rv = self.client.delete("api/user/%i" % u_id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.delete(
+            "api/user/%i" % u_id, content_type="application/json", headers=self.default_admin_logged_in_headers
+        )
         self.assert_success(rv)
 
         rv = self.client.get("api/user/%i" % u_id, content_type="application/json")
         self.assertEqual(401, rv.status_code)
-        rv = self.client.get("api/user/%i" % u_id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/user/%i" % u_id, content_type="application/json", headers=self.default_admin_logged_in_headers
+        )
         self.assertEqual(404, rv.status_code)
 
-    def test_create_user(self):
-        user = {"email": "tara@spiders.org"}
+    @patch("smtplib.SMTP", autospec=True)
+    def test_create_user(self, mock_smtp: MagicMock):
+        user_data = {"email": fake.email()}
         rv = self.client.post(
             "api/user",
-            data=self.jsonify(user),
+            data=self.jsonify(user_data),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
             follow_redirects=True,
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response["email"], "tara@spiders.org")
+        self.assertEqual(response["email"], user_data["email"])
         self.assertIsNotNone(response["id"])
 
-    def test_create_user_with_bad_role(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_create_user_with_bad_role(self, mock_smtp: MagicMock):
         user = {"email": "tara@spiders.org", "role": "web_weaver"}
 
         # post should change unknown role to 'user'
@@ -127,21 +138,22 @@ class TestUser(BaseTest):
             data=self.jsonify(user),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["role"], "user")
 
-    def test_non_admin_cannot_create_admin_user(self):
-        u = self.construct_user()
+    @patch("smtplib.SMTP", autospec=True)
+    def test_non_admin_cannot_create_admin_user(self, mock_smtp: MagicMock):
+        u = self.construct_user(role=Role.user)
         u_id = u.id
         u_email = u.email
         non_admin_headers = self.logged_in_headers(user_id=u.id)
-        admin_headers = self.logged_in_headers()
+        admin_headers = self.default_admin_logged_in_headers
 
         # post should make role 'user'
-        new_admin_user = {"email": "tara@spiders.org", "role": "admin"}
+        new_admin_user = {"email": fake.email(), "role": "admin"}
         rv = self.client.post(
             "/api/user",
             data=self.jsonify(new_admin_user),
@@ -178,7 +190,8 @@ class TestUser(BaseTest):
         response = rv.json
         self.assertEqual(response["role"], "admin")
 
-    def test_create_user_with_bad_password(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_create_user_with_bad_password(self, mock_smtp: MagicMock):
         user_id = fake_user_id()
         email = fake.email()
         role = Role.user
@@ -187,7 +200,7 @@ class TestUser(BaseTest):
             "/api/user",
             data=self.jsonify(data),
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_admin_logged_in_headers,
             content_type="application/json",
         )
         self.assert_success(rv)
@@ -198,7 +211,7 @@ class TestUser(BaseTest):
             # Should raise exception
             user.password = fake_password(secure=False)
 
-    def test_create_user_with_password(
+    def _create_user_with_password(
         self, user_id: int = None, email: str = None, role: Role = None, password: str = None
     ) -> User:
         role = role or Role.user
@@ -206,7 +219,7 @@ class TestUser(BaseTest):
         user_id = user_id or fake_user_id()
         email = email or fake.email()
         data = {"id": user_id, "email": email}
-        admin_headers = self.logged_in_headers()
+        admin_headers = self.default_admin_logged_in_headers
 
         rv = self.client.post(
             "/api/user",
@@ -250,11 +263,12 @@ class TestUser(BaseTest):
 
         return db_user
 
-    def test_login_user(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_login_user(self, mock_smtp: MagicMock):
         user_email = fake.email()
         user_password = fake_password()
         user_id = fake_user_id()
-        user = self.test_create_user_with_password(user_id=user_id, email=user_email, password=user_password)
+        user = self._create_user_with_password(user_id=user_id, email=user_email, password=user_password)
         data = {"email": user_email, "password": user_password}
 
         # Login shouldn't work with email not yet verified
@@ -282,62 +296,60 @@ class TestUser(BaseTest):
         self.assert_success(response)
         return json.loads(response.data.decode())
 
-    def test_register_sends_email(self):
-        message_count = len(EmailService.TEST_MESSAGES)
-        self.test_create_user_with_password()
-        self.assertGreater(len(EmailService.TEST_MESSAGES), message_count)
-        self.assertEqual("Autism DRIVE: Confirm Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
+    @patch("smtplib.SMTP", autospec=True)
+    def test_register_sends_email(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        user = self._create_user_with_password()
 
+        self.assert_email_sent(mock_sendmail, user.email, "Autism DRIVE: Confirm Email")
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
-    def test_forgot_password_sends_email(self):
-        user = self.test_create_user_with_password(user_id=10101, email="forgot_password_sends_email@test.com")
-        message_count = len(EmailService.TEST_MESSAGES)
+    @patch("smtplib.SMTP", autospec=True)
+    def test_forgot_password_sends_email(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        user = self._create_user_with_password(email=fake.email())
+        self.assert_email_sent(mock_sendmail, user.email, "Autism DRIVE: Confirm Email")
+        mock_sendmail.reset_mock()
         data = {"email": user.email}
         rv = self.client.post("/api/forgot_password", data=self.jsonify(data), content_type="application/json")
         self.assert_success(rv)
-        self.assertGreater(len(EmailService.TEST_MESSAGES), message_count)
-        self.assertEqual("Autism DRIVE: Password Reset Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
-
+        self.assert_email_sent(mock_sendmail, user.email, "Autism DRIVE: Password Reset Email")
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
     def test_enrolled_vs_inquiry_studies_by_user(self):
-        u = self.construct_user(email="u1@sartography.com")
-        s1 = self.construct_study(title="Super Study")
-        s2 = self.construct_study(title="Amazing Study")
-        s3 = self.construct_study(title="Phenomenal Study")
-        su1 = StudyUser(study=s1, user=u, status=StudyUserStatus.inquiry_sent)
-        su2 = StudyUser(study=s3, user=u, status=StudyUserStatus.inquiry_sent)
-        su3 = StudyUser(study=s2, user=u, status=StudyUserStatus.enrolled)
+        u = self.construct_user(email=fake.email())
+        u_headers = self.logged_in_headers(user_id=u.id)
+        s1 = self.construct_study(title=fake.text())
+        s2 = self.construct_study(title=fake.text())
+        s3 = self.construct_study(title=fake.text())
+        su1 = StudyUser(study_id=s1.id, user_id=u.id, status=StudyUserStatus.inquiry_sent)
+        su2 = StudyUser(study_id=s3.id, user_id=u.id, status=StudyUserStatus.inquiry_sent)
+        su3 = StudyUser(study_id=s2.id, user_id=u.id, status=StudyUserStatus.enrolled)
         self.session.add_all([su1, su2, su3])
         self.session.commit()
 
-        rv = self.client.get(
-            "/api/user/%i/inquiry/study" % u.id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get("/api/user/%i/inquiry/study" % u.id, content_type="application/json", headers=u_headers)
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(2, len(response))
         self.assertNotEqual(s2.id, response[0]["study_id"])
         self.assertNotEqual(s2.id, response[1]["study_id"])
-        rv = self.client.get(
-            "/api/user/%i/enrolled/study" % u.id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get("/api/user/%i/enrolled/study" % u.id, content_type="application/json", headers=u_headers)
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(1, len(response))
         self.assertEqual(s2.id, response[0]["study_id"])
 
     def test_get_user_by_study(self):
-        u = self.construct_user()
+        u = self.default_user
         s = self.construct_study()
-        su = StudyUser(study=s, user=u, status=StudyUserStatus.inquiry_sent)
+        su = StudyUser(study_id=s.id, user_id=u.id, status=StudyUserStatus.inquiry_sent)
         self.session.add(su)
         self.session.commit()
         rv = self.client.get(
-            "/api/study/%i/user" % s.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/study/%i/user" % s.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -347,7 +359,7 @@ class TestUser(BaseTest):
         self.assertEqual(u.email, response[0]["user"]["email"])
 
     def test_add_user_to_study(self):
-        u = self.construct_user()
+        u = self.default_user
         s = self.construct_study()
 
         us_data = {"study_id": s.id, "user_id": u.id}
@@ -356,7 +368,7 @@ class TestUser(BaseTest):
             "/api/study_user",
             data=self.jsonify(us_data),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -364,9 +376,9 @@ class TestUser(BaseTest):
         self.assertEqual(s.id, response["study_id"])
 
     def test_set_all_users_on_study(self):
-        u1 = self.construct_user()
-        u2 = self.construct_user()
-        u3 = self.construct_user()
+        u1 = self.default_user
+        u2 = self.default_user
+        u3 = self.default_user
         s = self.construct_study()
 
         us_data = [
@@ -378,7 +390,7 @@ class TestUser(BaseTest):
             "/api/study/%i/user" % s.id,
             data=self.jsonify(us_data),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -389,7 +401,7 @@ class TestUser(BaseTest):
             "/api/study/%i/user" % s.id,
             data=self.jsonify(us_data),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -397,10 +409,10 @@ class TestUser(BaseTest):
 
     def test_remove_user_from_study(self):
         self.test_add_user_to_study()
-        rv = self.client.delete("/api/study_user/%i" % 1, headers=self.logged_in_headers())
+        rv = self.client.delete("/api/study_user/%i" % 1, headers=self.default_logged_in_headers)
         self.assert_success(rv)
         rv = self.client.get(
-            "/api/study/%i/user" % 1, content_type="application/json", headers=self.logged_in_headers()
+            "/api/study/%i/user" % 1, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -443,12 +455,13 @@ class TestUser(BaseTest):
         self.assertTrue(Permission.user_roles not in editor.role.permissions())
         self.assertTrue(Permission.user_roles not in researcher.role.permissions())
 
-    def test_login_tracks_login_date(self):
+    @patch("smtplib.SMTP", autospec=True)
+    def test_login_tracks_login_date(self, mock_smtp: MagicMock):
         user_email = fake.email()
         user_password = fake_password()
         user_id = fake_user_id()
         time_before_create = utcnow()
-        user = self.test_create_user_with_password(user_id=user_id, email=user_email, password=user_password)
+        user = self._create_user_with_password(user_id=user_id, email=user_email, password=user_password)
         last_login = user.last_login
         self.assertAlmostEqual(time_before_create, last_login, delta=datetime.timedelta(seconds=10))
         data = {"email": user_email, "password": user_password}
@@ -473,15 +486,15 @@ class TestUser(BaseTest):
         self.assertGreater(time_after_2nd_login, time_after_1st_login)
 
     def test_get_favorites_by_user(self):
-        u = self.construct_user()
+        u = self.default_user
         r = self.construct_resource()
         c = self.construct_category()
-        fav1 = UserFavorite(resource_id=r.id, user=u, type="resource")
-        fav2 = UserFavorite(category_id=c.id, user=u, type="category")
+        fav1 = UserFavorite(resource_id=r.id, user_id=u.id, type="resource")
+        fav2 = UserFavorite(category_id=c.id, user_id=u.id, type="category")
         self.session.add_all([fav1, fav2])
         self.session.commit()
         rv = self.client.get(
-            "/api/user/%i/favorite" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/favorite" % u.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -492,49 +505,56 @@ class TestUser(BaseTest):
         self.assertEqual("category", response[1]["type"])
 
     def test_user_favorite_types(self):
-        u = self.construct_user(email="u1@sartography.com")
+        u = self.construct_user(email=fake.email(), role=Role.user)
+        u_headers = self.logged_in_headers(user_id=u.id)
         r = self.construct_resource()
         c = self.construct_category(name="cat1")
         c2 = self.construct_category(name="cat2")
-        fav1 = UserFavorite(resource_id=r.id, user=u, type="resource")
-        fav2 = UserFavorite(category_id=c.id, user=u, type="category")
-        fav3 = UserFavorite(category_id=c2.id, user=u, type="category")
-        fav4 = UserFavorite(age_range="adult", user=u, type="age_range")
-        fav5 = UserFavorite(age_range="aging", user=u, type="age_range")
-        fav6 = UserFavorite(age_range="transition", user=u, type="age_range")
-        fav7 = UserFavorite(language="arabic", user=u, type="language")
-        fav8 = UserFavorite(covid19_category="edu-tainment", user=u, type="covid19_category")
+        fav1 = UserFavorite(resource_id=r.id, user_id=u.id, type="resource")
+        fav2 = UserFavorite(category_id=c.id, user_id=u.id, type="category")
+        fav3 = UserFavorite(category_id=c2.id, user_id=u.id, type="category")
+        fav4 = UserFavorite(age_range="adult", user_id=u.id, type="age_range")
+        fav5 = UserFavorite(age_range="aging", user_id=u.id, type="age_range")
+        fav6 = UserFavorite(age_range="transition", user_id=u.id, type="age_range")
+        fav7 = UserFavorite(language="arabic", user_id=u.id, type="language")
+        fav8 = UserFavorite(covid19_category="edu-tainment", user_id=u.id, type="covid19_category")
         self.session.add_all([fav1, fav2, fav3, fav4, fav5, fav6, fav7, fav8])
         self.session.commit()
-        rv = self.client.get(
-            "/api/user/%i/favorite" % u.id, content_type="application/json", headers=self.logged_in_headers()
-        )
+        rv = self.client.get("/api/user/%i/favorite" % u.id, content_type="application/json", headers=u_headers)
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(8, len(response))
         rv = self.client.get(
-            "/api/user/%i/favorite/resource" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/favorite/resource" % u.id,
+            content_type="application/json",
+            headers=u_headers,
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(1, len(response))
         self.assertEqual(fav1.id, response[0]["id"])
         rv = self.client.get(
-            "/api/user/%i/favorite/category" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/favorite/category" % u.id,
+            content_type="application/json",
+            headers=u_headers,
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(2, len(response))
         self.assertEqual(fav2.id, response[0]["id"])
         rv = self.client.get(
-            "/api/user/%i/favorite/age_range" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/favorite/age_range" % u.id,
+            content_type="application/json",
+            headers=u_headers,
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(3, len(response))
         self.assertEqual(fav4.id, response[0]["id"])
         rv = self.client.get(
-            "/api/user/%i/favorite/language" % u.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/favorite/language" % u.id,
+            content_type="application/json",
+            headers=u_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -543,7 +563,7 @@ class TestUser(BaseTest):
         rv = self.client.get(
             "/api/user/%i/favorite/covid19_category" % u.id,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=u_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -551,7 +571,7 @@ class TestUser(BaseTest):
         self.assertEqual(fav8.id, response[0]["id"])
 
     def test_add_favorite_to_user(self):
-        u = self.construct_user()
+        u = self.default_user
         r = self.construct_resource()
 
         fav_data = [{"resource_id": r.id, "user_id": u.id, "type": "resource"}]
@@ -560,7 +580,7 @@ class TestUser(BaseTest):
             "/api/user_favorite",
             data=self.jsonify(fav_data),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -569,17 +589,17 @@ class TestUser(BaseTest):
 
     def test_remove_favorite_from_user(self):
         self.test_add_favorite_to_user()
-        rv = self.client.delete("/api/user_favorite/%i" % 1, headers=self.logged_in_headers())
+        rv = self.client.delete("/api/user_favorite/%i" % 1, headers=self.default_logged_in_headers)
         self.assert_success(rv)
         rv = self.client.get(
-            "/api/user/%i/favorite" % 1, content_type="application/json", headers=self.logged_in_headers()
+            "/api/user/%i/favorite" % 1, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(0, len(response))
 
     def test_delete_user_deletes_favorites(self):
-        u = self.construct_user()
+        u = self.construct_user(email=fake.email())
         r = self.construct_resource()
 
         fav_data = [
@@ -591,17 +611,21 @@ class TestUser(BaseTest):
             "/api/user_favorite",
             data=self.jsonify(fav_data),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.logged_in_headers(user_id=u.id),
         )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(2, len(response))
         self.assertEqual(u.id, response[0]["user_id"])
 
-        rv = self.client.delete("api/user/%i" % u.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.delete(
+            "api/user/%i" % u.id, content_type="application/json", headers=self.default_admin_logged_in_headers
+        )
         self.assert_success(rv)
 
-        rv = self.client.get("/api/user_favorite", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "/api/user_favorite", content_type="application/json", headers=self.default_admin_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(0, len(response))
@@ -614,37 +638,44 @@ class TestUser(BaseTest):
         self.construct_participant(user_id=u1.id, relationship=Relationship.dependent)
         self.construct_participant(user_id=u2.id, relationship=Relationship.self_participant)
 
-        rv = self.client.get("api/user/%i" % u1.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/user/%i" % u1.id, content_type="application/json", headers=self.default_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(2, response["participant_count"])
 
-        rv = self.client.get("api/user/%i" % u2.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/user/%i" % u2.id, content_type="application/json", headers=self.default_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(1, response["participant_count"])
 
-        rv = self.client.get("api/user/%i" % u3.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/user/%i" % u3.id, content_type="application/json", headers=self.default_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(0, response["participant_count"])
 
-    def test_user_created_password(self):
-        pass_user = self.test_create_user_with_password()
+    @patch("smtplib.SMTP", autospec=True)
+    def test_user_created_password(self, mock_smtp: MagicMock):
+        pass_user = self._create_user_with_password()
         self.assertEqual(pass_user.created_password(), True)
-        non_pass_user = self.construct_user()
+        non_pass_user = self.construct_user()  # Directly add a user to the database without a password
         self.assertEqual(non_pass_user.created_password(), False)
 
     def test_user_identity(self):
-        u = self.construct_user(email="superuser@sartography.com")
+        u = self.construct_user(email=fake.email())
         self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         self.assertEqual(u.identity(), "self_guardian")
-        u2 = self.construct_user(email="superuser2@sartography.com")
+        u2 = self.construct_user(email=fake.email())
         self.construct_participant(user_id=u2.id, relationship=Relationship.self_professional)
         self.assertEqual(u2.identity(), "self_professional")
 
     def test_percent_self_registration_complete(self):
-        u = self.construct_user(email="prof@sartography.com")
+        u = self.construct_user(email=fake.email())
         p = self.construct_participant(user_id=u.id, relationship=Relationship.self_participant)
         iq = self.get_identification_questionnaire(p.id)
         self.client.post(
@@ -658,17 +689,21 @@ class TestUser(BaseTest):
         self.assertGreater(u.percent_self_registration_complete(), 0)
 
     def test_user_participant_count_new_enum(self):
-        u1 = self.construct_user(email="1@sartography.com")
-        u4 = self.construct_user(email="4@sartography.com")
+        u1 = self.construct_user(email=fake.email())
+        u4 = self.construct_user(email=fake.email())
         self.construct_participant(user_id=u1.id, relationship=Relationship.self_guardian)
         self.construct_participant(user_id=u4.id, relationship=Relationship.self_interested)
 
-        rv = self.client.get("api/user/%i" % u1.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/user/%i" % u1.id, content_type="application/json", headers=self.default_admin_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(1, response["participant_count"])
 
-        rv = self.client.get("api/user/%i" % u4.id, content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/user/%i" % u4.id, content_type="application/json", headers=self.default_admin_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(1, response["participant_count"])

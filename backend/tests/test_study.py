@@ -1,9 +1,12 @@
-from tests.base_test import BaseTest  #isort:skip
+import random
+import smtplib
+from unittest.mock import MagicMock, patch
+
+from tests.base_test import BaseTest  # isort:skip
 from fixtures.study import MockStudy, MockStudyWithMoreFields
 from sqlalchemy import Integer, cast
 
-from app.email_service import EmailService
-from app.enums import Relationship
+from app.enums import Relationship, ParticipantRelationship
 from app.models import (
     ContactQuestionnaire,
     EmailLog,
@@ -12,6 +15,7 @@ from app.models import (
     StudyCategory,
     StudyInvestigator,
 )
+from tests.fixtures.fixture_utils import fake
 
 
 class TestStudy(BaseTest):
@@ -46,7 +50,7 @@ class TestStudy(BaseTest):
             data=self.jsonify(modified_study),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         rv = self.client.get("/api/study/%i" % s_id, content_type="application/json")
@@ -64,7 +68,7 @@ class TestStudy(BaseTest):
     def test_delete_study(self):
         s = self.construct_study()
         s_id = s.id
-        admin_headers = self.logged_in_headers()
+        admin_headers = self.default_logged_in_headers
         rv = self.client.get("api/study/%i" % s_id, content_type="application/json")
         self.assert_success(rv)
 
@@ -81,7 +85,7 @@ class TestStudy(BaseTest):
             data=self.jsonify(study),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -92,11 +96,11 @@ class TestStudy(BaseTest):
     def test_get_study_by_category(self):
         c = self.construct_category()
         s = self.construct_study()
-        cs = StudyCategory(study=s, category=c)
+        cs = StudyCategory(study_id=s.id, category_id=c.id)
         self.session.add(cs)
         self.session.commit()
         rv = self.client.get(
-            "/api/category/%i/study" % c.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/study" % c.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -108,12 +112,12 @@ class TestStudy(BaseTest):
         c = self.construct_category(name="c1")
         c2 = self.construct_category(name="c2")
         s = self.construct_study()
-        cs = StudyCategory(study=s, category=c)
-        cs2 = StudyCategory(study=s, category=c2)
+        cs = StudyCategory(study_id=s.id, category_id=c.id)
+        cs2 = StudyCategory(study_id=s.id, category_id=c2.id)
         self.session.add_all([cs, cs2])
         self.session.commit()
         rv = self.client.get(
-            "/api/category/%i/study" % c.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/category/%i/study" % c.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -124,7 +128,7 @@ class TestStudy(BaseTest):
     def test_category_study_count(self):
         c = self.construct_category()
         s = self.construct_study()
-        cs = StudyCategory(study=s, category=c)
+        cs = StudyCategory(study_id=s.id, category_id=c.id)
         self.session.add(cs)
         self.session.commit()
         rv = self.client.get("/api/category/%i" % c.id, content_type="application/json")
@@ -135,7 +139,7 @@ class TestStudy(BaseTest):
     def test_get_category_by_study(self):
         c = self.construct_category()
         s = self.construct_study()
-        cs = StudyCategory(study=s, category=c)
+        cs = StudyCategory(study_id=s.id, category_id=c.id)
         self.session.add(cs)
         self.session.commit()
         rv = self.client.get("/api/study/%i/category" % s.id, content_type="application/json")
@@ -202,7 +206,7 @@ class TestStudy(BaseTest):
             "/api/study_investigator",
             data=self.jsonify(si_data),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -210,7 +214,7 @@ class TestStudy(BaseTest):
         self.assertEqual(s.id, response["study_id"])
 
     def test_set_all_investigators_on_study(self):
-        headers = self.logged_in_headers()
+        headers = self.default_logged_in_headers
         i1 = self.construct_investigator(name="person1")
         i2 = self.construct_investigator(name="person2")
         i3 = self.construct_investigator(name="person3")
@@ -244,23 +248,34 @@ class TestStudy(BaseTest):
 
     def test_remove_investigator_from_study(self):
         self.test_add_investigator_to_study()
-        rv = self.client.delete("/api/study_investigator/%i" % 1, headers=self.logged_in_headers())
+        rv = self.client.delete("/api/study_investigator/%i" % 1, headers=self.default_logged_in_headers)
         self.assert_success(rv)
         rv = self.client.get("/api/study/%i/investigator" % 1, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(0, len(response))
 
-    def test_study_inquiry_sends_email(self):
-        message_count = len(EmailService.TEST_MESSAGES)
-        s = self.construct_study(title="The Best Study")
-        u = self.construct_user()
+    @patch("smtplib.SMTP", autospec=True)
+    def test_study_inquiry_sends_email(self, mock_smtp: MagicMock):
+        mock_sendmail: MagicMock[smtplib.SMTP.sendmail] = mock_smtp.return_value.sendmail
+        s = self.construct_study(title=fake.catch_phrase())
+        u = self.default_user
+        u_headers = self.logged_in_headers(user_id=u.id)
         guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         dependent1 = self.construct_participant(user_id=u.id, relationship=Relationship.dependent)
-        self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
-        self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
+        self.construct_contact_questionnaire(user=u, participant=guardian, phone=fake.phone_number(), email=u.email)
         self.construct_identification_questionnaire(
-            user=u, participant=dependent1, first_name="Fred", is_first_name_preferred=False, nickname="Zorba"
+            user=u,
+            participant=guardian,
+            first_name=fake.first_name(),
+            relationship_to_participant=random.choice([r.value for r in ParticipantRelationship]),
+        )
+        self.construct_identification_questionnaire(
+            user=u,
+            participant=dependent1,
+            first_name=fake.first_name(),
+            is_first_name_preferred=False,
+            nickname=fake.company(),
         )
 
         data = {"user_id": u.id, "study_id": s.id}
@@ -269,24 +284,25 @@ class TestStudy(BaseTest):
             data=self.jsonify(data),
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=u_headers,
         )
         self.assert_success(rv)
-        self.assertGreater(len(EmailService.TEST_MESSAGES), message_count)
-        self.assertEqual("Autism DRIVE: Study Inquiry Email", self.decode(EmailService.TEST_MESSAGES[-1]["subject"]))
+        self.assert_email_sent(mock_sendmail, s.coordinator_email, "Autism DRIVE: Study Inquiry Email")
 
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
-    def test_study_inquiry_creates_study_user(self):
+
+    @patch("smtplib.SMTP", autospec=True)
+    def test_study_inquiry_creates_study_user(self, mock_smtp: MagicMock):
         s = self.construct_study(title="The Best Study")
-        u = self.construct_user()
+        u = self.default_user
 
         self.assertEqual(0, len(s.study_users))
 
         guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
-        self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
+        self.construct_identification_questionnaire(user=u, participant=guardian, first_name=fake.first_name())
 
         data = {"user_id": u.id, "study_id": s.id}
         rv = self.client.post(
@@ -294,7 +310,7 @@ class TestStudy(BaseTest):
             data=self.jsonify(data),
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
@@ -306,10 +322,10 @@ class TestStudy(BaseTest):
 
     def test_study_inquiry_fails_without_valid_study_or_user(self):
         s = self.construct_study(title="The Best Study")
-        u = self.construct_user()
+        u = self.default_user
         guardian = self.construct_participant(user_id=u.id, relationship=Relationship.self_guardian)
         self.construct_contact_questionnaire(user=u, participant=guardian, phone="540-669-8855")
-        self.construct_identification_questionnaire(user=u, participant=guardian, first_name="Fred")
+        self.construct_identification_questionnaire(user=u, participant=guardian, first_name=fake.first_name())
 
         data = {"user_id": u.id, "study_id": 456}
         rv = self.client.post(
@@ -317,7 +333,7 @@ class TestStudy(BaseTest):
             data=self.jsonify(data),
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(400, rv.status_code)
         response = rv.json
@@ -328,7 +344,7 @@ class TestStudy(BaseTest):
             data=self.jsonify(data),
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assertEqual(400, rv.status_code)
         response = rv.json
@@ -336,31 +352,25 @@ class TestStudy(BaseTest):
 
     def construct_identification_questionnaire(
         self,
-        relationship_to_participant="adoptFather",
-        first_name="Karl",
+        relationship_to_participant=None,
+        first_name=None,
         is_first_name_preferred=True,
         nickname=None,
         participant=None,
         user=None,
     ):
+        user = self.construct_user(email=fake.email()) if user is None else user
+        participant = self.construct_participant(user_id=user.id, relationship=Relationship.dependent) if participant is None else participant
+
         iq = IdentificationQuestionnaire(
-            relationship_to_participant=relationship_to_participant,
-            first_name=first_name,
+            relationship_to_participant=relationship_to_participant if participant.relationship == Relationship.dependent else None,
+            relationship_to_participant_other=fake.job() if relationship_to_participant == ParticipantRelationship.other else None,
+            first_name=first_name or fake.first_name(),
             is_first_name_preferred=is_first_name_preferred,
-            nickname=nickname,
+            nickname=nickname or fake.company(),
+            participant_id=participant.id,
+            user_id=user.id,
         )
-        if user is None:
-            u = self.construct_user(email="ident@questionnaire.com")
-            iq.user_id = u.id
-        else:
-            u = user
-            iq.user_id = u.id
-
-        if participant is None:
-            iq.participant_id = self.construct_participant(user_id=u.id, relationship=Relationship.dependent).id
-        else:
-            iq.participant_id = participant.id
-
         self.session.add(iq)
         self.session.commit()
 
@@ -419,7 +429,9 @@ class TestStudy(BaseTest):
         self.assertEqual(r_dict["investigator_id"], i_id)
         self.assertEqual(r_dict["study_id"], s_id)
 
-        rv = self.client.delete(f"/api/study/{s_id}", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.delete(
+            f"/api/study/{s_id}", content_type="application/json", headers=self.default_logged_in_headers
+        )
         self.assert_success(rv)
 
         rv = self.client.get(f"/api/study_investigator/{si_id}", content_type="application/json")

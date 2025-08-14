@@ -1,4 +1,4 @@
-from tests.base_test import BaseTest  #isort:skip
+from tests.base_test import BaseTest  # isort:skip
 from app.models import Investigator, StudyInvestigator
 
 
@@ -12,7 +12,7 @@ class TestInvestigator(BaseTest):
             "/api/investigator/%i" % i_id,
             follow_redirects=True,
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
         response = rv.json
@@ -25,7 +25,7 @@ class TestInvestigator(BaseTest):
         self.assertIsNotNone(i)
 
         rv = self.client.get(
-            "/api/investigator/%i" % i.id, content_type="application/json", headers=self.logged_in_headers()
+            "/api/investigator/%i" % i.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -36,7 +36,7 @@ class TestInvestigator(BaseTest):
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
         )
         self.assert_success(rv)
 
@@ -49,17 +49,17 @@ class TestInvestigator(BaseTest):
         i_id = i.id
 
         rv = self.client.get(
-            "api/investigator/%i" % i_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/investigator/%i" % i_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/investigator/%i" % i_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/investigator/%i" % i_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
         rv = self.client.get(
-            "api/investigator/%i" % i_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/investigator/%i" % i_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assertEqual(404, rv.status_code)
 
@@ -73,7 +73,7 @@ class TestInvestigator(BaseTest):
             "api/investigator",
             data=self.jsonify(investigator),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
             follow_redirects=True,
         )
         self.assert_success(rv)
@@ -88,7 +88,9 @@ class TestInvestigator(BaseTest):
         self.construct_investigator(name="Zelda Cat")
         self.construct_investigator(name="Benjamin Jensen")
 
-        rv = self.client.get("api/investigator", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/investigator", content_type="application/json", headers=self.default_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response[0]["name"], "Adelaide Smith")
@@ -98,7 +100,9 @@ class TestInvestigator(BaseTest):
 
     def test_create_investigator_checks_for_name(self):
         self.test_create_investigator()
-        rv = self.client.get("api/investigator", content_type="application/json", headers=self.logged_in_headers())
+        rv = self.client.get(
+            "api/investigator", content_type="application/json", headers=self.default_logged_in_headers
+        )
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response[0]["name"], "Tara Tarantula")
@@ -109,7 +113,7 @@ class TestInvestigator(BaseTest):
             "api/investigator",
             data=self.jsonify(investigator),
             content_type="application/json",
-            headers=self.logged_in_headers(),
+            headers=self.default_logged_in_headers,
             follow_redirects=True,
         )
         self.assert_success(rv)
@@ -126,16 +130,16 @@ class TestInvestigator(BaseTest):
         si_id = si.id
 
         rv = self.client.get(
-            "api/study_investigator/%i" % si_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/study_investigator/%i" % si_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
         rv = self.client.delete(
-            "api/investigator/%i" % i.id, content_type="application/json", headers=self.logged_in_headers()
+            "api/investigator/%i" % i.id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assert_success(rv)
 
         rv = self.client.get(
-            "api/study_investigator/%i" % si_id, content_type="application/json", headers=self.logged_in_headers()
+            "api/study_investigator/%i" % si_id, content_type="application/json", headers=self.default_logged_in_headers
         )
         self.assertEqual(404, rv.status_code)

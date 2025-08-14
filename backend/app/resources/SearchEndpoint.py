@@ -1,9 +1,8 @@
 from typing import Literal
 
 import elasticsearch
-from elasticsearch_dsl.response import AggResponse
-from elasticsearch_dsl.response import Response as ElasticsearchResponse
-from elasticsearch_dsl.utils import HitMeta
+from elasticsearch.dsl import AggResponse, Response as ElasticsearchResponse
+from elasticsearch.dsl.utils import HitMeta
 from flask import request
 from flask.views import MethodView
 from marshmallow import ValidationError
