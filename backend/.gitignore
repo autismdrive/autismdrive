@@ -1,4 +1,10 @@
 .env
+ci.env
+docker.env
+local.env
+mirror.env
+testing.env
+
 .idea/
 **/__pycache__
 instance
@@ -12,3 +18,4 @@ star_drive.log
 dist/
 .venv/
 .coverage
+keys
