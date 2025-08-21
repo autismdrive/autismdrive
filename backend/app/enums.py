@@ -55,6 +55,7 @@ class ParticipantRelationship(enum.StrEnum):
     adopt_father = "adoptFather"
     other = "other"
 
+
 class Status(enum.StrEnum):
     currently_enrolling = "Currently enrolling"
     study_in_progress = "Study in progress"

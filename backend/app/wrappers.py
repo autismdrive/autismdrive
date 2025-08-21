@@ -1,9 +1,9 @@
 from functools import wraps
 from http import HTTPStatus
-from typing import Literal
 
-from app.enums import Role, Permission
+from app.enums import Permission, Role
 from app.rest_exception import RestException
+
 
 def _check_if_allowed(val: Permission | Role):
     from flask import g
@@ -31,7 +31,9 @@ def requires_role(role: Role):
         def wrapped(*args, **kwargs):
             _check_if_allowed(role)
             return f(*args, **kwargs)
+
         return wrapped
+
     return wrapper
 
 
@@ -43,5 +45,7 @@ def requires_permission(permission: Permission):
         def wrapped(*args, **kwargs):
             _check_if_allowed(permission)
             return f(*args, **kwargs)
+
         return wrapped
+
     return wrapper

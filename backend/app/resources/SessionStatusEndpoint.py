@@ -19,8 +19,14 @@ class SessionStatusEndpoint(MethodView):
         auth_token = request.headers["AUTHORIZATION"].split(" ")[1]
         if "user" in g and auth_token:
             try:
-                payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms="HS256")
-                return payload["exp"]
+                with open(settings.JWT.public_key_path, "rb") as key_file:
+                    public_key = key_file.read()
+                    payload = jwt.decode(
+                        jwt=auth_token,
+                        key=public_key,
+                        algorithms=[settings.JWT.algorithm],
+                    )
+                    return payload["exp"]
             except Exception:
                 return 0
         else:

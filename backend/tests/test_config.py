@@ -9,4 +9,3 @@ class TestConfig(BaseTest):
         self.assertEqual(response["mirroring"], False)
         self.assertEqual(response["testing"], True)
         self.assertEqual(response["development"], False)
-

@@ -1,9 +1,8 @@
 import datetime
 from dataclasses import dataclass, field
 
-from fixtures.location import MockLocation, MockLocationWithLatLong
-
 from app.models import User
+from tests.fixtures.location import MockLocation, MockLocationWithLatLong
 
 from .fixture_utils import fake
 

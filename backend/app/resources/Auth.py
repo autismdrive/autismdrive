@@ -14,7 +14,7 @@ from app.email_service import email_service
 from app.resources.UserEndpoint import get_user_by_email, get_user_by_id
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
-from app.utils import utcnow
+from app.utils import utcnow, profiler
 from config.load import settings
 
 auth_blueprint = Blueprint("auth", __name__, url_prefix="/api")
@@ -28,12 +28,12 @@ def confirm_email(email_token):
     from app.models import User
 
     try:
-        ts = URLSafeTimedSerializer(settings.SECRET_KEY)
+        ts = URLSafeTimedSerializer(settings.PASSWORD_RESET_TOKEN_KEY)
         email = ts.loads(email_token, salt="email-confirm-key", max_age=ONE_DAY)
     except Exception as _:
         raise RestException(RestException.EMAIL_TOKEN_INVALID)
 
-    user = get_user_by_email(email=email, with_joins=True)
+    user = get_user_by_email(email=email, with_joins=False)
 
     if user is None:
         raise RestException(RestException.EMAIL_NOT_REGISTERED)
@@ -44,7 +44,7 @@ def confirm_email(email_token):
     session.commit()
     session.close()
 
-    user_to_update = get_user_by_id(user_id=user_id, with_joins=True)
+    user_to_update = get_user_by_id(user_id=user_id, with_joins=False)
 
     user_to_update.token = User.encode_auth_token(user_id=user_id)
     user_to_update.last_login = utcnow()
@@ -57,6 +57,7 @@ def confirm_email(email_token):
     return db_user
 
 
+@profiler
 @auth_blueprint.route("/login_password", methods=["GET", "POST"])
 def login_password():
     from app.models import User
@@ -67,7 +68,7 @@ def login_password():
         raise RestException(RestException.INVALID_INPUT)
 
     email = request_data["email"].lower()
-    db_user = get_user_by_email(email=email, with_joins=True)
+    db_user = get_user_by_email(email=email, with_joins=False)
     schema = SchemaRegistry.UserSchema(many=False)
 
     if db_user is None:
@@ -77,7 +78,7 @@ def login_password():
 
         if User.is_correct_password(user_id=user_id, plaintext=request_data["password"]):
             # redirect users back to the front end, include the new auth token.
-            user_to_update = get_user_by_id(user_id=user_id, with_joins=True)
+            user_to_update = get_user_by_id(user_id=user_id, with_joins=False)
             user_to_update.token = User.encode_auth_token(user_id=user_id)
             user_to_update.last_login = utcnow()
             session.add(user_to_update)
@@ -130,7 +131,7 @@ def reset_password():
     password = request_data["password"]
     email_token = request_data["email_token"]
     try:
-        ts = URLSafeTimedSerializer(settings.SECRET_KEY)
+        ts = URLSafeTimedSerializer(settings.PASSWORD_RESET_TOKEN_KEY)
         email = ts.loads(email_token, salt="email-reset-key", max_age=ONE_DAY).lower()  # 24 hours
     except SignatureExpired:
         raise RestException(RestException.TOKEN_EXPIRED)

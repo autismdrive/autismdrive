@@ -1,9 +1,7 @@
-from copy import deepcopy
 from http import HTTPStatus
 
 from flask import g, request
 from flask.views import MethodView
-from marshmallow import ValidationError
 from sqlalchemy import Select, func, select, update
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.interfaces import LoaderOption
@@ -101,6 +99,7 @@ class ParticipantEndpoint(MethodView):
 
         db_updated = get_participant_by_id(participant_id, with_joins=True)
         return self.schema.dump(db_updated)
+
 
 class ParticipantListEndpoint(MethodView):
     schema = SchemaRegistry.ParticipantSchema(many=True)

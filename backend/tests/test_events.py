@@ -23,7 +23,9 @@ class TestEvents(BaseTest):
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
     def test_modify_event_basics(self, mock_gmaps_client):
-        self.loader.load_partial_zip_codes()
+        from app.data_loader import DataLoader
+        loader = DataLoader(directory=self.current_dir + "/../example_data")
+        loader.load_partial_zip_codes()
         self.construct_event()
         r = self.session.query(Event).first()
         self.assertIsNotNone(r)
@@ -66,7 +68,9 @@ class TestEvents(BaseTest):
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
     def test_create_event(self, mock_gmaps_client):
-        self.loader.load_partial_zip_codes()
+        from app.data_loader import DataLoader
+        loader = DataLoader(directory=self.current_dir + "/../example_data")
+        loader.load_partial_zip_codes()
         event = MockEvent()
         rv = self.client.post(
             "api/event",
@@ -196,7 +200,9 @@ class TestEvents(BaseTest):
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
     def test_resource_change_log(self, mock_gmaps_client):
-        self.loader.load_partial_zip_codes()
+        from app.data_loader import DataLoader
+        loader = DataLoader(directory=self.current_dir + "/../example_data")
+        loader.load_partial_zip_codes()
         event = self.construct_event(title="A Event that is Super and Great")
         event_id = event.id
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)

@@ -79,9 +79,9 @@ source python-env/bin/activate
 pip3 install -r requirements.txt
 ```
 
-If you are on MacOS, you may get an error while building wheels for psycopg2. If so, you may need to make sure postgresql is installed locally (even if you are running the database via Docker) and reinstall and re-link openssl:
+If you are on MacOS, you may get an error while building wheels for psycopg. If so, you may need to make sure postgresql is installed locally (even if you are running the database via Docker) and reinstall and re-link openssl:
 ```bash
-brew install postgresql@14
+brew install postgresql@17
 xcode-select --install
 brew reinstall openssl
 echo 'export PATH="/usr/local/Cellar/openssl@3/3.1.2/bin:$PATH"' >> ~/.zshrc
@@ -89,11 +89,28 @@ echo 'export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/Cellar/openssl@3/3.1.2/lib/' 
 ```
 
 
-## Add a config file
+## Add a local.env file and set the required environment variables
 In the `backend` directory, execute the following command:
 ```BASH
-mkdir -p instance && cp config/default.py instance/instance_config.py
+cp config/env/template.env config/env/local.env
 ```
+
+Update the values in local.env to match your local environment. Follow the instructions in the comments of `template.env` to set the values correctly.
+
+To run the local server and the Flask CLI, you MUST have the `FLASK_APP` and `ENV_NAME` environment variables set to the correct values. You can do this by running the following command in the `backend` directory:
+```BASH
+export FLASK_APP=./app/uwsgi.py
+export ENV_NAME=local
+```
+
+The settings that the application uses are defined in the various `*.env` files in the `config` directory. For example, the `local.env` file is used to set environment variables that override the default settings in the config files. You can have multiple environment files for different environments:
+- `local.env`: Use when running the server via UWSGI and/or using the Flask CLI on the same machine where the application code lives.
+- `ci.env`: Used by the [GitHub Workflow script](../.github/workflows/main.yml) to run tests in this repository's [GitHub Actions](https://github.com/autismdrive/autismdrive/actions) CI (continuous integration) environment.
+- `docker.env`: Used for running the server in a Docker container. 
+- `mirror.env`: Used for running the server in the private server environment protected by the [UVA High Security VPN](https://virginia.service-now.com/its?id=itsweb_kb_article&sys_id=9a5c088c6f59ee400a017f512e3ee4e2), where HSD (Highly Sensitive Data) is stored.
+- `testing.env`: Used for running unit tests.
+
+You can switch between these by changing the `ENV_NAME` variable to `local`, `ci`, `docker`, `mirror`, or `testing`. The application will automatically load the appropriate environment variables from the corresponding `.env` file. These environment variables are used to configure the application, such as database connection settings, API keys, and other configuration options. Since these values are sensitive, they should not be committed to the repository. The `.gitignore` file explicitly prevents any of these `.env` files from being committed to the git repository.
 
 ### Update the Database
 You will need to update your database each time you return to do a pull to make sure all the migrations are run. In the `backend` directory, execute the following command:

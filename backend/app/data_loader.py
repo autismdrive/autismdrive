@@ -102,7 +102,7 @@ class DataLoader:
                     includes_registration=True,
                     is_uva_education_content=True,
                 )
-                self.__increment_id_sequence(Resource)
+                self._increment_id_sequence(Resource)
 
                 if isinstance(row[31], int):
                     event.max_users = row[31]
@@ -171,7 +171,7 @@ class DataLoader:
                     is_draft=False,
                 )
 
-                self.__increment_id_sequence(Resource)
+                self._increment_id_sequence(Resource)
 
                 for i in range(29, len(row)):
                     if row[i]:
@@ -215,7 +215,7 @@ class DataLoader:
                     is_draft=False,
                 )
 
-                self.__increment_id_sequence(Resource)
+                self._increment_id_sequence(Resource)
 
                 for i in range(15, len(row)):
                     if row[i]:
@@ -279,7 +279,7 @@ class DataLoader:
 
                 session.add(study)
                 session.commit()
-                self.__increment_id_sequence(Study)
+                self._increment_id_sequence(Study)
 
                 for i in range(24, 31):
                     if row[i] and row[i] != "":
@@ -409,7 +409,6 @@ class DataLoader:
             else:
                 raise (Exception("This category is not defined: " + category_name))
 
-        session.close()
         return category
 
     def get_geocode(self, address_dict: dict, lat_long_dict: Optional[LatLng] = None) -> None | LatLng:
@@ -507,7 +506,7 @@ class DataLoader:
 
         session.commit()
 
-    def __increment_id_sequence(self, model):
+    def _increment_id_sequence(self, model):
         with engine.connect() as connection:
             connection.execute(select(func.nextval(model.__tablename__ + "_id_seq"))).scalar()
 

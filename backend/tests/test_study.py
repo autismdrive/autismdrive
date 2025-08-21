@@ -6,7 +6,7 @@ from tests.base_test import BaseTest  # isort:skip
 from fixtures.study import MockStudy, MockStudyWithMoreFields
 from sqlalchemy import Integer, cast
 
-from app.enums import Relationship, ParticipantRelationship
+from app.enums import ParticipantRelationship, Relationship
 from app.models import (
     ContactQuestionnaire,
     EmailLog,
@@ -292,7 +292,6 @@ class TestStudy(BaseTest):
         logs = self.session.query(EmailLog).all()
         self.assertIsNotNone(logs[-1].tracking_code)
 
-
     @patch("smtplib.SMTP", autospec=True)
     def test_study_inquiry_creates_study_user(self, mock_smtp: MagicMock):
         s = self.construct_study(title="The Best Study")
@@ -360,11 +359,19 @@ class TestStudy(BaseTest):
         user=None,
     ):
         user = self.construct_user(email=fake.email()) if user is None else user
-        participant = self.construct_participant(user_id=user.id, relationship=Relationship.dependent) if participant is None else participant
+        participant = (
+            self.construct_participant(user_id=user.id, relationship=Relationship.dependent)
+            if participant is None
+            else participant
+        )
 
         iq = IdentificationQuestionnaire(
-            relationship_to_participant=relationship_to_participant if participant.relationship == Relationship.dependent else None,
-            relationship_to_participant_other=fake.job() if relationship_to_participant == ParticipantRelationship.other else None,
+            relationship_to_participant=relationship_to_participant
+            if participant.relationship == Relationship.dependent
+            else None,
+            relationship_to_participant_other=fake.job()
+            if relationship_to_participant == ParticipantRelationship.other
+            else None,
             first_name=first_name or fake.first_name(),
             is_first_name_preferred=is_first_name_preferred,
             nickname=nickname or fake.company(),

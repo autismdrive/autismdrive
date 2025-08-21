@@ -3,9 +3,10 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 
+import click
 from dateutil import tz
 from elasticsearch import Elasticsearch, RequestError
-from elasticsearch_dsl import (
+from elasticsearch.dsl import (
     A,
     Boolean,
     Date,
@@ -22,13 +23,12 @@ from elasticsearch_dsl import (
     analyzer,
     tokenizer,
 )
-from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import MatchAll, MoreLikeThis, MultiMatch
+from elasticsearch.dsl.connections import connections
+from elasticsearch.dsl.query import MatchAll, MoreLikeThis, MultiMatch
 
 from app.database import session
 from app.enums import Permission
 from app.utils import utcnow
-from app.utils.category_utils import calculate_level, search_path
 from app.utils.resource_utils import DatabaseObjectDict, category_names, indexable_content
 from config.base import ElasticsearchSettings
 from config.load import settings
@@ -113,22 +113,24 @@ class ElasticIndex(object):
     @classmethod
     def establish_connection(cls, es_settings: ElasticsearchSettings):
         """Establish connection to an ElasticSearch host, and initialize the Submission collection"""
-        if es_settings.http_auth_user != "":
-            cls.connection = connections.create_connection(
-                hosts=es_settings.hosts,
-                port=es_settings.port,
-                request_timeout=es_settings.timeout,
-                verify_certs=es_settings.verify_certs,
-                use_ssl=es_settings.use_ssl,
-                http_auth=(es_settings.http_auth_user, es_settings.http_auth_pass),
-            )
-        else:
-            cls.connection = connections.create_connection(
-                hosts=es_settings.hosts,
-                request_timeout=es_settings.timeout,
-                verify_certs=es_settings.verify_certs,
-                ssl_show_warn=es_settings.use_ssl,
-            )
+
+        click.secho(f"{es_settings.model_dump()}")
+
+        kwargs = {
+            "hosts": [f"http{'s' if es_settings.use_ssl else ''}://{h}:{es_settings.port}" for h in es_settings.hosts],
+            "request_timeout": es_settings.timeout,
+            "verify_certs": es_settings.use_ssl and es_settings.verify_certs,
+            "http_auth": (es_settings.http_auth_user, es_settings.http_auth_pass),
+            "ssl_show_warn": es_settings.use_ssl,
+        }
+
+        if es_settings.http_auth_user == "":
+            del kwargs["http_auth"]
+            kwargs["ssl_show_warn"] = es_settings.use_ssl
+
+        click.secho(f"{kwargs}")
+
+        cls.connection = connections.create_connection(**kwargs)
 
     @classmethod
     def clear(cls):
@@ -219,6 +221,7 @@ class ElasticIndex(object):
     def search(cls, search):
         from flask import g
 
+        from app.utils.category_utils import calculate_level, search_path
         from app.resources.CategoryEndpoint import get_category_by_id
         from app.resources.UserEndpoint import get_user_by_id
 

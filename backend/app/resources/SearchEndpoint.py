@@ -1,7 +1,8 @@
 from typing import Literal
 
 import elasticsearch
-from elasticsearch.dsl import AggResponse, Response as ElasticsearchResponse
+from elasticsearch.dsl import AggResponse
+from elasticsearch.dsl import Response as ElasticsearchResponse
 from elasticsearch.dsl.utils import HitMeta
 from flask import request
 from flask.views import MethodView

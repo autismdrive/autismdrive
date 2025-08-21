@@ -4,7 +4,7 @@ import typing
 
 import click
 from psycopg import OperationalError
-from sqlalchemy import DateTime, Enum, MetaData, Select, Table, create_engine, inspect, select, text
+from sqlalchemy import DateTime, Enum, MetaData, Select, Table, create_engine, inspect, select
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, joinedload, scoped_session, sessionmaker
 from sqlalchemy_utils import database_exists
@@ -13,8 +13,8 @@ from app.utils import get_random_integer
 from config.load import settings
 
 engine: Engine = create_engine(
-    settings.SQLALCHEMY_DATABASE_URI,
-    echo=settings.SQLALCHEMY_TRACK_MODIFICATIONS,
+    url=settings.SQLALCHEMY.get_uri(),
+    echo=settings.SQLALCHEMY.track_modifications,
     pool_pre_ping=True,
 )
 
@@ -42,21 +42,20 @@ def _create_tables(base_metadata: MetaData, engine_: Engine):
         click.secho(f"Error connecting to database: {e}")
 
 
-def _delete_tables(base_metadata: MetaData, engine_: Engine):
+def _delete_all_tables(base_metadata: MetaData, engine_: Engine):
     """Deletes all tables in the given database in reverse dependency order"""
 
     # Clear out any tables that may have been created
     click.secho(f"Deleting tables from database {engine_.url.database}...")
-    for table in reversed(base_metadata.sorted_tables):
-        try:
-            # Delete all rows in the table
-            with engine.begin() as conn:
-                # Check if table exists
-                if engine.dialect.has_table(conn, table.name):
-                    conn.execute(table.delete())
+    try:
+        # Delete all tables
+        with engine.begin() as conn:
+            for t in base_metadata.sorted_tables:
+                conn.execute(t.delete())
 
-        except Exception as e:
-            click.secho(f"Error cleaning table {table.name}: {e}")
+        click.secho("Deleted all tables.")
+    except Exception as e:
+        click.secho(f"Error deleting tables: {e}", fg="red")
 
 
 class Base(DeclarativeBase):
@@ -72,8 +71,10 @@ Base.metadata.bind = engine
 
 if not database_exists(engine.url):
     _create_db(engine)
-    _create_tables(Base.metadata, engine)
 
+if len(inspect(engine).get_table_names()) == 0:
+    click.secho(f"Database {engine.url.database} is empty, creating tables...")
+    _create_tables(Base.metadata, engine)
 
 session = scoped_session(
     sessionmaker(
@@ -85,30 +86,13 @@ session = scoped_session(
 inspector = inspect(engine)
 
 
-def _reset_table_id_sequences(base_metadata: MetaData, engine_: Engine):
-    click.secho(f"Resetting id sequences for {engine_.url.database} tables...")
-    for table in reversed(base_metadata.sorted_tables):
-        try:
-            with engine.begin() as conn:
-                if engine.dialect.has_table(conn, table.name):
-                    sequence_name = f"{table.name}_id_seq"
-                    conn.execute(text(f"ALTER SEQUENCE IF EXISTS {sequence_name} RESTART WITH 1"))
-
-        except Exception as e:
-            click.secho(f"Error resetting table {table.name}: {e}")
-
-
 def clear_db(base_metadata: MetaData = Base.metadata):
-    base_metadata.bind = engine
+    from sqlalchemy_utils import drop_database
 
-    if database_exists(engine.url):
-        # Delete all tables in reverse dependency order
-        _delete_tables(base_metadata, engine)
-    else:
-        _create_db(engine)
+    drop_database(engine.url)
 
+    _create_db(engine)
     _create_tables(base_metadata, engine)
-    _reset_table_id_sequences(base_metadata, engine)
 
 
 def migrate_db():

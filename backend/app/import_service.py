@@ -1,6 +1,9 @@
-# Fire off the scheduler
-# The Data Importer should run on the MIRROR, and will make calls to the primary server to download
-# data, store it locally, and remove it from the master when necessary.
+"""
+The Import Service is run at regular intervals (via the app Background Scheduler)
+on the MIRROR private server. When run, it makes calls to the public server to download
+data, store it locally, and remove highly sensitive data (HSD) from the public server.
+"""
+
 import logging
 
 import requests
@@ -26,9 +29,9 @@ class ImportService:
     EXPORT_ADMIN_ENDPOINT = "/api/export/admin"
     USER_ENDPOINT = "/api/session"
     token = "invalid"
-    master_url = settings.MASTER_URL
-    email = settings.MASTER_EMAIL
-    password = settings.MASTER_PASS
+    public_server_url = settings.PUBLIC_SERVER_URL
+    email = settings.PUBLIC_SERVER_ADMIN_EMAIL
+    password = settings.PUBLIC_SERVER_ADMIN_PASSWORD
     import_interval_minutes = settings.IMPORT_INTERVAL_MINUTES
 
     def run_backup(self, load_admin=True, full_backup=False):
@@ -70,7 +73,7 @@ class ImportService:
 
     def login(self):
         creds = {"email": self.email, "password": self.password}
-        response = requests.post(self.master_url + self.LOGIN_ENDPOINT, json=creds)
+        response = requests.post(self.public_server_url + self.LOGIN_ENDPOINT, json=creds)
         if response.status_code != 200:
             self.logger.error("Authentication to Primary Server Failed." + str(response))
         else:
@@ -81,14 +84,14 @@ class ImportService:
         # Verifies we still have a valid token, and returns the headers
         # or attempts to re-authenticate.
         headers = {"Authorization": "Bearer {}".format(self.token), "Accept": "application/json"}
-        response = requests.get(self.master_url + self.USER_ENDPOINT, headers=headers)
+        response = requests.get(self.public_server_url + self.USER_ENDPOINT, headers=headers)
         if response.status_code != 200:
             self.login()
             headers = {"Authorization": "Bearer {}".format(self.token)}
         return headers
 
     def get_export_list(self, full_backup=False) -> list[ExportInfo]:
-        url = self.master_url + self.EXPORT_ENDPOINT
+        url = self.public_server_url + self.EXPORT_ENDPOINT
         last_log = (
             session.execute(
                 select(DataTransferLog)
@@ -127,7 +130,7 @@ class ImportService:
                 url = export.url
 
             session.close()
-            url = self.master_url + url
+            url = self.public_server_url + url
             print("Calling: " + url)
             response = requests.get(url, headers=self.get_headers())
             export.json_data = response.json()
@@ -218,12 +221,12 @@ class ImportService:
         if not settings.DELETE_RECORDS:
             self.logger.info("DELETE is off in the configuration.  So not deleting.")
             return
-        url = self.master_url + item["_links"]["self"]
+        url = self.public_server_url + item["_links"]["self"]
         response = requests.delete(url, headers=self.get_headers())
         assert response.status_code == 200
 
     def load_admin(self):
-        url = self.master_url + self.EXPORT_ADMIN_ENDPOINT
+        url = self.public_server_url + self.EXPORT_ADMIN_ENDPOINT
         response = requests.get(url, headers=self.get_headers())
         schema = SchemaRegistry.AdminExportSchema()
         json_response = response.json()

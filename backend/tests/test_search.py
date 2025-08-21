@@ -17,6 +17,7 @@ from app.resources.CategoryEndpoint import add_joins_to_statement as add_cat_joi
 from app.resources.ResourceEndpoint import add_joins_to_statement as add_resource_joins
 from app.resources.StudyEndpoint import get_study_by_id
 from app.utils import utcnow
+from tests.fixtures.location import fake_coords
 
 
 def fake_params(kw):
@@ -190,6 +191,7 @@ class TestSearch(BaseTest):
         self.assertEqual(0, len(search_results["hits"]))
 
     def test_search_location_by_geo_point(self):
+        query_coords = fake_coords(radius_mi=0)
         geo_query = {
             "words": "rainbows",
             "sort": {
@@ -202,29 +204,32 @@ class TestSearch(BaseTest):
         }
 
         # Add a location within the distance filter
+        coords_near = fake_coords(radius_mi=1)
         location_near = self.construct_location(
             title="local unicorn",
             description="delivering rainbows within the orbit of Uranus",
-            latitude=38.149595,
-            longitude=-79.072557,
+            latitude=coords_near["latitude"],
+            longitude=coords_near["longitude"],
             is_draft=False,
         )
 
         # Add a location beyond the distance filter
+        coords_far = fake_coords(radius_mi=100)
         location_far = self.construct_location(
             title="distant unicorn",
             description="delivering rainbows to the greater Trans-Neptunian Region",
-            latitude=-38.149595,
-            longitude=100.927443,
+            latitude=coords_far["latitude"],
+            longitude=coords_far["longitude"],
             is_draft=False,
         )
 
         # Add a location somewhere in between
+        coords_mid = fake_coords(radius_mi=20)
         location_mid = self.construct_location(
             title="middle unicorn",
             description="delivering rainbows somewhere in between",
-            latitude=37.5246403,
-            longitude=-77.5633015,
+            latitude=coords_mid["latitude"],
+            longitude=coords_mid["longitude"],
             is_draft=False,
         )
 
@@ -672,10 +677,7 @@ class TestSearch(BaseTest):
                 longitude=fake.coordinate(center=-78.024902, radius=1.7),
                 is_draft=False,
             )
-            self.construct_resource(
-                title=f"{fake.catch_phrase()} {kw1} {fake.catch_phrase()}",
-                is_draft=False
-            )
+            self.construct_resource(title=f"{fake.catch_phrase()} {kw1} {fake.catch_phrase()}", is_draft=False)
 
         query = {"words": kw1}
         search_results_all = self.search(query)

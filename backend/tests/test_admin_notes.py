@@ -1,13 +1,15 @@
-from copy import deepcopy
+from tests.base_test import BaseTest, profiler  # isort:skip
 
+from copy import deepcopy
 from sqlalchemy import desc
 
-from tests.base_test import BaseTest  # isort:skip
 from app.models import AdminNote
 from tests.fixtures.fixture_utils import fake
 
 
 class TestAdminNote(BaseTest):
+
+    @profiler
     def test_admin_note_basics(self):
         u = self.default_user
         loc = self.construct_location()
@@ -29,6 +31,7 @@ class TestAdminNote(BaseTest):
         self.assertEqual(response["id"], an.id)
         self.assertEqual(response["note"], "This resource is related to an event record")
 
+    @profiler
     def test_modify_admin_note_basics(self):
         note1 = fake.paragraph()
         note2 = fake.paragraph()
@@ -37,7 +40,12 @@ class TestAdminNote(BaseTest):
         u = self.default_user
         e = self.construct_event()
         self.construct_admin_note(user=u, resource=e, note=note1)
-        an = self.session.query(AdminNote).filter_by(user_id=u.id, resource_id=e.id).order_by(desc(AdminNote.last_updated)).first()
+        an = (
+            self.session.query(AdminNote)
+            .filter_by(user_id=u.id, resource_id=e.id)
+            .order_by(desc(AdminNote.last_updated))
+            .first()
+        )
         self.assertIsNotNone(an)
         rv = self.client.get(
             "/api/admin_note/%i" % an.id, content_type="application/json", headers=self.default_logged_in_headers
@@ -65,6 +73,7 @@ class TestAdminNote(BaseTest):
         rv3_dict = rv3.json
         self.assertEqual(rv3_dict["note"], note2)
 
+    @profiler
     def test_delete_admin_note(self):
         an = self.construct_admin_note(user=self.default_user, resource=self.construct_resource())
         an_id = an.id
@@ -85,6 +94,7 @@ class TestAdminNote(BaseTest):
         )
         self.assertEqual(404, rv.status_code)
 
+    @profiler
     def test_create_admin_note(self):
         admin_note = {
             "note": "My Favorite Things",
@@ -103,11 +113,12 @@ class TestAdminNote(BaseTest):
         self.assertEqual(response["note"], "My Favorite Things")
         self.assertIsNotNone(response["id"])
 
+    @profiler
     def test_admin_note_by_user_basics(self):
         u = self.default_user
         r = self.construct_resource()
         self.construct_admin_note(user=u, resource=r, note="Lotsa stuff to say about this resource")
-        an = self.session.query(AdminNote).first()
+        an = self.session.query(AdminNote).filter(AdminNote.resource_id == r.id).first()
         self.assertIsNotNone(an)
         rv = self.client.get(
             "/api/user/%i/admin_note" % u.id,
@@ -120,11 +131,12 @@ class TestAdminNote(BaseTest):
         self.assertEqual(response[0]["id"], an.id)
         self.assertEqual(response[0]["note"], "Lotsa stuff to say about this resource")
 
+    @profiler
     def test_admin_note_by_resource_basics(self):
         u = self.default_user
         r = self.construct_resource()
         self.construct_admin_note(user=u, resource=r, note="This resource is a duplicate")
-        an = self.session.query(AdminNote).first()
+        an = self.session.query(AdminNote).filter(AdminNote.resource_id == r.id).first()
         self.assertIsNotNone(an)
         rv = self.client.get(
             "/api/resource/%i/admin_note" % r.id,
@@ -137,9 +149,11 @@ class TestAdminNote(BaseTest):
         self.assertEqual(response[0]["id"], an.id)
         self.assertEqual(response[0]["note"], "This resource is a duplicate")
 
+    @profiler
     def test_many_notes(self):
-        u1 = self.construct_user(email="u1@sartography.com")
-        u2 = self.construct_user(email="u2@sartography.com")
+        num_before = self.session.query(AdminNote).count()
+        u1 = self.construct_user(email=fake.email())
+        u2 = self.construct_user(email=fake.email())
         r1 = self.construct_resource(title="R1")
         r2 = self.construct_resource(title="R2")
         r3 = self.construct_resource(title="R3")
@@ -157,7 +171,7 @@ class TestAdminNote(BaseTest):
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(5, len(response))
+        self.assertEqual(num_before + 5, len(response))
         rv = self.client.get(
             "/api/resource/%i/admin_note" % r1.id,
             follow_redirects=True,

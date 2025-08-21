@@ -2,6 +2,9 @@ import datetime
 import re
 from random import randint
 
+from line_profiler import LineProfiler
+
+profiler = LineProfiler()
 
 class RandomInts(object):
     """A singleton class to hold the set of previously-generated random integers"""

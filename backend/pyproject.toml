@@ -11,41 +11,42 @@ name = "autismdrive"
 version = "0.1.0"
 readme = "README.md"
 dependencies = [
-    "APScheduler",
-    "Flask==3.1.1",
-    "Flask-Bcrypt",
-    "Flask-Cors",
-    "Flask-HTTPAuth",
-    "Flask-Migrate",
-    "PyJWT",
-    "SQLAlchemy",
-    "SQLAlchemy-Utils",
-    "XlsxWriter",
+    "apscheduler",
+    "flask-bcrypt",
+    "flask-cors",
+    "flask-httpauth",
+    "flask-migrate",
+    "flask==3.1.1",
+    "pyjwt",
+    "sqlalchemy",
+    "sqlalchemy-utils",
+    "xlsxwriter",
     "alembic",
     "click",
-    "elasticsearch==8.19.0",
-    "elasticsearch-dsl==8.18.0",
+    "elasticsearch==9.1.0",
     "flask-marshmallow",
     "googlemaps",
     "httpretty",
     "icecream",
     "idna",
     "itsdangerous",
-    "marshmallow==3.26.1",
     "marshmallow-sqlalchemy==1.1.0",
+    "marshmallow==3.26.1",
     "openpyxl",
     "psycopg",
+    "psycopg-binary",
+    "psycopg-c",
     "pycparser",
     "pydantic",
     "pydantic-settings",
+    "pyjwt[crypto]",
     "python-dateutil",
+    "python-dotenv",
     "pytz",
     "requests",
     "six",
     "tzlocal",
     "urllib3",
-    "psycopg-c",
-    "psycopg-binary",
     "uwsgi",
 ]
 
@@ -64,6 +65,7 @@ dev = [
     "gevent",
     "ruff",
     "traceback-with-variables",
+    "line-profiler",
 ]
 
 [tool.ruff]
@@ -80,3 +82,9 @@ exclude = [
     "tests",
 ]
 namespaces = false
+
+[tool.ruff.lint]
+ignore = [
+    "E402",  # module level import not at top of file
+    "F841",  # local variable assigned but never used
+]

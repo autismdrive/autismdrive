@@ -6,6 +6,7 @@ from utils import MockGoogleMapsClient
 
 from app.enums import Role
 from app.models import Location, ResourceCategory, ResourceChangeLog
+from tests.fixtures.location import fake_coords
 
 
 class TestLocations(BaseTest):
@@ -37,8 +38,9 @@ class TestLocations(BaseTest):
         response["title"] = "Edwarardos Lemonade and Oil Change"
         response["description"] = "Better fluids for you and your car."
         response["website"] = "http://sartography.com"
-        response["latitude"] = 34.5678
-        response["longitude"] = -98.7654
+        coords = fake_coords()
+        response["latitude"] = coords["latitude"]
+        response["longitude"] = coords["longitude"]
         orig_date = response["last_updated"]
         rv = self.client.put(
             "/api/location/%i" % r_id,
@@ -54,8 +56,8 @@ class TestLocations(BaseTest):
         self.assertEqual(response["title"], "Edwarardos Lemonade and Oil Change")
         self.assertEqual(response["description"], "Better fluids for you and your car.")
         self.assertEqual(response["website"], "http://sartography.com")
-        self.assertEqual(response["latitude"], 34.5678)
-        self.assertEqual(response["longitude"], -98.7654)
+        self.assertEqual(response["latitude"], coords["latitude"])
+        self.assertEqual(response["longitude"], coords["longitude"])
         self.assertNotEqual(orig_date, response["last_updated"])
 
     def test_delete_location(self):
@@ -74,7 +76,9 @@ class TestLocations(BaseTest):
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
     def test_create_location(self, mock_gmaps_client):
-        self.loader.load_partial_zip_codes()
+        from app.data_loader import DataLoader
+        loader = DataLoader(directory=self.current_dir + "/../example_data")
+        loader.load_partial_zip_codes()
         location = MockLocation()
         rv = self.client.post(
             "api/location",
@@ -194,26 +198,26 @@ class TestLocations(BaseTest):
         self.assertEqual(z.longitude, response["longitude"])
 
     def test_resource_change_log(self):
-        l = self.construct_location(title="A Location that is Super and Great")
-        l_id = l.id
+        loc = self.construct_location(title="A Location that is Super and Great")
+        loc_id = loc.id
         u = self.construct_user(email="editor@sartorgraphy.com", role=Role.admin)
         u_id = u.id
         admin_headers = self.logged_in_headers(user_id=u_id)
 
-        rv = self.client.get("api/location/%i" % l_id, content_type="application/json")
+        rv = self.client.get("api/location/%i" % loc_id, content_type="application/json")
         self.assert_success(rv)
 
         response = rv.json
         response["title"] = "Super Great Location"
         rv = self.client.put(
-            "/api/location/%i" % l_id,
+            "/api/location/%i" % loc_id,
             data=self.jsonify(response),
             content_type="application/json",
             follow_redirects=True,
             headers=admin_headers,
         )
         self.assert_success(rv)
-        rv = self.client.get("/api/location/%i" % l_id, content_type="application/json")
+        rv = self.client.get("/api/location/%i" % loc_id, content_type="application/json")
         self.assert_success(rv)
         response = rv.json
         self.assertEqual(response["title"], "Super Great Location")
@@ -223,7 +227,7 @@ class TestLocations(BaseTest):
         self.assertIsNotNone(logs[-1].user_id)
 
         rv = self.client.get(
-            "/api/resource/%i/change_log" % l_id, content_type="application/json", headers=admin_headers
+            "/api/resource/%i/change_log" % loc_id, content_type="application/json", headers=admin_headers
         )
         self.assert_success(rv)
         response = rv.json
@@ -234,11 +238,13 @@ class TestLocations(BaseTest):
         )
         self.assert_success(rv)
         response = rv.json
-        self.assertEqual(response[-1]["resource_id"], l_id)
+        self.assertEqual(response[-1]["resource_id"], loc_id)
 
     @patch("googlemaps.Client", return_value=MockGoogleMapsClient(), autospec=True)
     def test_geocode_setting(self, mock_gmaps_client):
-        self.loader.load_partial_zip_codes()
+        from app.data_loader import DataLoader
+        loader = DataLoader(directory=self.current_dir + "/../example_data")
+        loader.load_partial_zip_codes()
         location = MockLocation()
 
         rv = self.client.post(

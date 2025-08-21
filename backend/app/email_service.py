@@ -65,7 +65,7 @@ class EmailService:
             tracking_code = self.tracking_code()
             logo_url = url_for("track.logo", user_id=user.id, code=tracking_code, _external=True)
         user.token_url = ""
-        ts = URLSafeTimedSerializer(settings.SECRET_KEY)
+        ts = URLSafeTimedSerializer(settings.PASSWORD_RESET_TOKEN_KEY)
         token = ts.dumps(user.email, salt="email-reset-key")
         role = "" + user.role.name + "/"
 
@@ -112,7 +112,7 @@ class EmailService:
 
     def reset_email(self, user):
         user.token_url = ""
-        ts = URLSafeTimedSerializer(settings.SECRET_KEY)
+        ts = URLSafeTimedSerializer(settings.PASSWORD_RESET_TOKEN_KEY)
         token = ts.dumps(user.email, salt="email-reset-key")
         role = "" + user.role.name + "/"
         tracking_code = self.tracking_code()

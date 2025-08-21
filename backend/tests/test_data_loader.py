@@ -1,12 +1,11 @@
-from app.utils import utcnow
-
 from tests.base_test import BaseTest  # isort:skip
+
 import math
 from typing import Callable
 from unittest.mock import patch
 
 from utils import MockGoogleMapsClient
-
+from app.utils import utcnow
 from app.elastic_index import elastic_index
 from app.models import (
     Category,
@@ -23,8 +22,16 @@ from app.models import (
     ZipCode,
 )
 
+from app.data_loader import DataLoader
 
 class TestDataLoader(BaseTest):
+    loader: DataLoader
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        cls.loader = DataLoader(directory=cls.current_dir + "/../example_data")
+
     def _load_and_assert_success(self, class_to_load, load_method=Callable, category_class=None, category_type=""):
         num_rc_after = -math.inf
         num_rc_before = math.inf

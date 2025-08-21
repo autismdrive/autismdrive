@@ -54,7 +54,7 @@ class TestImportCase(BaseTestQuestionnaire):
         self.assertIsNotNone(headers)
         self.assertEqual(f"Bearer {fake_token}", headers["Authorization"])
 
-        expected_json = {"email": settings.MASTER_EMAIL, "password": settings.MASTER_PASS}
+        expected_json = {"email": settings.PUBLIC_SERVER_ADMIN_EMAIL, "password": settings.PUBLIC_SERVER_ADMIN_PASSWORD}
         mock_post.assert_called_with(f"{self.api_url}/api/login_password", json=expected_json)
         mock_get.assert_called_with(
             f"{self.api_url}/api/session", headers={"Authorization": "Bearer invalid", "Accept": "application/json"}

@@ -1,17 +1,37 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ElasticsearchSettings(BaseModel):
-    hosts: list[str] = Field(default_factory=lambda: ["http://localhost:9200"])
+    hosts: list[str] = Field(default_factory=lambda: ["localhost"])
     http_auth_pass: str = ""
     http_auth_user: str = ""
     index_prefix: str = "stardrive"
+    port: int = 9200
     timeout: int = 20
     use_ssl: bool = False
     verify_certs: bool = False
+
+
+class JWTSettings(BaseModel):
+    algorithm: str = "EdDSA"
+    public_key_path: str = "__PUBLIC_KEY_PATH__"
+    private_key_path: str = "__PRIVATE_KEY_PATH__"
+
+
+class SQLAlchemySettings(BaseModel):
+    username: str = "ed_user"
+    password: str = "ed_pass"
+    host: str = "localhost"
+    port: int = 5432
+    database: str = "stardrive"
+    track_modifications: bool = False
+
+    def get_uri(self) -> str:
+        """Constructs the SQLAlchemy database URI."""
+        return f"postgresql+psycopg://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
 
 
 class GoogleMapsMapIds(BaseModel):
@@ -20,6 +40,10 @@ class GoogleMapsMapIds(BaseModel):
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        validate_default=False, extra="ignore", env_ignore_empty=True, case_sensitive=True, env_nested_delimiter="__"
+    )
+
     NAME: str = "STAR DRIVE Database"
     VERSION: str = "0.1"
 
@@ -34,15 +58,14 @@ class Settings(BaseSettings):
     EXPORT_CHECK_INTERNAL_MINUTES: int = 1
     IMPORT_INTERVAL_MINUTES: int = 1
 
-    SQLALCHEMY_DATABASE_URI: str = "postgresql+psycopg://ed_user:ed_pass@localhost/stardrive"
-    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    SQLALCHEMY: SQLAlchemySettings = Field(default_factory=SQLAlchemySettings)
 
     ELASTIC_SEARCH: ElasticsearchSettings = Field(default_factory=ElasticsearchSettings)
 
     API_URL: str = "http://localhost:5000"
     SITE_URL: str = "http://localhost:4200"
 
-    SECRET_KEY: str = "stardrive_impossibly_bad_key_stored_in_public_repo_dont_use_this_outside_development_yuck!"
+    JWT: JWTSettings = Field(default_factory=JWTSettings)
 
     FRONTEND_AUTH_CALLBACK: str = "#/session"
     FRONTEND_EMAIL_RESET: str = "#/reset_password/"
@@ -80,8 +103,9 @@ class Settings(BaseSettings):
         "should include at least one of each of the following: uppercase letters, "
         "lowercase letters, numbers, and punctuation characters."
     )
+    PASSWORD_RESET_TOKEN_KEY: str = "__PASSWORD_RESET_TOKEN_KEY__"
 
     FLASK_DEBUG: bool = False
-    MASTER_EMAIL: str = "__MASTER_EMAIL__"
-    MASTER_PASS: str = "__MASTER_PASS__"
-    MASTER_URL: str = "http://localhost:5000"
+    PUBLIC_SERVER_ADMIN_EMAIL: str = "__PUBLIC_SERVER_ADMIN_EMAIL__"
+    PUBLIC_SERVER_ADMIN_PASSWORD: str = "__PUBLIC_SERVER_ADMIN_PASSWORD__"
+    PUBLIC_SERVER_URL: str = "http://localhost:5000"

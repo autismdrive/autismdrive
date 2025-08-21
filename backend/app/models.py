@@ -1021,7 +1021,6 @@ class Participant(Base):
     avatar_color: Mapped[Optional[str]] = mapped_column(default=None)
     has_consented: Mapped[Optional[bool]] = mapped_column(default=None)
 
-
     def get_name(self):
         from app.resources.ParticipantEndpoint import get_participant_by_id
 
@@ -1438,7 +1437,13 @@ class User(Base):
                 "iat": utcnow(),
                 "sub": f"{user_id}",
             }
-            return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+            with open(settings.JWT.private_key_path, "rb") as key_file:
+                private_key = key_file.read()
+                return jwt.encode(
+                    payload=payload,
+                    key=private_key,
+                    algorithm=settings.JWT.algorithm,
+                )
         except Exception as e:
             return e
 
@@ -1447,8 +1452,17 @@ class User(Base):
         from app.rest_exception import RestException
 
         try:
-            payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms="HS256")
-            return int(payload["sub"])
+            with open(settings.JWT.public_key_path, "rb") as key_file:
+                public_key = key_file.read()
+                payload = jwt.decode(
+                    jwt=auth_token,
+                    key=public_key,
+                    algorithms=[settings.JWT.algorithm],
+                )
+
+                return int(payload["sub"])
+        except Exception as e:
+            raise e
         except jwt.ExpiredSignatureError:
             raise RestException(RestException.TOKEN_EXPIRED)
         except jwt.InvalidTokenError:

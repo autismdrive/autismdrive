@@ -16,30 +16,30 @@ from app.resources.Auth import auth_blueprint
 from app.resources.Tracking import tracking_blueprint
 from app.rest_exception import RestException
 from app.views import endpoints
+from config.load import settings
 from config.logging import logging_config
 
 
-def create_app(settings=None):
-    from config.base import Settings
-    from config.load import settings as loaded_settings
+def create_app():
+    click.secho(f"\n*** create_app > settings.ENV_NAME = {settings.ENV_NAME} ***\n")
+    click.secho(f"\n*** create_app > settings.NAME = {settings.NAME} ***\n")
+    click.secho(
+        f"\n*** create_app > settings.ELASTIC_SEARCH.http_auth_user = {settings.ELASTIC_SEARCH.http_auth_user} ***\n"
+    )
 
-    _settings: Settings = loaded_settings if settings is None else settings
-
-    click.secho(f"\n*** create_app > _settings.ENV_NAME = {_settings.ENV_NAME} ***\n")
-
-    logging_config["loggers"][""]["level"] = "DEBUG" if _settings.FLASK_DEBUG else "WARN"
+    logging_config["loggers"][""]["level"] = "DEBUG" if settings.FLASK_DEBUG else "WARN"
     logging.config.dictConfig(logging_config)
 
     _app = APIApp(__name__, instance_relative_config=True)
 
-    _app.config.from_object(_settings)
-    _app.config["FLASK_DEBUG"] = _settings.FLASK_DEBUG
-    _app.settings = _settings
+    _app.config.from_object(settings)
+    _app.config["FLASK_DEBUG"] = settings.FLASK_DEBUG
+    _app.settings = settings
 
     # Enable CORS
-    if _settings.CORS_ENABLED:
+    if settings.CORS_ENABLED:
         # Convert list of allowed origins to list of regexes
-        origins_re = r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in _settings.CORS_ALLOW_ORIGINS])
+        origins_re = r"|".join([r"^https?:\/\/%s(.*)" % o.replace(r".", r"\.") for o in settings.CORS_ALLOW_ORIGINS])
 
         logging.getLogger("flask_cors").level = logging.WARN
 

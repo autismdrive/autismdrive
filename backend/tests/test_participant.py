@@ -140,7 +140,7 @@ class TestParticipant(BaseTestQuestionnaire):
         rv1 = self.client.get(
             f"/api/participant/{p_id}",
             content_type="application/json",
-            headers=u1_headers  # Log in as User 1
+            headers=u1_headers,  # Log in as User 1
         )
         self.assert_success(rv1)
 
@@ -148,7 +148,7 @@ class TestParticipant(BaseTestQuestionnaire):
         rv_no_access1 = self.client.get(
             f"/api/participant/{p_id}",
             content_type="application/json",
-            headers=u2_headers  # Log in as User 2
+            headers=u2_headers,  # Log in as User 2
         )
         self.assertEqual(400, rv_no_access1.status_code)
         resp_no_access1 = rv_no_access1.json
@@ -181,7 +181,9 @@ class TestParticipant(BaseTestQuestionnaire):
         self.assert_success(rv2)
         rv2_dict = rv2.json
         self.assertEqual(rv2_dict["user_id"], u2_id)
-        self.assertGreater(datetime.datetime.fromisoformat(rv2_dict["last_updated"]), datetime.datetime.fromisoformat(orig_date))
+        self.assertGreater(
+            datetime.datetime.fromisoformat(rv2_dict["last_updated"]), datetime.datetime.fromisoformat(orig_date)
+        )
 
         # User 2 should be able to see the Participant now
         rv3 = self.client.get(f"/api/participant/{p_id}", content_type="application/json", headers=u2_headers)

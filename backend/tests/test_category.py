@@ -2,7 +2,6 @@ from tests.base_test import BaseTest  # isort:skip
 from sqlalchemy import Integer, cast, select
 
 from app.models import Category
-from app.utils.category_utils import all_search_paths
 
 
 class TestCategory(BaseTest):
@@ -159,6 +158,8 @@ class TestCategory(BaseTest):
         self.assertNotIn("children", response["parent"])
 
     def test_category_can_create_searchable_path(self):
+        from app.utils.category_utils import all_search_paths
+
         c1 = self.construct_category()
         c2 = self.construct_category(name="I'm the kid", parent_id=c1.id)
         c3 = self.construct_category(name="I'm the grand kid", parent_id=c2.id)
