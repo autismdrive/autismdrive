@@ -22,8 +22,8 @@ class JWTSettings(BaseModel):
 
 
 class SQLAlchemySettings(BaseModel):
-    username: str = "ed_user"
-    password: str = "ed_pass"
+    username: str = "__POSTGRESQL_USERNAME__"
+    password: str = "__POSTGRESQL_PASSWORD__"
     host: str = "localhost"
     port: int = 5432
     database: str = "stardrive"

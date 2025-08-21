@@ -107,35 +107,37 @@ def create_app():
 
             error_dict = {"details": traceback_with_variables.format_exc(error)}
 
-        # if settings.ENV_NAME in ["local", "dev", "testing"]:
-        try:
-            frame = currentframe()
-            outer_frames = getouterframes(currentframe())
+        # Log the value of all available variables in the context of the error
+        # if we're in a local development or testing environment.
+        if settings.ENV_NAME in ["local", "testing"]:
+            try:
+                frame = currentframe()
+                outer_frames = getouterframes(currentframe())
 
-            for frame_info in outer_frames:
-                if "Endpoint" in frame_info.filename:
-                    arg_vals = getargvalues(frame_info.frame)
-                    error_location = f"{frame_info.filename}:{frame_info.lineno}"
-                    error_context = json.loads(
-                        json.dumps(
-                            arg_vals.locals,
-                            ensure_ascii=True,
-                            indent=4,
-                            sort_keys=True,
-                            default=str,
+                for frame_info in outer_frames:
+                    if "Endpoint" in frame_info.filename:
+                        arg_vals = getargvalues(frame_info.frame)
+                        error_location = f"{frame_info.filename}:{frame_info.lineno}"
+                        error_context = json.loads(
+                            json.dumps(
+                                arg_vals.locals,
+                                ensure_ascii=True,
+                                indent=4,
+                                sort_keys=True,
+                                default=str,
+                            )
                         )
-                    )
 
-                    error_dict = error_dict | {
-                        "error_location": error_location or None,
-                        "error_context": error_context or None,
-                    }
-        except Exception as e:
-            _app.logger.error(f"Error while trying to get error context: {e}")
+                        error_dict = error_dict | {
+                            "error_location": error_location or None,
+                            "error_context": error_context or None,
+                        }
+            except Exception as e:
+                _app.logger.error(f"Error while trying to get error context: {e}")
 
-        # Prevent memory leak (https://docs.python.org/3/library/inspect.html#:~:text=handle_stackframe_without_leak)
-        del outer_frames
-        del frame
+            # Prevent memory leak (https://docs.python.org/3/library/inspect.html#:~:text=handle_stackframe_without_leak)
+            del outer_frames
+            del frame
 
         response = jsonify(json.loads(json.dumps(error_dict, ensure_ascii=True, indent=4, sort_keys=True, default=str)))
         response.status_code = error.status_code

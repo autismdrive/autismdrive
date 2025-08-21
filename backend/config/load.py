@@ -12,11 +12,13 @@ type EnvName = Literal[
     "mirror",
     "template",
     "testing",
+    "production",
 ]
 
 _error_message = (
     "Environment variable 'ENV_NAME' is not set. Please set it to one of the following "
-    "valid environment names: 'ci', 'docker', 'local', 'mirror', 'template', or 'testing'."
+    "valid environment names: 'ci', 'docker', 'local', 'mirror', 'template', 'testing', "
+    "or 'production'."
 )
 
 

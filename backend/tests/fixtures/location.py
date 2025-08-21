@@ -50,7 +50,7 @@ def fake_coords(
 
 @dataclass
 class MockLocation(MockResource):
-    """A Location with for testing with just the required fields filled in."""
+    """A Location for testing with just the required fields filled in."""
 
     type: str = field(default_factory=lambda: "location")
     primary_contact: str = field(default_factory=lambda: fake.name())
@@ -64,7 +64,7 @@ class MockLocation(MockResource):
 
 @dataclass
 class MockLocationWithLatLong(MockLocation):
-    """A Location with for testing with fake latitude & longitude."""
+    """A Location for testing with fake latitude & longitude."""
 
     latitude: float = field(default_factory=lambda: fake_coords()["latitude"])
     longitude: float = field(default_factory=lambda: fake_coords()["longitude"])

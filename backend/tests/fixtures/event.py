@@ -9,7 +9,7 @@ from .fixture_utils import fake
 
 @dataclass
 class MockEvent(MockLocation):
-    """An Event with for testing with just the required fields filled in."""
+    """An Event for testing with just the required fields filled in."""
 
     date: datetime.datetime = field(default_factory=lambda: fake.future_datetime())
     time: str = field(default_factory=lambda: fake.time_object().strftime("%H:%M"))
@@ -18,7 +18,7 @@ class MockEvent(MockLocation):
 
 @dataclass
 class MockEventWithAllTheThings(MockLocationWithLatLong, MockEvent):
-    """An Event with for testing with fake values for all most fields."""
+    """An Event for testing with fake values for all most fields."""
 
     # # Inherited from MockResource
     # type
