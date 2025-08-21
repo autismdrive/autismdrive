@@ -1,14 +1,16 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Backend - run local Flask server" type="PythonConfigurationType" factoryName="Python">
-    <module name="backend" />
-    <option name="ENV_FILES" value="$PROJECT_DIR$/.env" />
+    <module name="Autism DRIVE Backend" />
+    <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="ENV_NAME" value="local" />
+      <env name="PYTHONPATH" value="$PYTHONPATH:$PROJECT_DIR$" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="SDK_NAME" value="uv (backend) (3)" />
+    <option name="SDK_NAME" value="uv" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
