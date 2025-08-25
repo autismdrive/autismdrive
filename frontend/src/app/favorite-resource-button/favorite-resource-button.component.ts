@@ -1,25 +1,26 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {UserFavorite} from '../_models/user_favorite';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {Resource} from '../_models/resource';
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {User} from '@models/user';
+import {UserFavorite} from '@models/user_favorite';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-favorite-resource-button',
   templateUrl: './favorite-resource-button.component.html',
-  styleUrls: ['./favorite-resource-button.component.scss']
+  styleUrls: ['./favorite-resource-button.component.scss'],
+  imports: [CommonModule, FlexModule, MatIconModule, MatButtonModule, MatTooltipModule],
 })
-export class FavoriteResourceButtonComponent implements OnInit {
+export class FavoriteResourceButtonComponent {
   @Input() resource_id: number;
   favorite: UserFavorite;
   @Input() user: User;
 
-  constructor(
-    private api: ApiService
-  ) { }
-
-  ngOnInit() {
-  }
+  constructor(private api: ApiService) {}
 
   userFavorite() {
     for (const f of this.user.user_favorites) {
@@ -31,7 +32,9 @@ export class FavoriteResourceButtonComponent implements OnInit {
   }
 
   addFavorite() {
-    const favorite: UserFavorite[] = [new UserFavorite({'user_id': this.user.id, 'resource_id': this.resource_id, 'type': 'resource' })];
+    const favorite: UserFavorite[] = [
+      new UserFavorite({user_id: this.user.id, resource_id: this.resource_id, type: 'resource'}),
+    ];
     this.api.addUserFavorites(favorite).subscribe(f => {
       this.user.user_favorites.push(f[0]);
     });
@@ -44,7 +47,10 @@ export class FavoriteResourceButtonComponent implements OnInit {
       }
     }
     this.api.deleteUserFavorite(this.favorite).subscribe(x => {
-      this.user.user_favorites.splice(this.user.user_favorites.findIndex(f => f.id === this.favorite.id), 1);
+      this.user.user_favorites.splice(
+        this.user.user_favorites.findIndex(f => f.id === this.favorite.id),
+        1,
+      );
     });
   }
 

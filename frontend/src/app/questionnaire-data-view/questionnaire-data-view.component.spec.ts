@@ -1,22 +1,26 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { QuestionnaireDataViewComponent } from './questionnaire-data-view.component';
+import {mockQuestionnaireInfoList} from '@app/shared/fixtures/mock-questionnaire-info-list';
+import {mockExportResponse} from '@app/shared/fixtures/mock-response';
+import {ApiService} from '@services/api/api.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {QuestionnaireDataViewComponent} from './questionnaire-data-view.component';
 
 describe('QuestionnaireDataViewComponent', () => {
   let component: QuestionnaireDataViewComponent;
-  let fixture: ComponentFixture<QuestionnaireDataViewComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ QuestionnaireDataViewComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<QuestionnaireDataViewComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(QuestionnaireDataViewComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(QuestionnaireDataViewComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .mock(ApiService, {
+        getQuestionnaireInfoList: jest.fn().mockReturnValue(of(mockQuestionnaireInfoList)),
+        exportQuestionnaire: jest.fn().mockReturnValue(of(mockExportResponse)),
+      });
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(QuestionnaireDataViewComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

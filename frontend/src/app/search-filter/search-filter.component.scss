@@ -1,8 +1,8 @@
-@import '../../config';
+@use '../../styles/config' as config;
 
-::ng-deep .mat-hint {
+:root .mat-hint {
   display: block;
-  color: $brand-accent;
+  color: config.$brand-accent;
   font-size: 1rem;
   padding-top: 0.5rem;
 }
@@ -12,9 +12,10 @@ button {
   text-align: left;
 }
 
-::ng-deep .mat-menu-panel {
+:root .mat-menu-panel {
   max-width: 400px !important;
   width: 400px;
+
   .mat-menu-content {
     width: initial;
 
@@ -23,6 +24,7 @@ button {
     }
   }
 }
+
 .mat-menu-trigger {
   min-width: 100%;
   min-height: 36px;

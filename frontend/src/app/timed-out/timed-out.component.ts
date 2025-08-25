@@ -1,32 +1,26 @@
-import { Component, HostBinding, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { fadeTransition } from '../_animations/animations';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {Component, HostBinding, OnInit} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {RouterModule} from '@angular/router';
+import {fadeTransition} from '@animations/animations';
+import {LogoComponent} from '@app/logo/logo.component';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {AuthenticationService} from '@services/authentication/authentication-service';
 
 @Component({
+  standalone: true,
   selector: 'app-timedout',
   templateUrl: './timed-out.component.html',
   styleUrls: ['./timed-out.component.scss'],
-  animations: [fadeTransition()]
+  animations: [fadeTransition()],
+  imports: [FlexModule, LogoComponent, RouterModule, MatButtonModule],
 })
-export class TimedoutComponent implements OnInit {
+export class TimedOutComponent implements OnInit {
   @HostBinding('@fadeTransition')
   title: string;
 
-  constructor(private router: Router,
-              private authenticationService: AuthenticationService
-  ) {
-  }
+  constructor(private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.authenticationService.logout();
-  }
-
-  goHome() {
-    this.router.navigate(['']);
-  }
-
-  goLogin() {
-    this.router.navigate(['/login']);
   }
 }

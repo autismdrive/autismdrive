@@ -1,20 +1,44 @@
-import {Component, EventEmitter, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormGroup} from '@angular/forms';
-import {FormlyFieldConfig} from '@ngx-formly/core';
+import {AsyncPipe, CommonModule} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, EventEmitter, signal, WritableSignal} from '@angular/core';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatError} from '@angular/material/form-field';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {LogoComponent} from '@app/logo/logo.component';
+import {scrollToTop} from '@app/shared/utilities/scrollToTop';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
+import {FormlyMatInputModule} from '@ngx-formly/material/input';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {WindowService} from '@services/window/window.service';
 import {DeviceDetectorService} from 'ngx-device-detector';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {scrollToTop} from '../../util/scrollToTop';
-import {User} from '../_models/user';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {lastValueFrom} from 'rxjs';
 
 @Component({
+  standalone: true,
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  imports: [
+    AsyncPipe,
+    CommonModule,
+    FlexModule,
+    FormlyMatInputModule,
+    FormlyModule,
+    LoadingComponent,
+    LogoComponent,
+    MatButtonModule,
+    MatError,
+    ReactiveFormsModule,
+    RouterModule,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent implements OnInit {
-  loading = false;
+export class LoginComponent {
+  loading: WritableSignal<boolean> = signal(false);
   emailToken: string;
   errorEmitter = new EventEmitter<string>();
   form = new FormGroup({});
@@ -24,7 +48,7 @@ export class LoginComponent implements OnInit {
     {
       key: 'email',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Email Address:',
         placeholder: 'Enter email',
@@ -34,7 +58,7 @@ export class LoginComponent implements OnInit {
     {
       key: 'password',
       type: 'input',
-      templateOptions: {
+      props: {
         label: 'Password:',
         type: 'password',
         required: true,
@@ -48,20 +72,23 @@ export class LoginComponent implements OnInit {
     private googleAnalytics: GoogleAnalyticsService,
     private route: ActivatedRoute,
     private router: Router,
+    private windowService: WindowService,
   ) {
     this.route.queryParams.subscribe(qParams => {
       if (qParams.hasOwnProperty('returnUrl')) {
-        this.returnUrl = qParams.returnUrl;
-        this.authenticationService.currentUser.subscribe(u => this._goToReturnUrl(u));
+        this.returnUrl = qParams['returnUrl'];
       }
     });
 
     this.route.params.subscribe(params => {
       if (params.hasOwnProperty('email_token')) {
-        this.emailToken = params.email_token;
+        this.emailToken = params['email_token'];
       }
     });
-    this.authenticationService.currentUser.subscribe(user => {
+
+    effect(() => {
+      const user = this.authenticationService.currentUser();
+
       // If the login form discovers there is a user, send folks to the return url.
       if (user) {
         this._goToReturnUrl(user);
@@ -69,35 +96,32 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-  }
-
-  submit(model) {
-    this.loading = true;
+  async submit(model) {
+    this.loading.set(true);
 
     if (this.form.valid) {
-      this.authenticationService.login(model['email'], model['password'], this.emailToken).subscribe(u => {
-        this._goToReturnUrl(u);
-        this.googleAnalytics.accountEvent('login');
-        },
-        error => {
-          if (error) {
-            this.errorEmitter.emit(error);
-          } else {
-            this.errorEmitter.emit('An unexpected error occurred. Please contact support');
-          }
-          this.loading = false;
-        });
+      try {
+        await lastValueFrom(this.authenticationService.login(model['email'], model['password'], this.emailToken));
+        this.googleAnalytics?.accountEvent('login');
+      } catch (error) {
+        if (error) {
+          this.errorEmitter.emit(error);
+        } else {
+          this.errorEmitter.emit('An unexpected error occurred. Please contact support');
+        }
+        this.loading.set(false);
+      }
     } else {
-      this.loading = false;
+      this.loading.set(false);
       this.errorEmitter.emit('Please enter a valid email address and password.');
     }
   }
 
   private _goToReturnUrl(user: User) {
     if (user) {
-      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => scrollToTop(this.deviceDetectorService));
+      this.router.navigateByUrl(this.returnUrl || '/profile').then(_ => {
+        scrollToTop(this.deviceDetectorService, this.windowService);
+      });
     }
   }
-
 }

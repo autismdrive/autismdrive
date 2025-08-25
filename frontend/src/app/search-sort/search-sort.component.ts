@@ -1,24 +1,22 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {SortMethod} from '../_models/sort_method';
+import {CommonModule} from '@angular/common';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {SortMethod} from '@models/sort_method';
 
 @Component({
+  standalone: true,
   selector: 'app-search-sort',
   templateUrl: './search-sort.component.html',
-  styleUrls: ['./search-sort.component.scss']
+  styleUrls: ['./search-sort.component.scss'],
+  imports: [MatFormFieldModule, MatSelectModule, CommonModule],
 })
-export class SearchSortComponent implements OnInit {
+export class SearchSortComponent {
   @Input() selectedSort: SortMethod;
-  @Input() sortMethods: { [key: string]: SortMethod };
+  @Input() sortMethods: Record<string, SortMethod>;
   @Output() sortMethodSelected = new EventEmitter<SortMethod>();
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
 
   get sortMethodsList() {
     return Object.values(this.sortMethods);
   }
-
 }

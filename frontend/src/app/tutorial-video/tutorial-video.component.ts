@@ -1,33 +1,41 @@
 /// <reference types="@types/youtube" />
-import {Component, Input, OnInit} from '@angular/core';
-import {NavItem} from '../_models/nav-item';
-import ClosedCaptionsLoadPolicy = YT.ClosedCaptionsLoadPolicy;
-import ModestBranding = YT.ModestBranding;
-import RelatedVideos = YT.RelatedVideos;
-import ShowInfo = YT.ShowInfo;
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {YouTubePlayerModule} from '@angular/youtube-player';
+import {DetailsLinkComponent} from '@app/details-link/details-link.component';
+import {NavItem} from '@models/nav-item';
+import {StorageService} from '@services/storage/storage.service';
+import {WindowService} from '@services/window/window.service';
+import {MarkdownModule} from 'ngx-markdown';
 
 @Component({
+  standalone: true,
   selector: 'app-tutorial-video',
   templateUrl: './tutorial-video.component.html',
-  styleUrls: ['./tutorial-video.component.scss']
+  styleUrls: ['./tutorial-video.component.scss'],
+  imports: [MatButtonModule, MatIconModule, MarkdownModule, DetailsLinkComponent, CommonModule, YouTubePlayerModule],
 })
-export class TutorialVideoComponent implements OnInit {
+export class TutorialVideoComponent {
   @Input() videoSize: string;
   @Input() videoId: string;
   @Input() instructions: string;
   @Input() links: NavItem[];
   playerVars: YT.PlayerVars = {
-    cc_load_policy: ClosedCaptionsLoadPolicy.ForceOn,
-    modestbranding: ModestBranding.Modest,
-    rel: RelatedVideos.Hide,
-    showinfo: ShowInfo.Hide,
+    cc_load_policy: 1, // YT.ClosedCaptionsLoadPolicy.ForceOn
+    modestbranding: 1, // YT.ModestBranding.Modest
+    rel: 0, // YT.RelatedVideos.Hide
+    showinfo: 0, // YT.ShowInfo.Hide
   };
 
-  constructor() {
-  }
+  constructor(
+    private storageService: StorageService,
+    private windowService: WindowService,
+  ) {}
 
   get windowWidthFactor(): number {
-    const windowWidthPx = window.innerWidth;
+    const windowWidthPx = this.windowService.window.innerWidth;
 
     if (windowWidthPx < 600) {
       return 0.7;
@@ -37,6 +45,8 @@ export class TutorialVideoComponent implements OnInit {
       return 0.9;
     } else if (windowWidthPx >= 1280) {
       return 1.0;
+    } else {
+      return 1.0;
     }
   }
 
@@ -45,6 +55,7 @@ export class TutorialVideoComponent implements OnInit {
       case 'large':
         return 1.0;
       case 'medium':
+      default:
         return 0.75;
       case 'small':
         return 0.5;
@@ -61,10 +72,7 @@ export class TutorialVideoComponent implements OnInit {
     return Math.floor(baseSize * this.videoWidthFactor * this.windowWidthFactor);
   }
 
-  ngOnInit() {
-  }
-
   hideVideo() {
-    localStorage.setItem('shouldHideTutorialVideo', 'true');
+    this.storageService.set('shouldHideTutorialVideo', 'true');
   }
 }

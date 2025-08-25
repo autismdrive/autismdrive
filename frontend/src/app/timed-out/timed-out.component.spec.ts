@@ -1,21 +1,27 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TimedoutComponent } from './timed-out.component';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {TimedOutComponent} from './timed-out.component';
 
-describe('TimedoutComponent', () => {
-  let component: TimedoutComponent;
-  let fixture: ComponentFixture<TimedoutComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ TimedoutComponent ]
-    })
-    .compileComponents();
-  }));
+describe('TimedOutComponent', () => {
+  let component: TimedOutComponent;
+  let fixture: MockedComponentFixture<TimedOutComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TimedoutComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(TimedOutComponent)
+      .keep(NoopAnimationsModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .mock(AuthenticationService, {
+        logout: jest.fn().mockImplementation(() => {
+          localStorage.removeItem(AuthenticationStateService.LOCAL_TOKEN_KEY);
+        }),
+      });
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(TimedOutComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

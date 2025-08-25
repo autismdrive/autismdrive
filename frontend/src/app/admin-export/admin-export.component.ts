@@ -1,26 +1,31 @@
+import {CommonModule, DatePipe} from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
-  ComponentFactory,
-  ComponentFactoryResolver,
+  effect,
   OnInit,
   ViewChild,
   ViewChildren,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
-import {Router} from '@angular/router';
+import {MatRippleModule} from '@angular/material/core';
+import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatTableModule} from '@angular/material/table';
+import {DataTransferDataSource} from '@models/data_transfer_data_source';
+import {DataTransferLog} from '@models/data_transfer_log';
+import {ApiService} from '@services/api/api.service';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 import {merge} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {DataTransferDataSource} from '../_models/data_transfer_data_source';
-import {DataTransferLog} from '../_models/data_transfer_log';
-import {ApiService} from '../_services/api/api.service';
-import {ConfigService} from '../_services/config/config.service';
 import {AdminExportDetailsComponent} from '../admin-export-details/admin-export-details.component';
 
 @Component({
+  standalone: true,
   selector: 'app-admin-export',
   templateUrl: './admin-export.component.html',
-  styleUrls: ['./admin-export.component.scss']
+  styleUrls: ['./admin-export.component.scss'],
+  imports: [MatPaginatorModule, MatTableModule, CommonModule, DatePipe, MatRippleModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminExportComponent implements OnInit {
   dataTransferDataSource: DataTransferDataSource;
@@ -36,19 +41,21 @@ export class AdminExportComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    private configService: ConfigService,
-    private router: Router,
-    private resolver: ComponentFactoryResolver
+    private appEnvironmentService: AppEnvironmentService,
   ) {
+    effect(() => {
+      if (this.appEnvironmentService.props()) {
+        this.mirroring = this.appEnvironmentService.mirroring;
+        this.loadData();
+        this.loadLatestLog();
+      }
+    });
   }
 
   ngOnInit(): void {
-    this.mirroring = this.configService.mirroring;
-    this.loadData();
-    this.loadLatestLog();
-    merge(this.paginator.page).pipe(
-      tap(() => this.loadData())
-    ).subscribe();
+    merge(this.paginator.page)
+      .pipe(tap(() => this.loadData()))
+      .subscribe();
   }
 
   loadData() {
@@ -79,7 +86,6 @@ export class AdminExportComponent implements OnInit {
   }
 
   selectRow(index: number) {
-    console.log('Row ' + index + ' Selected');
     if (this.expandedRow != null) {
       // clear old content
       this.rowContainers.toArray()[this.expandedRow].clear();
@@ -89,8 +95,7 @@ export class AdminExportComponent implements OnInit {
       this.expandedRow = null;
     } else {
       const container = this.rowContainers.toArray()[index];
-      const factory: ComponentFactory<any> = this.resolver.resolveComponentFactory(AdminExportDetailsComponent);
-      const inlineComponent = container.createComponent(factory);
+      const inlineComponent = container.createComponent(AdminExportDetailsComponent);
       this.dataTransferDataSource.logs$.subscribe(logs => {
         inlineComponent.instance.exportDetails = logs[index].details;
         this.expandedRow = index;

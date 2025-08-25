@@ -1,21 +1,8 @@
 <div>
-  <mat-form-field
-    style="width: 100%"
-  >
+  <mat-form-field style="width: 100%">
     <mat-label>Chain Steps</mat-label>
-    <textarea
-      #chainStepsTextArea
-      [defaultValue]="chainStepsText"
-      matInput
-      rows="15"
-    ></textarea>
+    <textarea #chainStepsTextArea [defaultValue]="chainStepsText" matInput rows="15"></textarea>
   </mat-form-field>
 </div>
 
-<button
-  (click)="save(chainStepsTextArea)"
-  color="primary"
-  mat-flat-button
->Save
-</button>
-
+<button (click)="save(chainStepsTextArea)" color="primary" mat-flat-button>Save</button>

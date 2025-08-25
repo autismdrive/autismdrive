@@ -1,0 +1,1 @@
+CREATE USER ed_user WITH PASSWORD 'ed_pass' CREATEDB;

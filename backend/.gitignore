@@ -1,4 +1,3 @@
-.env
 .idea/
 **/__pycache__
 instance
@@ -8,3 +7,12 @@ python-env
 _trial_temp.lock
 pylintrc
 star_drive.log
+*.egg-info
+dist/
+.venv/
+.coverage
+keys/
+
+*.env
+!template*.env
+

@@ -1,21 +1,51 @@
+import {AsyncPipe, CommonModule, DatePipe, PercentPipe} from '@angular/common';
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSort, MatSortModule} from '@angular/material/sort';
+import {MatTableModule} from '@angular/material/table';
 import {Router} from '@angular/router';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {UserDataSource} from '@models/user_data_source';
+import {ApiService} from '@services/api/api.service';
 import {fromEvent, merge} from 'rxjs';
 import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
-import {UserDataSource} from '../_models/user_data_source';
-import {ApiService} from '../_services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-user-admin',
   templateUrl: './user-admin.component.html',
-  styleUrls: ['./user-admin.component.scss']
+  styleUrls: ['./user-admin.component.scss'],
+  imports: [
+    AsyncPipe,
+    DatePipe,
+    MatFormFieldModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
+    MatTableModule,
+    PercentPipe,
+    MatInputModule,
+    CommonModule,
+    LoadingComponent,
+  ],
 })
 export class UserAdminComponent implements OnInit, AfterViewInit {
   dataSource: UserDataSource;
-  displayedColumns = ['id', 'role', 'email', 'last_updated', 'registration_date', 'last_login', 'participant_count',
-    'created_password', 'identity', 'percent_self_registration_complete'];
+  displayedColumns = [
+    'id',
+    'role',
+    'email',
+    'last_updated',
+    'registration_date',
+    'last_login',
+    'participant_count',
+    'created_password',
+    'identity',
+    'percent_self_registration_complete',
+  ];
   default_page_size = 10;
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -24,14 +54,13 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
 
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
   ) {
     this.dataSource = new UserDataSource(this.api);
   }
 
   ngOnInit() {
-    this.dataSource.loadUsers('', 'email', 'asc',
-      0, this.default_page_size);
+    this.dataSource.loadUsers('', 'email', 'asc', 0, this.default_page_size);
   }
 
   onRowClicked(row) {
@@ -39,31 +68,33 @@ export class UserAdminComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-
     // server-side search
     fromEvent(this.input.nativeElement, 'keyup')
       .pipe(
         debounceTime(150),
         distinctUntilChanged(),
-        tap(() => {
+        tap(async () => {
           this.paginator.pageIndex = 0;
-          this.loadUsers();
-        })
+          await this.loadUsers();
+        }),
       )
       .subscribe();
 
     // reset the paginator after sorting
-    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-    merge(this.sort.sortChange, this.paginator.page).pipe(
-      tap(() => this.loadUsers())
-    ).subscribe();
-
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(tap(() => this.loadUsers()))
+      .subscribe();
   }
 
-  loadUsers() {
-    this.dataSource.loadUsers(this.input.nativeElement.value, this.sort.active, this.sort.direction,
-      this.paginator.pageIndex, this.paginator.pageSize);
+  async loadUsers() {
+    await this.dataSource.loadUsers(
+      this.input.nativeElement.value,
+      this.sort.active,
+      this.sort.direction,
+      this.paginator.pageIndex,
+      this.paginator.pageSize,
+    );
   }
-
 }

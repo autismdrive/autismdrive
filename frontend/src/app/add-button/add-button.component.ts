@@ -1,25 +1,22 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {User} from '../_models/user';
-import {Router} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTooltip} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
+import {User} from '@models/user';
 
 @Component({
+  standalone: true,
   selector: 'app-add-button',
   templateUrl: './add-button.component.html',
-  styleUrls: ['./add-button.component.scss']
+  styleUrls: ['./add-button.component.scss'],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltip, RouterModule],
 })
-export class AddButtonComponent implements OnInit {
+export class AddButtonComponent {
   @Input() currentUser: User;
   @Input() addLink: string;
   @Input() addLabel: string;
 
-  constructor(
-    private router: Router
-  ) { }
-
-  ngOnInit() {
-  }
-
-  openAdd() {
-    this.router.navigateByUrl(this.addLink);
-  }
+  constructor() {}
 }

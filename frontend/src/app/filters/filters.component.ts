@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {Component} from '@angular/core';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @Component({
+  standalone: true,
   selector: 'app-filters',
   templateUrl: './filters.component.html',
-  styleUrls: ['./filters.component.scss']
+  styleUrls: ['./filters.component.scss'],
+  imports: [MatCheckboxModule],
 })
-export class FiltersComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+export class FiltersComponent {
+  constructor() {}
 }

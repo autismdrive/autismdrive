@@ -2,26 +2,22 @@
 <div mat-dialog-content>
   <mat-form-field>
     <mat-label>Name:</mat-label>
-    <input matInput [(ngModel)]="data.si.investigator.name">
+    <input matInput [(ngModel)]="data.si.investigator.name" />
   </mat-form-field>
   <mat-form-field>
     <mat-label>Title:</mat-label>
-    <input matInput [(ngModel)]="data.si.investigator.title">
+    <input matInput [(ngModel)]="data.si.investigator.title" />
   </mat-form-field>
   <mat-form-field>
     <mat-label>Organization Name:</mat-label>
-    <input matInput [(ngModel)]="data.si.investigator.organization_name">
+    <input matInput [(ngModel)]="data.si.investigator.organization_name" />
   </mat-form-field>
   <mat-form-field>
     <mat-label>Bio Link:</mat-label>
-    <input matInput [(ngModel)]="data.si.investigator.bio_link">
+    <input matInput [(ngModel)]="data.si.investigator.bio_link" />
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-flat-button
-          color="primary"
-          [mat-dialog-close]="data.si.investigator"
-          cdkFocusInitial
-  >Save</button>
+  <button mat-flat-button color="primary" [mat-dialog-close]="data.si.investigator" cdkFocusInitial>Save</button>
 </div>

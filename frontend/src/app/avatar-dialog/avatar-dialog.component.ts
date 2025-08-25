@@ -1,87 +1,74 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {Participant} from '../_models/participant';
-import {ParticipantRelationship} from '../_models/participantRelationship';
-import {ApiService} from '../_services/api/api.service';
+import {CommonModule, DOCUMENT, NgOptimizedImage} from '@angular/common';
+import {AfterViewInit, Component, Inject, signal, WritableSignal} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon';
+import {Participant} from '@models/participant';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {lastValueFrom} from 'rxjs';
 import {ParticipantProfileComponent} from '../participant-profile/participant-profile.component';
 
 @Component({
+  standalone: true,
   selector: 'app-avatar-dialog',
   templateUrl: './avatar-dialog.component.html',
-  styleUrls: ['./avatar-dialog.component.scss']
+  styleUrls: ['./avatar-dialog.component.scss'],
+  imports: [MatDialogModule, FlexModule, CommonModule, MatButtonModule, MatIconModule, NgOptimizedImage],
 })
-export class AvatarDialogComponent implements OnInit {
-  avatarImages: string[] = [];
-  avatarColors: string[] = [];
-  selectedIcon: string;
-  selectedColor: string;
+export class AvatarDialogComponent implements AfterViewInit {
+  avatarImages: WritableSignal<string[]> = signal([]);
+  avatarColors: WritableSignal<string[]> = signal([]);
+  selectedIcon: WritableSignal<string> = signal(undefined);
+  selectedColor: WritableSignal<string> = signal(undefined);
+  participant: WritableSignal<Participant> = signal(undefined);
 
   constructor(
     private api: ApiService,
     public dialogRef: MatDialogRef<ParticipantProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { participant: Participant }
+    @Inject(MAT_DIALOG_DATA) public data: {participant: Participant},
+    @Inject(DOCUMENT) public document: Document,
   ) {
-    for (let i = 0; i < 104; i++) {
-      this.avatarImages[i] = (i + 1).toLocaleString('en', {minimumIntegerDigits: 3});
-    }
+    this.avatarImages.set(
+      Array(104)
+        .fill(0)
+        .map((_, i) => String(i + 1).padStart(3, '0')),
+    );
 
-    for (let i = 0; i < 16; i++) {
-      this.avatarColors[i] = `hsl(${i * 16},100%,80%)`;
-    }
+    this.avatarColors.set(
+      Array(16)
+        .fill(0)
+        .map((_, i) => `hsl(${i * 16},100%,80%)`),
+    );
 
-    this.selectedIcon = this.data.participant.avatar_icon || '001';
-    this.selectedColor = this.data.participant.avatar_color || `hsl(0, 100%, 80%)`;
-
-    this.dialogRef.afterOpened().subscribe(() => {
-      const imageEl = document.getElementsByClassName('avatar-image-active')[0] as HTMLElement;
-      const colorEl = document.getElementsByClassName('color-swatch-active')[0] as HTMLElement;
-
-      if (imageEl) {
-        const x = imageEl.offsetLeft - imageEl.clientWidth * 1.25 - imageEl.parentElement.clientWidth;
-        imageEl.parentElement.scrollTo({left: x});
-      }
-      if (colorEl) {
-        const x = colorEl.offsetLeft - colorEl.clientWidth * 3 - colorEl.parentElement.clientWidth;
-        colorEl.parentElement.scrollTo({left: x});
-      }
-    });
+    this.selectedIcon.set(this.data.participant.avatar_icon || '001');
+    this.selectedColor.set(this.data.participant.avatar_color || `hsl(0, 100%, 80%)`);
+    this.participant.set(this.data.participant);
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit() {
+    const imageEl = this.document.getElementsByClassName('avatar-image-active')[0] as HTMLElement;
+    const colorEl = this.document.getElementsByClassName('color-swatch-active')[0] as HTMLElement;
+
+    if (imageEl) {
+      const x = imageEl.offsetLeft - imageEl.clientWidth * 1.25 - imageEl.parentElement.clientWidth;
+      imageEl.parentElement.scrollTo({left: x});
+    }
+    if (colorEl) {
+      const x = colorEl.offsetLeft - colorEl.clientWidth * 3 - colorEl.parentElement.clientWidth;
+      colorEl.parentElement.scrollTo({left: x});
+    }
   }
 
   onNoClick(): void {
     this.dialogRef.close();
   }
 
-  getPrompt(): string {
+  get prompt(): string {
     const isSelf = this.data.participant.relationship !== ParticipantRelationship.DEPENDENT;
     const subj = isSelf ? 'your' : `${this.data.participant.name || 'your child'}'s`;
     return `Choose ${subj} avatar`;
-  }
-
-  setColor(color: string) {
-    this.selectedColor = color;
-  }
-
-  setImage(image: string) {
-    this.selectedIcon = image;
-  }
-
-  isSelectedImage(avatarImage: string): boolean {
-    if (this.selectedIcon) {
-      return avatarImage === this.selectedIcon;
-    } else {
-      return avatarImage === this.data.participant.avatar_icon;
-    }
-  }
-
-  isSelectedColor(avatarColor: string): boolean {
-    if (this.selectedColor) {
-      return avatarColor === this.selectedColor;
-    } else {
-      return avatarColor === this.data.participant.avatar_color;
-    }
   }
 
   scroll($event: MouseEvent, className: string, direction: string) {
@@ -92,9 +79,10 @@ export class AvatarDialogComponent implements OnInit {
     el.scrollBy(x, 0);
   }
 
-  onSubmit() {
-    this.data.participant.avatar_color = this.selectedColor || this.data.participant.avatar_color;
-    this.data.participant.avatar_icon = this.selectedIcon || this.data.participant.avatar_icon;
-    this.api.updateParticipant(this.data.participant).subscribe(() => this.dialogRef.close());
+  async onSubmit() {
+    this.data.participant.avatar_color = this.selectedColor();
+    this.data.participant.avatar_icon = this.selectedIcon();
+    await lastValueFrom(this.api.updateParticipant(this.data.participant));
+    this.dialogRef.close();
   }
 }

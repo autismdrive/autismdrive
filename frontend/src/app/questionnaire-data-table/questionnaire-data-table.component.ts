@@ -1,28 +1,32 @@
+import {CommonModule} from '@angular/common';
 import {Component, Input, OnChanges} from '@angular/core';
-import {snakeToUpperCase} from '../../util/snakeToUpper';
-import {QuestionnaireDataSource} from '../_models/questionnaire_data_source';
-import {TableInfo} from '../_models/table_info';
-import {ApiService} from '../_services/api/api.service';
+import {MatButtonModule} from '@angular/material/button';
+import {MatTableModule} from '@angular/material/table';
+import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
+import {QuestionnaireDataSource} from '@models/questionnaire_data_source';
+import {TableInfo} from '@models/table_info';
+import {ApiService} from '@services/api/api.service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
+  standalone: true,
   selector: 'app-questionnaire-data-table',
   templateUrl: './questionnaire-data-table.component.html',
-  styleUrls: ['./questionnaire-data-table.component.scss']
+  styleUrls: ['./questionnaire-data-table.component.scss'],
+  imports: [MatButtonModule, MatTableModule, CommonModule],
 })
 export class QuestionnaireDataTableComponent implements OnChanges {
-  @Input()
-  questionnaire_info: TableInfo;
+  @Input() questionnaire_info: TableInfo;
   selected_info: TableInfo;
 
   dataSource: QuestionnaireDataSource;
   displayedColumns = [];
   columnNames = [];
 
-
   constructor(
     private api: ApiService,
-  ) {
-  }
+    private windowService: WindowService,
+  ) {}
 
   get snakeToUpperCase() {
     return snakeToUpperCase;
@@ -43,20 +47,16 @@ export class QuestionnaireDataTableComponent implements OnChanges {
   load_columns() {
     this.displayedColumns = [];
     this.columnNames = [];
-    this.api
-      .getQuestionnaireListMeta(this.selected_info.table_name)
-      .subscribe(
-      result => {
-        for (const column of result['fields']) {
-          if (!this.displayedColumns.includes(column.name)) {
-            this.displayedColumns.push({'name': column.name, 'type': column.type});
-          }
-          if (!this.columnNames.includes(column.name)) {
-            this.columnNames.push(column.name);
-          }
+    this.api.getQuestionnaireListMeta(this.selected_info.table_name).subscribe(result => {
+      for (const column of result['fields']) {
+        if (!this.displayedColumns.includes(column.name)) {
+          this.displayedColumns.push({name: column.name, type: column.type});
+        }
+        if (!this.columnNames.includes(column.name)) {
+          this.columnNames.push(column.name);
         }
       }
-    );
+    });
   }
 
   format_element(element, column) {
@@ -69,18 +69,19 @@ export class QuestionnaireDataTableComponent implements OnChanges {
 
   exportQ(info) {
     this.api.exportQuestionnaire(info.table_name).subscribe(response => {
-      console.log('data', response);
       const filename = response.headers.get('x-filename');
-      const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
 
       const url = URL.createObjectURL(blob);
       const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
 
       a.href = url;
       a.download = filename;
-      window.document.body.appendChild(a);
+      this.windowService.window.document.body.appendChild(a);
       a.click();
-      window.document.body.removeChild(a);
+      this.windowService.window.document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
   }

@@ -1,20 +1,34 @@
-import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ChangeDetectorRef, Component, Inject} from '@angular/core';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
+import {ApiService} from '@services/api/api.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {StorageService} from '@services/storage/storage.service';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {User} from '../_models/user';
-import {FormGroup} from '@angular/forms';
-import {FormlyFieldConfig} from '@ngx-formly/core';
-import {ApiService} from '../_services/api/api.service';
-import {ActivatedRoute} from '@angular/router';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {StudySurveyEntryComponent} from '../study-survey-entry/study-survey-entry.component';
 
 @Component({
+  standalone: true,
   selector: 'app-register-dialog',
   templateUrl: './register-dialog.component.html',
-  styleUrls: ['./register-dialog.component.scss']
+  styleUrls: ['./register-dialog.component.scss'],
+  imports: [
+    ReactiveFormsModule,
+    FormlyModule,
+    FlexModule,
+    MatButtonModule,
+    MatDialogModule,
+    LoadingComponent,
+    CommonModule,
+  ],
 })
-export class RegisterDialogComponent implements OnInit {
+export class RegisterDialogComponent {
   private _stateSubject: BehaviorSubject<string>;
   public registerState: Observable<string>;
 
@@ -27,11 +41,11 @@ export class RegisterDialogComponent implements OnInit {
       key: 'email',
       validators: {
         fieldMatch: {
-          expression: (control) => {
+          expression: control => {
             const value = control.value;
 
             // avoid displaying the message error when values are empty
-            return value.emailConfirm === value.email || (!value.emailConfirm || !value.email);
+            return value.emailConfirm === value.email || !value.emailConfirm || !value.email;
           },
           message: 'Email Does Not Match',
           errorPath: 'emailConfirm',
@@ -41,7 +55,7 @@ export class RegisterDialogComponent implements OnInit {
         {
           key: 'email',
           type: 'input',
-          templateOptions: {
+          props: {
             type: 'email',
             label: 'Email Address:',
             placeholder: 'Enter email',
@@ -49,12 +63,12 @@ export class RegisterDialogComponent implements OnInit {
           },
           validators: {
             validation: ['email'],
-          }
+          },
         },
         {
           key: 'emailConfirm',
           type: 'input',
-          templateOptions: {
+          props: {
             type: 'email',
             label: 'Confirm Email',
             placeholder: 'Please re-enter your email',
@@ -68,12 +82,13 @@ export class RegisterDialogComponent implements OnInit {
   constructor(
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private route: ActivatedRoute,
     private googleAnalytics: GoogleAnalyticsService,
     public dialogRef: MatDialogRef<StudySurveyEntryComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      displaySurvey: boolean
-    }
+    private storageService: StorageService,
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      displaySurvey: boolean;
+    },
   ) {
     this._stateSubject = new BehaviorSubject<string>('form');
     this.registerState = this._stateSubject.asObservable();
@@ -82,15 +97,12 @@ export class RegisterDialogComponent implements OnInit {
     this.user = new User({
       id: null,
       email: this.model['email'],
-      role: 'User'
+      role: 'User',
     });
   }
 
-  ngOnInit() {
-  }
-
   submit() {
-    localStorage.removeItem('token_url');
+    this.storageService.remove('token_url');
     if (this.form.valid) {
       this._stateSubject.next('submitting');
       this.registerState = this._stateSubject.asObservable();
@@ -100,27 +112,29 @@ export class RegisterDialogComponent implements OnInit {
       this.user['email'] = this.model['email']['email'];
 
       // Submit the user data to the backend.
-      this.api.addUser(this.user).subscribe(u => {
-        this.user = u;
-        if (u.hasOwnProperty('token_url')) {
-          localStorage.setItem('token_url', u.token_url);
-        }
-        this.googleAnalytics.accountEvent('register');
-        this._stateSubject.next('wait_for_email');
-        this.registerState = this._stateSubject.asObservable();
-        this.changeDetectorRef.detectChanges();
-        this.data.displaySurvey = true;
-      }, error1 => {
-        this._stateSubject.next('form');
-        this.registerState = this._stateSubject.asObservable();
-        this.errorMessage = error1;
-        this.changeDetectorRef.detectChanges();
-      });
+      this.api.addUser(this.user).subscribe(
+        u => {
+          this.user = u;
+          if (u.hasOwnProperty('token_url')) {
+            this.storageService.set('token_url', u.token_url);
+          }
+          this.googleAnalytics.accountEvent('register');
+          this._stateSubject.next('wait_for_email');
+          this.registerState = this._stateSubject.asObservable();
+          this.changeDetectorRef.detectChanges();
+          this.data.displaySurvey = true;
+        },
+        error1 => {
+          this._stateSubject.next('form');
+          this.registerState = this._stateSubject.asObservable();
+          this.errorMessage = error1;
+          this.changeDetectorRef.detectChanges();
+        },
+      );
     }
   }
 
   public get registerStateValue(): string {
     return this._stateSubject.value;
   }
-
 }

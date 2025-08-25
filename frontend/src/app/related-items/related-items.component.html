@@ -1,5 +1,5 @@
 <div fxLayout="column" fxLayoutGap="2em">
-  <mat-card *ngIf="!loading && (relatedStudies.length > 0)" [ngClass]="{'related-items': true}">
+  <mat-card *ngIf="!loading && relatedStudies.length > 0" [ngClass]="{'related-items': true}">
     <mat-card-title>Related Research Studies</mat-card-title>
     <mat-card-content>
       <mat-list>
@@ -7,25 +7,31 @@
           <mat-list-item>
             <a mat-line (click)="goStudy(relStudy.id)" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="8px">
               <app-type-icon [iconType]="'study'"></app-type-icon>
-              <span class="study-title">{{relStudy.short_title || relStudy.title}}</span>
+              <span class="study-title">{{ relStudy.short_title || relStudy.title }}</span>
             </a>
-            <p mat-line>{{relStudy.short_description || relStudy.description}}</p>
+            <p mat-line>{{ relStudy.short_description || relStudy.description }}</p>
           </mat-list-item>
         </div>
       </mat-list>
     </mat-card-content>
   </mat-card>
-  <mat-card *ngIf="!loading && (relatedResources.length > 0)" [ngClass]="{'related-items': true}">
+  <mat-card *ngIf="!loading && relatedResources.length > 0" [ngClass]="{'related-items': true}">
     <mat-card-title>Related Resources</mat-card-title>
     <mat-card-content>
       <mat-list>
         <div *ngFor="let relResource of relatedResources">
           <mat-list-item>
-            <a  mat-line (click)="goResource(relResource.id)" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="8px">
+            <a
+              mat-line
+              (click)="goResource(relResource.id)"
+              fxLayout="row"
+              fxLayoutAlign="start start"
+              fxLayoutGap="8px"
+            >
               <app-type-icon [iconType]="relResource.type"></app-type-icon>
-              <span class="resource-title">{{relResource.title}}</span>
+              <span class="resource-title">{{ relResource.title }}</span>
             </a>
-            <p mat-line>{{relResource.description | truncate: 140}}</p>
+            <p mat-line>{{ relResource.description | truncate: 140 }}</p>
           </mat-list-item>
         </div>
       </mat-list>

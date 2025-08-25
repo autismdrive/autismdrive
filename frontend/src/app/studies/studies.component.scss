@@ -1,12 +1,4 @@
-@import '../../config';
-
-#hero {
-  background-image: url('/assets/studies/hero.jpg');
-
-  h1 {
-    color: white;
-  }
-}
+@use '../../styles/config' as config;
 
 .studies {
   padding: 5.5%;
@@ -14,17 +6,25 @@
   h1 {
     font-size: 2.5rem;
 
-    &:after {
+    &::after {
       content: '';
       background-color: #e57200;
       width: 6.25rem;
-      height: .125rem;
+      height: 0.125rem;
       display: block;
     }
   }
 }
 
-::ng-deep .mat-form-field-wrapper{
+#hero {
+  background-image: url('/public/studies/hero.jpg');
+
+  h1 {
+    color: white;
+  }
+}
+
+:root .mat-form-field-wrapper {
   margin-bottom: -1.25em;
 }
 
@@ -37,13 +37,17 @@
 }
 
 /* desktop display */
-.mobile_device_480px {
+.mobile-device-480px {
   display: none;
 }
 
 /* mobile display */
-@media only screen and (max-device-width: 480px) {
-  .mobile_device_480px{display: block;}
-  .desktop {display: none;}
-}
+@media only screen and (device-width <= 480px) {
+  .mobile-device-480px {
+    display: block;
+  }
 
+  .desktop {
+    display: none;
+  }
+}

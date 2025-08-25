@@ -1,16 +1,24 @@
+import {CommonModule} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
-import {Category} from '../_models/category';
-import {AgeRange, Covid19Categories, Language} from '../_models/hit_type';
-import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-topics-dialog.component';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
 import {MatDialog} from '@angular/material/dialog';
-import {User} from '../_models/user';
-import {UserFavorite} from '../_models/user_favorite';
-import {ApiService} from '../_services/api/api.service';
+import {MatIconModule} from '@angular/material/icon';
+import {RouterModule} from '@angular/router';
+import {Category} from '@models/category';
+import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
+import {User} from '@models/user';
+import {UserFavorite} from '@models/user_favorite';
+import {ApiService} from '@services/api/api.service';
+import {FavoriteTopicsDialogComponent} from '../favorite-topics-dialog/favorite-topics-dialog.component';
 
 @Component({
+  standalone: true,
   selector: 'app-favorite-topics',
   templateUrl: './favorite-topics.component.html',
-  styleUrls: ['./favorite-topics.component.scss']
+  styleUrls: ['./favorite-topics.component.scss'],
+  imports: [CommonModule, MatCardModule, MatChipsModule, RouterModule, MatButtonModule, MatIconModule],
 })
 export class FavoriteTopicsComponent implements OnInit {
   @Input() currentUser: User;
@@ -25,8 +33,8 @@ export class FavoriteTopicsComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    public dialog: MatDialog
-  ) { }
+    public dialog: MatDialog,
+  ) {}
 
   ngOnInit() {
     this.loadFavorites();
@@ -47,7 +55,6 @@ export class FavoriteTopicsComponent implements OnInit {
     });
   }
 
-
   openFavoriteTopicsDialog(): void {
     const dialogRef = this.dialog.open(FavoriteTopicsDialogComponent, {
       maxWidth: '100vw',
@@ -57,24 +64,26 @@ export class FavoriteTopicsComponent implements OnInit {
         topics: this.favoriteTopics,
         ages: this.favoriteAges,
         languages: this.favoriteLanguages,
-        covid19_categories: this.favoriteCovid19Topics
-      }
+        covid19_categories: this.favoriteCovid19Topics,
+      },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const favorites: UserFavorite[] = [];
         result.topics.forEach(topic => {
-          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'category', 'category_id': topic.id }));
+          favorites.push(new UserFavorite({user_id: this.currentUser.id, type: 'category', category_id: topic.id}));
         });
         result.ages.forEach(age => {
-          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'age_range', 'age_range': age }));
+          favorites.push(new UserFavorite({user_id: this.currentUser.id, type: 'age_range', age_range: age}));
         });
         result.languages.forEach(language => {
-          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'language', 'language': language }));
+          favorites.push(new UserFavorite({user_id: this.currentUser.id, type: 'language', language: language}));
         });
         result.covid19_categories.forEach(c19 => {
-          favorites.push(new UserFavorite({'user_id': this.currentUser.id, 'type': 'covid19_category', 'covid19_category': c19 }));
+          favorites.push(
+            new UserFavorite({user_id: this.currentUser.id, type: 'covid19_category', covid19_category: c19}),
+          );
         });
         this.api.addUserFavorites(favorites).subscribe();
         this.favoriteTopics = result.topics;
@@ -84,5 +93,4 @@ export class FavoriteTopicsComponent implements OnInit {
       }
     });
   }
-
 }

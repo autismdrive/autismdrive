@@ -1,14 +1,20 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {Category} from '../_models/category';
-import {Aggregation} from '../_models/query';
+import {CommonModule} from '@angular/common';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatHint} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatMenuModule} from '@angular/material/menu';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {Aggregation} from '@models/query';
 
 @Component({
+  standalone: true,
   selector: 'app-search-filter',
   templateUrl: './search-filter.component.html',
-  styleUrls: ['./search-filter.component.scss']
+  styleUrls: ['./search-filter.component.scss'],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatHint, LoadingComponent, CommonModule],
 })
-export class SearchFilterComponent implements OnInit {
-
+export class SearchFilterComponent {
   @Input() label_title: string;
   @Input() label_icon: string;
   @Input() label_any: string;
@@ -16,13 +22,9 @@ export class SearchFilterComponent implements OnInit {
   @Input() aggregations: Aggregation[];
   @Input() isNotApplicable: boolean;
   @Input() notApplicableMessage: string;
-  @Output() filterSelected = new EventEmitter<String>();
+  @Output() filterSelected = new EventEmitter<string>();
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   select(keepType?: string) {
     this.filterSelected.emit(keepType);

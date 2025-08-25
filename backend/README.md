@@ -27,9 +27,9 @@ You can use Docker to run the two primary dependencies for this project:  Postgr
 ####  Not Using Docker
 ###### PostgreSQL
 * MacOS:
-[Download and install Postgres.app](https://postgresapp.com). This will install `postgres`, along with the command-line tools, including `psql`, `pg_ctl`, and others. Then update your `PATH` variable to look in the Postgres.app `bin` directory for the relevant Postgres CLI tools.
+Install postgresql via brew:
 ```BASH
-export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
+brew install postgresql@14
 ```
 
 * Debian/Ubuntu:
@@ -37,7 +37,7 @@ export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
 apt-get install postgresql postgresql-client libpq-dev
 ```
 ###### Database Setup
-*NOTE:* Docker will do this automatically, only necissary if you are doing it locally.
+*NOTE:* Docker will do this automatically, only necessary if you are doing it locally.
 *NOTE:* The configuration is currently set up to use "ed_pass" as a password.  You will be promoted to enter a password when you connect.
 * MacOS:
 ```BASH
@@ -65,7 +65,7 @@ We are currently using version 6, and should look at upgrading this in the futur
 
 
 #### Angular
-You will need the angular command line utilities to run the front end.
+You will need the angular command line utilities to run the frontend.
 ```BASH
 npm install -g @angular/cli
 ```
@@ -79,11 +79,38 @@ source python-env/bin/activate
 pip3 install -r requirements.txt
 ```
 
-## Add a config file
+If you are on MacOS, you may get an error while building wheels for psycopg. If so, you may need to make sure postgresql is installed locally (even if you are running the database via Docker) and reinstall and re-link openssl:
+```bash
+brew install postgresql@17
+xcode-select --install
+brew reinstall openssl
+echo 'export PATH="/usr/local/Cellar/openssl@3/3.1.2/bin:$PATH"' >> ~/.zshrc
+echo 'export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/Cellar/openssl@3/3.1.2/lib/' >> ~/.zshrc
+```
+
+
+## Add a local.env file and set the required environment variables
 In the `backend` directory, execute the following command:
 ```BASH
-mkdir instance && cp -r config instance/config && cp instance/config/default.py instance/config.py
+cp config/env/template.env config/env/local.env
 ```
+
+Update the values in local.env to match your local environment. Follow the instructions in the comments of `template.env` to set the values correctly.
+
+To run the local server and the Flask CLI, you MUST have the `FLASK_APP` and `ENV_NAME` environment variables set to the correct values. You can do this by running the following command in the `backend` directory:
+```BASH
+export FLASK_APP=./app/uwsgi.py
+export ENV_NAME=local
+```
+
+The settings that the application uses are defined in the various `*.env` files in the `config` directory. For example, the `local.env` file is used to set environment variables that override the default settings in the config files. You can have multiple environment files for different environments:
+- `local.env`: Use when running the server via UWSGI and/or using the Flask CLI on the same machine where the application code lives.
+- `ci.env`: Used by the [GitHub Workflow script](../.github/workflows/main.yml) to run tests in this repository's [GitHub Actions](https://github.com/autismdrive/autismdrive/actions) CI (continuous integration) environment.
+- `docker.env`: Used for running the server in a Docker container. 
+- `mirror.env`: Used for running the server in the private server environment protected by the [UVA High Security VPN](https://virginia.service-now.com/its?id=itsweb_kb_article&sys_id=9a5c088c6f59ee400a017f512e3ee4e2), where HSD (Highly Sensitive Data) is stored.
+- `testing.env`: Used for running unit tests.
+
+You can switch between these by changing the `ENV_NAME` variable to `local`, `ci`, `docker`, `mirror`, or `testing`. The application will automatically load the appropriate environment variables from the corresponding `.env` file. These environment variables are used to configure the application, such as database connection settings, API keys, and other configuration options. Since these values are sensitive, they should not be committed to the repository. The `.gitignore` file explicitly prevents any of these `.env` files from being committed to the git repository.
 
 ### Update the Database
 You will need to update your database each time you return to do a pull to make sure all the migrations are run. In the `backend` directory, execute the following command:
@@ -101,9 +128,10 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 ```
 
 ### Update Data Models
-Each time you modify your data models you will need to create new migrations. The following command will compare the database to the code and create new migrations as needed.  You can edit this newly generated file - it will show up under migrations/versions
+Any time you modify the data model for any table in `backend/app/models.py` you will need to create new migrations. The following command will compare the database to the code and create new migrations as needed.  You can edit this newly generated file - it will show up under `backend/migrations/versions`.
 ```BASH
-flask db migrate
+cd backend/migrations
+alembic revision --autogenerate -m "describe your changes here"
 ```
 
 ### Load in the seed data
@@ -175,9 +203,9 @@ Don't commit code that doesn't have at least some basic testing of the new funct
 
 
 ### Database calls
-* Favor db.session.query over using the models for these calls.
+* Favor session.query over using the models for these calls.
 ```
-db.session.query( ...
+session.query( ...
 ```
 not
 ```
@@ -186,41 +214,28 @@ models.Resrouce.query( ...
 
 
 ### Security / Authentication
-This will become increasingly complicated, so check back here often.
-At present the system can handle single sign on (SSO) authentication through Shibboleth via a
-connector on the apache web server that looks for headers we know are provided by the University
-of Virginia.  This will change in the future as we migrate to using a OnConnect which will allow
-connections with more institutions.  We'll also need to offer direct log-ins for community users.
+At present the system only supports username/password authentication. The frontend (Angular) and backend (Flask) use a JWT token ([via Bearer authentication Authorization HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication#bearer)).
 
-Once credentials are established, the front end (Angular) and backend (Flask/Python) will use a JWT
-token.
+The user enters their credentials via the Angular frontend UI. Angular sends those credentials to the Flask backend. Once verified, the backend sends a JWT authentication token to the frontend, and the user is redirected to a frontend route that stores the JWT in LocalStorage and finally redirects the user to the frontend page they were on when they clicked the "Login" button.
+
 
 #### Develoment Mode
-The SSO aspect is bypassed in Development mode.  Clicking the log in button will immediately
-log you in as the user specified in your instance/config.py.
-```
-SSO_DEVELOPMENT_UID = 'dhf8r'
-```
-I've created users for primary developers in our example_data, and that information is loaded
-into the database automatically with a *flask reset*  Add yourself there if needed.
+In local dev environments, the database is populated with fake users from `backend/example_data/users.csv`, and that information is loaded
+into the database automatically with the `flask reset` CLI command. This will NOT work in production environments.
 
-#### Production Mode
-In production, the redirect on the front end needs to point to the url that will direct us out to
-Shibboleth.  The account we use will send the user back to an API endpoint that will generate a JWT
-token, and then redirect again to the front end, passing that token along as a GET parameter.
 
 
 ## Testing
 
 ### Run backend tests
 Make sure you have set up your test database (see Database Setup above)
-You can use nose2 to execute all of tests, or you can run them individually using
+You can use unittest to execute all of the tests, or you can run them individually using
 Pycharm or other IDE.
 In the `backend` directory, execute the following command:
 ```BASH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
-nose2
+unittest
 ```
 
 ### Run frontend tests
@@ -256,16 +271,16 @@ variable to specify this when you fire up the mirroring instance.
 APP_CONFIG_FILE=/full/path/to/config/mirror.py
 ```
   
-Note that it should be the full path.  You'll be running both instances, 
+Note that it should be the full absolute path. You'll be running both instances, 
 so don't set this environment variable for all commands, just for running the instance.
-For me, I have it set as an environment variable under the Run Configuration within
-PyCharm.  I copied by existing run command and added this environment variable
-there.  You will also need to add a port (5001) argument so you aren't running on the 
-same port as the primary server.  Below are the settings in my Run configuration:
+You can set the environment variable under the Run Configuration within
+PyCharm. Specify the port argument as 5001 so you aren't running on the 
+same port as the primary server. In PyCharm, go to Run > Edit Configurations... > + > Python:
 
+```
 Parameters: 5001
-Environment Variable: PYTHONUNBUFFERED=1;MIRRORING=true
-
+Environment Variables: PYTHONUNBUFFERED=1;MIRRORING=true
+```
 You will need to build the basic data structures in the database in order to
 load data for this you will need to run the init_db flask command, but
 you will need to make that specific to the mirror instance.  You'll need to provide
@@ -280,20 +295,25 @@ You will need to install:
   * Python 3
   * Elastic Search 6
   * Apache Web Server
-     * mod-wsgi  (for running flask apps within apache)
+     * mod-wsgi  (for running Flask apps within Apache)
   * Postgres 
  
-I've tended to set up the website under /var/www/star or /var/www/autismdrive (the new name and url)
-In the /var/www/autismdrive/ I create a python virtual enviroment with the command:
+In Production, the deployed files are located at `/var/www/autismdrive`:
+```bash
+mkdir -p /var/www/autismdrive
+```
+
+In the `/var/www/autismdrive/` directory, create a Python virtual enviroment with the command:
 ```
 python3 -m venv python-env
 ```
-When pushing to production please create a new 'Release' on gitHub describing the changes that were rolled out.
 
-Currently we are using a separate repository for deployment: star-drive-dist. To prepare this for deployment, you should have a
-copy of star-drive-dist in the same directory as your local copy of star-drive. Your local star-drive should be on master, 
+When pushing to production please create a new 'Release' on GitHub describing the changes that were rolled out.
+
+Currently we are using a separate repository for deployment: `autismdrive-dist`. To prepare this for deployment, you should have a
+copy of `autismdrive-dist` in the same directory as your local copy of `autismdrive`. Your local `autismdrive` should be on the `master` branch, 
 up to date with all the changes for the release. Once this is ready, run the ```prepare_for_deploy.sh``` script in 
-star-drive-dist to prepare the release. Commit these changes referencing the release number and push them up. 
+`autismdrive-dist` to prepare the release. Commit these changes referencing the release number and push them up. 
 
 
 

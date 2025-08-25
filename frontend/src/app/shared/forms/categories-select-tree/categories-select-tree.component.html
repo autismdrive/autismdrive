@@ -1,0 +1,69 @@
+<p>
+  <label [for]="field.key">
+    <mat-label *ngIf="field.props.label">
+      {{ field.props.label }}
+      <span [hidden]="field.props.required" class="mat-form-field-required-marker">*</span>
+    </mat-label>
+  </label>
+</p>
+<mat-error>
+  <formly-validation-message [field]="field"></formly-validation-message>
+</mat-error>
+
+<mat-tree
+  #tree
+  [dataSource]="dataSource"
+  [childrenAccessor]="childrenAccessor"
+  class="tree-select"
+  [trackBy]="trackBy"
+  [expansionKey]="expansionKey"
+  [formlyAttributes]="field"
+>
+  <mat-label [class]="{'mat-invalid': field.formControl.invalid}">{{ field.props.label }}</mat-label>
+  <!-- This is the tree node template for leaf nodes -->
+  <!-- There is inline padding applied to this node using styles. This padding value depends on the mat-icon-button width. -->
+  <mat-nested-tree-node
+    #treeNode="matNestedTreeNode"
+    *matTreeNodeDef="let node"
+    matTreeNodeToggle
+    class="leaf-tree-node"
+  >
+    <mat-checkbox
+      [formlyAttributes]="field"
+      [formControl]="formControlCast"
+      [checked]="checklistSelection.isSelected(node)"
+      (change)="toggleNode(node)"
+      [id]="node.id"
+      #categoryCheckbox
+    >
+      {{ node.name }}
+    </mat-checkbox>
+  </mat-nested-tree-node>
+
+  <!-- This is the tree node template for expandable nodes -->
+  <mat-nested-tree-node
+    *matTreeNodeDef="let node; when: hasNestedChild"
+    matTreeNodeToggle
+    [cdkTreeNodeTypeaheadLabel]="node.name"
+  >
+    <div class="mat-tree-node" [id]="node.id.toString()">
+      <button
+        mat-icon-button
+        [attr.aria-label]="'toggle ' + node.name"
+        class="toggle-node-button"
+        matTreeNodeToggle
+        (change)="handleExpand()"
+      >
+        <mat-icon class="mat-icon-rtl-mirror">
+          {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+        </mat-icon>
+      </button>
+      {{ node.name }}
+    </div>
+
+    <!-- There is inline padding applied to this div using styles. This padding value depends on the mat-icon-button width.  -->
+    <div [class.tree-select-invisible]="!tree.isExpanded(node)" role="group">
+      <ng-container matTreeNodeOutlet></ng-container>
+    </div>
+  </mat-nested-tree-node>
+</mat-tree>

@@ -1,13 +1,31 @@
 import {MediaMatcher} from '@angular/cdk/layout';
+import {CommonModule} from '@angular/common';
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import {snakeToUpperCase} from '../../util/snakeToUpper';
-import {TableInfo} from '../_models/table_info';
-import {ApiService} from '../_services/api/api.service';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatListModule} from '@angular/material/list';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {QuestionnaireDataTableComponent} from '@app/questionnaire-data-table/questionnaire-data-table.component';
+import {snakeToUpperCase} from '@app/shared/utilities/snakeToUpper';
+import {TableInfo} from '@models/table_info';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
+  standalone: true,
   selector: 'app-questionnaire-data-view',
   templateUrl: './questionnaire-data-view.component.html',
-  styleUrls: ['./questionnaire-data-view.component.scss']
+  styleUrls: ['./questionnaire-data-view.component.scss'],
+  imports: [
+    FlexModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatListModule,
+    MatIconModule,
+    CommonModule,
+    QuestionnaireDataTableComponent,
+  ],
 })
 export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   questionnaire_info: TableInfo[];
@@ -20,17 +38,17 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   constructor(
     private api: ApiService,
     changeDetectorRef: ChangeDetectorRef,
-    media: MediaMatcher
+    media: MediaMatcher,
+    private windowService: WindowService,
   ) {
     // We will change the display slightly based on mobile vs desktop
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     // Using addEventListener causes page failures for older Sarafi / webkit / iPhone
     // this.mobileQuery.addEventListener('change', this._mobileQueryListener);
-    // tslint:disable-next-line:deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);
 
-    window.addEventListener('resize', this._mobileQueryListener);
+    this.windowService.window.addEventListener('resize', this._mobileQueryListener);
   }
 
   get snakeToUpperCase() {
@@ -38,19 +56,16 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.api.getQuestionnaireInfoList().subscribe(
-      info => {
-        this.questionnaire_info = info;
-      }
-    );
+    this.api.getQuestionnaireInfoList().subscribe(info => {
+      this.questionnaire_info = info;
+    });
   }
 
   ngOnDestroy(): void {
     // removeEventListener fails on older versions of iOS / Safari / iPhone
     // this.mobileQuery.removeEventListener('change', this._mobileQueryListener);
-    // tslint:disable-next-line:deprecation
     this.mobileQuery.removeListener(this._mobileQueryListener);
-    window.removeEventListener('resize', this._mobileQueryListener);
+    this.windowService.window.removeEventListener('resize', this._mobileQueryListener);
   }
 
   selectQuestionnaire(info: TableInfo) {
@@ -60,20 +75,20 @@ export class QuestionnaireDataViewComponent implements OnInit, OnDestroy {
   }
 
   exportAll() {
-    console.log('clicking the button for export all');
     this.api.exportQuestionnaire('all').subscribe(response => {
-      console.log('data', response);
       const filename = response.headers.get('x-filename');
-      const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
 
       const url = URL.createObjectURL(blob);
       const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
 
       a.href = url;
       a.download = filename;
-      window.document.body.appendChild(a);
+      this.windowService.window.document.body.appendChild(a);
       a.click();
-      window.document.body.removeChild(a);
+      this.windowService.window.document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
   }

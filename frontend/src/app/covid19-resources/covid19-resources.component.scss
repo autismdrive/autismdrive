@@ -1,4 +1,4 @@
-@import '../../config';
+@use '../../styles/config' as config;
 
 .covid19-resources {
   margin: 2em;
@@ -6,11 +6,10 @@
 
 .category-buttons {
   width: 250px;
-
 }
 
 .covid19-hero {
-  background: $brand-primary;
+  background: config.$brand-primary;
   color: white;
   padding: 1em;
   margin-top: 0;

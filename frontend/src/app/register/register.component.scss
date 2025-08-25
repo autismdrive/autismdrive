@@ -1,24 +1,33 @@
 #hero {
-  background-image: url('/assets/join/hero.jpg');
+  background-image: url('/public/join/hero.jpg');
   background-position: 0 18%;
   padding-top: 8rem;
   padding-bottom: 8rem;
   background-size: 100% auto;
-  @media (max-width: 768px) {
+
+  @media (width <= 768px) {
     background-position: 0 0;
   }
 
   .hero-content {
     display: grid;
-    @media (min-width: 768px) { grid-template-columns: 2fr 1fr; }
-    @media (min-width: 992px) { grid-template-columns: 1fr 1fr; }
-    @media (min-width: 1200px) { grid-template-columns: 1fr 1fr; }
 
+    @media (width >= 768px) {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    @media (width >= 992px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (width >= 1200px) {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   .form.border-box {
     max-width: 100%;
-    background-color: #FFFFFF;
+    background-color: #fff;
     color: black;
     padding: 2em;
 
@@ -26,15 +35,14 @@
       text-transform: uppercase;
     }
   }
-
 }
 
-  .bold-title {
-    text-transform: uppercase;
-    font-size: 1.8em;
-    font-weight: bold;
-  }
+.bold-title {
+  text-transform: uppercase;
+  font-size: 1.8em;
+  font-weight: bold;
+}
 
-  .register-container {
-    margin: 1em;
-  }
+.register-container {
+  margin: 1em;
+}

@@ -3,18 +3,13 @@
     max-width: 100vw;
   }
 
-  ::ng-deep .mat-list .mat-list-item .mat-line {
+  :root .mat-list .mat-list-item .mat-line {
     word-wrap: break-word;
     white-space: pre-wrap;
   }
 
-  ::ng-deep .mat-list .mat-list-item {
+  :root .mat-list .mat-list-item {
     height: initial;
     margin-bottom: 1rem;
   }
-}
-
-.mat-card {
-  //max-height: 400px;
-  //overflow: auto;
 }

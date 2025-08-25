@@ -1,71 +1,125 @@
-/// <reference types="@types/googlemaps" />
-import {formatDate} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+/// <reference types="@types/google.maps" />
+import {CommonModule, DatePipe, formatDate, NgOptimizedImage, UpperCasePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, inject, signal, ViewChild, WritableSignal} from '@angular/core';
+import {GoogleMapsModule, MapAdvancedMarker, MapInfoWindow} from '@angular/google-maps';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatLine} from '@angular/material/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ContactItem} from '../_models/contact_item';
-import {Resource} from '../_models/resource';
-import {ResourceChangeLog} from '../_models/resource_change_log';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import LatLngLiteral = google.maps.LatLngLiteral;
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {AdminNoteDisplayComponent} from '@app/admin-note-display/admin-note-display.component';
+import {ContactItemComponent} from '@app/contact-item/contact-item.component';
+import {EditButtonComponent} from '@app/edit-button/edit-button.component';
+import {EventRegistrationComponent} from '@app/event-registration/event-registration.component';
+import {FavoriteResourceButtonComponent} from '@app/favorite-resource-button/favorite-resource-button.component';
+import {FilterChipsComponent} from '@app/filter-chips/filter-chips.component';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {RelatedItemsComponent} from '@app/related-items/related-items.component';
+import {GOOGLE_MAPS_MAP_IDS} from '@app/tokens';
+import {TypeIconComponent} from '@app/type-icon/type-icon.component';
+import {ContactItem} from '@models/contact_item';
+import {Resource} from '@models/resource';
+import {ResourceChangeLog} from '@models/resource_change_log';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleMapsLibraryService} from '@services/google-maps-library/google-maps-library.service';
+import {WindowService} from '@services/window/window.service';
+import {MarkdownComponent} from 'ngx-markdown';
 
 @Component({
+  standalone: true,
   selector: 'app-resource-detail',
   templateUrl: './resource-detail.component.html',
-  styleUrls: ['./resource-detail.component.scss']
+  styleUrls: ['./resource-detail.component.scss'],
+  imports: [
+    AdminNoteDisplayComponent,
+    CommonModule,
+    ContactItemComponent,
+    DatePipe,
+    EditButtonComponent,
+    EventRegistrationComponent,
+    FavoriteResourceButtonComponent,
+    FilterChipsComponent,
+    FlexModule,
+    LoadingComponent,
+    MarkdownComponent,
+    MatButtonModule,
+    MatCardModule,
+    GoogleMapsModule,
+    NgOptimizedImage,
+    RelatedItemsComponent,
+    RouterModule,
+    TypeIconComponent,
+    UpperCasePipe,
+    MatLine,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResourceDetailComponent implements OnInit {
+export class ResourceDetailComponent {
+  @ViewChild(MapInfoWindow) infoWindow: MapInfoWindow;
   resource: Resource;
-  mapLoc: LatLngLiteral;
+  mapLoc: google.maps.LatLngLiteral;
   currentUser: User;
   changeLog: ResourceChangeLog[];
-  loading = true;
+  loading: WritableSignal<boolean> = signal(true);
   contactItems: ContactItem[];
-  typeName: string;
   showInfoWindow = false;
   safeVideoLink: SafeResourceUrl;
-  get isPastEvent(): boolean {
-    const eventDate = new Date(this.resource.date);
-    const now = new Date();
-
-    console.log('eventDate', eventDate);
-    return !!(
-      this.resource &&
-      this.resource.type === 'event' &&
-      (eventDate < now) &&
-      this.resource.post_event_description
-    );
-  }
+  safeVideoImgUrl: SafeResourceUrl;
+  googleMapsCoreLibrary: google.maps.CoreLibrary;
+  googleMapsMapIds = inject(GOOGLE_MAPS_MAP_IDS);
+  mapOptions: WritableSignal<google.maps.MapOptions> = signal(undefined);
 
   constructor(
     private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router,
+    public router: Router,
     private authenticationService: AuthenticationService,
     private _sanitizer: DomSanitizer,
+    private googleMapsLibrary: GoogleMapsLibraryService,
+    private windowService: WindowService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+    });
+    effect(() => {
+      const core = this.googleMapsLibrary.core();
+      const isLoading = this.loading();
+
+      if (!isLoading && core && this.resource?.hasCoords()) {
+        this.googleMapsCoreLibrary = core;
+        this.mapOptions.set({
+          mapId: this.googleMapsMapIds.resourceDetailsPage,
+          center: {lat: this.resource?.latitude, lng: this.resource?.longitude},
+          zoom: 10,
+          disableDefaultUI: true,
+        });
+      }
+    });
     this.route.params.subscribe(params => {
-      this.loading = true;
+      this.loading.set(true);
       this.safeVideoLink = null;
-      const resourceId = params.resourceId ? parseInt(params.resourceId, 10) : null;
+      this.safeVideoImgUrl = null;
+
+      const resourceId = params['resourceId'] ? parseInt(params['resourceId'], 10) : null;
 
       if (typeof resourceId === 'number' && isFinite(resourceId)) {
         const path = this.route.snapshot.url[0].path;
         const resourceType = path.charAt(0).toUpperCase() + path.slice(1);
         this.api[`get${resourceType}`](resourceId).subscribe(resource => {
           this.resource = new Resource(resource);
-
-          console.log('resource = ', this.resource);
-
           this.initializeContactItems();
           this.loadMapLocation();
-          this.loading = false;
+          this.loading.set(false);
           if (this.resource.video_code) {
-            this.safeVideoLink = this._sanitizer
-              .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.resource.video_code);
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(
+              'https://www.youtube.com/embed/' + this.resource.video_code,
+            );
+            this.safeVideoLink = this._sanitizer.bypassSecurityTrustResourceUrl(
+              'https://img.youtube.com/vi/' + resource.video_code + '/hqdefault.jpg',
+            );
           }
           if (this.currentUser && this.currentUser.permissions.includes('edit_resource')) {
             this.api.getResourceChangeLog(this.resource.id).subscribe(log => {
@@ -77,19 +131,23 @@ export class ResourceDetailComponent implements OnInit {
     });
   }
 
-  get userCanEdit(): boolean {
-    return (
-      this.currentUser &&
-      this.currentUser.permissions.includes('edit_resource')
+  get isPastEvent(): boolean {
+    const eventDate = new Date(this.resource.date);
+    const now = new Date();
+    return !!(
+      this.resource &&
+      this.resource.type === 'event' &&
+      eventDate < now &&
+      this.resource.post_event_description
     );
   }
 
-  get resourceIsDraft(): boolean {
-    return (this.resource.is_draft === true);
+  get userCanEdit(): boolean {
+    return this.currentUser && this.currentUser.permissions.includes('edit_resource');
   }
 
-  ngOnInit() {
-
+  get resourceIsDraft(): boolean {
+    return this.resource.is_draft === true;
   }
 
   loadMapLocation() {
@@ -97,7 +155,7 @@ export class ResourceDetailComponent implements OnInit {
       navigator.geolocation.getCurrentPosition(p => {
         this.mapLoc = {
           lat: p.coords.latitude,
-          lng: p.coords.longitude
+          lng: p.coords.longitude,
         };
       });
     }
@@ -113,7 +171,7 @@ export class ResourceDetailComponent implements OnInit {
   goWebsite($event: MouseEvent) {
     $event.preventDefault();
     if (this.resource && this.resource.website) {
-      window.open(this.resource.website, '_blank');
+      this.windowService.window.open(this.resource.website, '_blank');
     }
   }
 
@@ -129,6 +187,8 @@ export class ResourceDetailComponent implements OnInit {
 
       return `https://www.google.com/maps/dir/${this.mapLoc.lat},${this.mapLoc.lng}/${encodeURIComponent(address)}`;
     }
+
+    return '';
   }
 
   initializeContactItems() {
@@ -137,28 +197,33 @@ export class ResourceDetailComponent implements OnInit {
       {
         condition: !!r.primary_contact,
         icon: 'person_pin',
-        details: [r.primary_contact]
+        details: [r.primary_contact],
       },
       {
         condition: !!r.organization_name,
         icon: 'business',
-        details: [r.organization_name]
+        details: [r.organization_name],
       },
       {
         condition: !!r.date,
         icon: 'access_time',
-        details: [r.date && `${formatDate(r.date, 'longDate', 'en-US', '-0')}: ${r.time}`]
+        details: [r.date && `${formatDate(r.date, 'longDate', 'en-US', '-0')}: ${r.time}`],
       },
       {
         condition: !!(r.location_name || r.street_address1 || r.street_address2 || r.city || r.state || r.zip),
         icon: 'location_on',
-        details: [r.location_name, r.street_address1, r.street_address2, `${r.city ? r.city + ',' : r.city} ${r.state} ${r.zip}`],
+        details: [
+          r.location_name,
+          r.street_address1,
+          r.street_address2,
+          `${r.city ? r.city + ',' : r.city} ${r.state} ${r.zip}`,
+        ],
         type: 'address',
       },
       {
         condition: !!r.ticket_cost,
         icon: 'monetization_on',
-        details: [r.ticket_cost]
+        details: [r.ticket_cost],
       },
       {
         condition: !!r.phone,
@@ -181,8 +246,40 @@ export class ResourceDetailComponent implements OnInit {
     ];
   }
 
-  toggleInfoWindow($event) {
+  toggleInfoWindow(marker: MapAdvancedMarker) {
     this.showInfoWindow = !this.showInfoWindow;
+    this.infoWindow.open(marker);
   }
 
+  makePoint(x: number, y: number): google.maps.Point {
+    return new this.googleMapsCoreLibrary.Point(x, y);
+  }
+
+  mapCircleOptions(resource: Resource): google.maps.CircleOptions {
+    return {
+      center: {
+        lat: resource.latitude,
+        lng: resource.longitude,
+      },
+      radius: 32186.9, // Approximately 20 miles in meters
+      fillColor: resource.type.toLowerCase() === 'location' ? '#6c799c' : '#E57200',
+      fillOpacity: 0.1,
+      clickable: true,
+    };
+  }
+
+  markerOptions(resource: Resource): google.maps.marker.AdvancedMarkerElementOptions {
+    const imgEl = document.createElement('img');
+    imgEl.src =
+      location.origin + '/public/map/' + resource.type + (resource.street_address1 ? '' : '-no-address') + '.svg';
+
+    return {
+      position: {
+        lat: resource.latitude,
+        lng: resource.longitude,
+      },
+      title: resource.title,
+      content: imgEl,
+    };
+  }
 }

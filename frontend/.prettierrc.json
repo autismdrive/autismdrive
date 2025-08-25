@@ -1,0 +1,22 @@
+{
+  "endOfLine": "auto",
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "bracketSpacing": false,
+  "arrowParens": "avoid",
+  "printWidth": 120,
+  "plugins": ["prettier-plugin-organize-imports"],
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "strict",
+  "overrides": [
+    {
+      "files": "*.component.html",
+      "options": {
+        "parser": "angular",
+        "htmlWhitespaceSensitivity": "strict"
+      }
+    }
+  ]
+}

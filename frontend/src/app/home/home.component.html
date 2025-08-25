@@ -1,19 +1,16 @@
-<div
-  id="hero"
-  class="gradient-overlay container with-escaping-tiles"
->
+<div id="hero" class="gradient-overlay container with-escaping-tiles">
   <div class="hero-content">
     <h1>Transform Outcomes. Together.</h1>
-    <hr/>
+    <hr />
     <p class="h4">
-      We're bringing together researchers, professionals, and community organizations to improve the lives of individuals
-      with autism and their families. Autism DRIVE gives you access to ground-breaking autism research and innovative
-      models for care, support, and education.
+      We're bringing together researchers, professionals, and community organizations to improve the lives of
+      individuals with autism and their families. Autism DRIVE gives you access to ground-breaking autism research and
+      innovative models for care, support, and education.
     </p>
   </div>
 
   <div
-    class="row escaping-tiles-2x "
+    class="row escaping-tiles-2x"
     fxLayout.lt-sm="column"
     fxLayout.gt-xs="row wrap"
     fxLayoutGap="40px"
@@ -25,7 +22,7 @@
       url="/register"
       title="Join Autism DRIVE"
       subtitle="Connect to upcoming studies at UVA and resources across the state relevant to you."
-      linkSize="2"
+      [linkSize]="2"
       routerLink="/register"
     ></app-border-box-tile>
     <app-border-box-tile
@@ -34,43 +31,42 @@
       url="/search"
       title="Find Resources"
       subtitle="Access autism-focused resources available in Virginia and online."
-      linkSize="2"
+      [linkSize]="2"
       routerLink="/search"
     ></app-border-box-tile>
   </div>
 </div>
 <div class="container mat-typography">
-  <div
-    class="row"
-    fxLayout="column"
-    fxLayoutAlign="center center"
-  >
-    <p class="intro">The Autism DRIVE enables secure storage and sharing of autism data, helping to monitor progress and outcomes. The system also provides access to resources for families and professionals -- infusing cutting-edge knowledge into community-based practices.</p>
+  <div class="row" fxLayout="column" fxLayoutAlign="center center">
+    <p class="intro">
+      The Autism DRIVE enables secure storage and sharing of autism data, helping to monitor progress and outcomes. The
+      system also provides access to resources for families and professionals -- infusing cutting-edge knowledge into
+      community-based practices.
+    </p>
   </div>
 </div>
 
-<div class="jumbo-section">
-  <header class="jumbo-section-header">
-    <span class="watermark" role="presentation">Autism</span>
-    <h2>
-      <span class="line-1">
-        Transformative <br fxShow fxHide.gt-sm />
-        Autism Research
-      </span>
-      <span class="line-2">Current Studies</span>
-    </h2>
-  </header>
-</div>
+<app-loading *ngIf="!newsItems()"></app-loading>
+<ng-container *ngIf="newsItems()?.length > 0">
+  <div class="jumbo-section">
+    <header class="jumbo-section-header">
+      <span class="watermark" role="presentation">Autism</span>
+      <h2>
+        <span class="line-1">
+          Transformative <br fxShow fxHide.gt-sm />
+          Autism Research
+        </span>
+        <span class="line-2">Current Studies</span>
+      </h2>
+    </header>
+  </div>
 
-<div class="container">
-  <div class="row">
-    <app-news-item
-      *ngFor="let item of newsItems; let i = index"
-      [item]="item"
-      [index]="i"
-    ></app-news-item>
-    <div class="more-studies">
-      <app-details-link [url]="'/studies'" label="View more studies" size="2"></app-details-link>
+  <div class="container">
+    <div class="row">
+      <app-news-item *ngFor="let item of newsItems(); let i = index" [item]="item" [index]="i"></app-news-item>
+      <div class="more-studies">
+        <app-details-link [url]="'/studies'" label="View more studies" [size]="2"></app-details-link>
+      </div>
     </div>
   </div>
-</div>
+</ng-container>

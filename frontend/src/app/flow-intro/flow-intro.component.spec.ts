@@ -1,22 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FlowIntroComponent } from './flow-intro.component';
+import {mockFlow} from '@app/shared/fixtures/mock-flow';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {FlowIntroComponent} from './flow-intro.component';
 
 describe('FlowIntroComponent', () => {
   let component: FlowIntroComponent;
-  let fixture: ComponentFixture<FlowIntroComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ FlowIntroComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FlowIntroComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(FlowIntroComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(FlowIntroComponent, {flow: mockFlow}, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

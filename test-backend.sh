@@ -7,11 +7,11 @@
 export HOME_DIR=`pwd`
 BACKEND_PATH="${HOME_DIR}/backend"
 
-echo -e '\n\n*** Starting tests in backend with nose2 ***\n\n'
+echo -e '\n\n*** Starting tests in backend with pytest ***\n\n'
 cd $BACKEND_PATH
 source python-env/bin/activate
 export FLASK_APP=./app/__init__.py
-nose2 -v & TESTING_PID=$!
+pytest -v & TESTING_PID=$!
 
 wait $TESTING_PID
 

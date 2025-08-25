@@ -1,13 +1,18 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { NewsItem } from '../_models/news-item';
-import { IntervalService } from '../_services/interval/interval.service';
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
+import {NewsItem} from '@models/news-item';
+import {IntervalService} from '@services/interval/interval.service';
 
 @Component({
+  standalone: true,
   selector: 'app-hero-slides',
   templateUrl: './hero-slides.component.html',
-  styleUrls: ['./hero-slides.component.scss']
+  styleUrls: ['./hero-slides.component.scss'],
+  imports: [CommonModule, MatTooltipModule, RouterModule],
 })
-export class HeroSlidesComponent implements OnInit {
+export class HeroSlidesComponent {
   @Input() slides: NewsItem[];
   activeIndex = 0;
   delayMs = 5000;
@@ -18,11 +23,8 @@ export class HeroSlidesComponent implements OnInit {
     }, this.delayMs);
   }
 
-  ngOnInit() {
-  }
-
   _incrementActiveIndex() {
-    if (this.activeIndex < (this.slides.length - 1)) {
+    if (this.activeIndex < this.slides.length - 1) {
       this.activeIndex++;
     } else {
       this.activeIndex = 0;
@@ -43,14 +45,17 @@ export class HeroSlidesComponent implements OnInit {
     if (slideIndex === this.activeIndex) {
       return 'active';
     } else {
-      if (this.activeIndex === this.slides.length - 1) { // Last slide
+      if (this.activeIndex === this.slides.length - 1) {
+        // Last slide
         // On last slide, first slide is next
-        return (slideIndex === 0) ? 'next' : 'prev';
-      } else if (this.activeIndex === 0) { // First slide
+        return slideIndex === 0 ? 'next' : 'prev';
+      } else if (this.activeIndex === 0) {
+        // First slide
         // On first slide, last slide is prev
-        return (slideIndex === (this.slides.length - 1)) ? 'prev' : 'next';
-      } else { // Middle slide
-        return (slideIndex < this.activeIndex) ? 'prev' : 'next';
+        return slideIndex === this.slides.length - 1 ? 'prev' : 'next';
+      } else {
+        // Middle slide
+        return slideIndex < this.activeIndex ? 'prev' : 'next';
       }
     }
   }

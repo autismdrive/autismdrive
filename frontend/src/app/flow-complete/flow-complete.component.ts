@@ -1,22 +1,23 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Flow} from '../_models/flow';
-import {Router} from '@angular/router';
-import {ParticipantRelationship} from '../_models/participantRelationship';
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {Router, RouterModule} from '@angular/router';
+import {Flow} from '@models/flow';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {FlexModule} from '@ngbracket/ngx-layout';
 
 @Component({
+  standalone: true,
   selector: 'app-flow-complete',
   templateUrl: './flow-complete.component.html',
-  styleUrls: ['./flow-complete.component.scss']
+  styleUrls: ['./flow-complete.component.scss'],
+  imports: [CommonModule, MatButtonModule, FlexModule, RouterModule],
 })
-export class FlowCompleteComponent implements OnInit {
-
+export class FlowCompleteComponent {
   @Input()
   flow: Flow;
 
-  constructor(private router: Router) { }
-
-  ngOnInit() {
-  }
+  constructor(private router: Router) {}
 
   goProfile($event) {
     $event.preventDefault();

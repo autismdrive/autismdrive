@@ -1,4 +1,4 @@
-@import '../../material';
+@use '../../styles/config' as config;
 
 .border-box-tile {
   display: grid;
@@ -8,105 +8,116 @@
   position: relative;
   padding: 0;
   margin: 0;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgb(255 255 255 / 80%);
   text-align: center;
-  color: $brand-primary;
+  color: config.$brand-primary;
 
-  &.border-box-tile-1x { height: $tile-height-1x; }
-  &.border-box-tile-2x { height: $tile-height-2x; }
+  &.border-box-tile-1x {
+    height: config.$tile-height-1x;
+  }
+
+  &.border-box-tile-2x {
+    height: config.$tile-height-2x;
+  }
 
   .border-box-tile-inner {
     &.hover {
-      &:before {
+      &::before {
         opacity: 0;
       }
 
-      &:after {
+      &::after {
         opacity: 1;
       }
     }
 
-    &:before,
-    &:after {
+    &::before,
+    &::after {
       content: '';
       pointer-events: none;
       transition: opacity 0.5s;
       position: absolute;
       width: 100%;
       height: 100%;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       margin: 0;
     }
 
-    &:before {
+    &::before {
       border: 11px solid #dadada;
-      border-image: linear-gradient(to bottom, $brand-gray-tint-2 0%, $brand-gray-tint-3 100%);
+      border-image-source: linear-gradient(to bottom, config.$brand-gray-tint-2 0%, config.$brand-gray-tint-3 100%);
       border-image-slice: 1;
       opacity: 1;
     }
 
-    &:after {
+    &::after {
       border: 11px solid #002f6c;
-      border-image: linear-gradient($brand-primary 0%, $brand-accent 100%);
+      border-image-source: linear-gradient(config.$brand-primary 0%, config.$brand-accent 100%);
       border-image-slice: 1;
       opacity: 0;
     }
 
-    &.deselected:after {
+    &.deselected::after {
       opacity: 0;
     }
 
-    &.deselected:before {
+    &.deselected::before {
       opacity: 1;
     }
 
-    &.selected:after {
+    &.selected::after {
       opacity: 1;
     }
 
-    &.selected:before {
+    &.selected::before {
       opacity: 0;
     }
 
     p.intro {
-      padding: 0 20px 0 20px;
-      color: $body-color;
+      padding: 0 20px;
+      color: config.$body-color;
       font-weight: bold;
     }
 
     .border-box-tile-label {
       &.border-box-tile-label-1x {
-        @include mat-typography-level-to-styles($custom-typography, title);
+        font-size: var(--mat-sys-title-large-size);
+        font-weight: var(--mat-sys-title-large-weight);
+        font-family: var(--mat-sys-title-large-font), sans-serif;
+        letter-spacing: var(--mat-sys-title-large-tracking);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;
         text-transform: uppercase;
-        letter-spacing: 1.8px;
       }
 
       &.border-box-tile-label-2x {
-        @include mat-typography-level-to-styles($custom-typography, display-1);
+        font-size: var(--mat-sys-display-small-size);
+        font-weight: var(--mat-sys-display-small-weight);
+        font-family: var(--mat-sys-display-small-font), sans-serif;
+        letter-spacing: var(--mat-sys-display-small-tracking);
         margin-top: 1em;
         margin-bottom: 1em;
         font-style: italic;
         text-transform: uppercase;
-
-
       }
     }
 
     // XS - MD
-    @media (max-width: 1023px) {
+    @media (width <= 1023px) {
       padding: 1em;
-      .border-box-tile-label.border-box-tile-label-1x { font-size: 1em; }
-      .border-box-tile-label.border-box-tile-label-2x { font-size: 2em; }
+
+      .border-box-tile-label.border-box-tile-label-1x {
+        font-size: 1em;
+      }
+
+      .border-box-tile-label.border-box-tile-label-2x {
+        font-size: 2em;
+      }
     }
 
     // LG & XL
-    @media (min-width: 1024px) {
+    @media (width >= 1024px) {
       padding: 2.4375rem;
     }
   }

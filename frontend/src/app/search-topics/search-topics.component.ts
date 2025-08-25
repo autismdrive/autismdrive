@@ -1,20 +1,28 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges
-} from '@angular/core';
-import {CategoriesById, Category} from '../_models/category';
-import {CategoriesService} from '../_services/categories/categories.service';
+import {CommonModule} from '@angular/common';
+import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatListModule} from '@angular/material/list';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {CategoriesById, Category} from '@models/category';
+import {ExtendedModule} from '@ngbracket/ngx-layout';
+import {CategoriesService} from '@services/categories/categories.service';
 
 @Component({
+  standalone: true,
   selector: 'app-search-topics',
   templateUrl: './search-topics.component.html',
-  styleUrls: ['./search-topics.component.scss']
+  styleUrls: ['./search-topics.component.scss'],
+  imports: [
+    CommonModule,
+    ExtendedModule,
+    MatButtonModule,
+    MatIconModule,
+    MatListModule,
+    MatMenuModule,
+    MatTooltipModule,
+  ],
 })
 export class SearchTopicsComponent {
   @Input() category: Category;
@@ -56,7 +64,7 @@ export class SearchTopicsComponent {
   }
 
   hasChildren(cat: Category) {
-    const category = (cat.id === null) ? cat : this.categoriesById[cat.id];
+    const category = cat.id === null ? cat : this.categoriesById[cat.id];
     return category && category.children && category.children.length > 0;
   }
 
@@ -67,5 +75,4 @@ export class SearchTopicsComponent {
       return [];
     }
   }
-
 }

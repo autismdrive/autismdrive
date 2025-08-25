@@ -1,7 +1,7 @@
-@import '../../config';
+@use '../../styles/config' as config;
 
 #hero {
-  background-image: url('/assets/home/hero-family.jpg');
+  background-image: url('/public/home/hero-family.jpg');
   background-position: 50% 33%;
   padding-top: 80px;
   padding-bottom: 80px;
@@ -10,16 +10,13 @@
     text-align: center;
 
     h1 {
-      font-family: "bodoni-urw", serif;
+      font-family: bodoni-urw, serif;
       text-transform: uppercase;
     }
 
     hr {
       border-top-width: 4px;
-      margin-top: 1em;
-      margin-bottom: 1em;
-      margin-left: auto;
-      margin-right: auto;
+      margin: 1em auto;
     }
   }
 }

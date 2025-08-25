@@ -1,91 +1,61 @@
-<div
-  class="mat-typography"
-  *ngIf="data.participant"
->
+<div class="mat-typography" *ngIf="participant()">
   <div mat-dialog-content>
-    <h1 mat-dialog-title>{{getPrompt()}}</h1>
+    <h1 mat-dialog-title>{{ prompt }}</h1>
 
-    <div
-      fxLayout="column"
-      fxLayoutAlign="center center"
-    >
-      <div
-        class="avatar"
-        [ngStyle]="{'background-color': selectedColor || data.participant.avatar_color}"
-      >
-        <img src="/assets/avatars/{{selectedIcon || data.participant.avatar_icon}}.svg">
+    <div fxLayout="column" fxLayoutAlign="center center">
+      <div class="avatar" [ngStyle]="{'background-color': selectedColor || participant().avatar_color}">
+        <img
+          [src]="`/public/avatars/${selectedIcon() || participant().avatar_icon}.svg`"
+          alt="{{ participant().name }}"
+          width="192"
+          height="192"
+        />
       </div>
     </div>
     <p>Pick an image</p>
 
     <div class="avatar-images-row">
-      <button
-        mat-button
-        class="scroll-left"
-        (click)="scroll($event, 'avatar-images', 'left')"
-      >
+      <button mat-button class="scroll-left" (click)="scroll($event, 'avatar-images', 'left')">
         <mat-icon>chevron_left</mat-icon>
       </button>
       <div class="avatar-images">
         <button
-          *ngFor="let avatarImage of avatarImages"
+          *ngFor="let avatarImage of avatarImages(); let i = index"
           class="avatar-image"
-          (click)="setImage(avatarImage)"
-          [ngClass]="{'avatar-image-active': isSelectedImage(avatarImage)}"
+          (click)="selectedIcon.set(avatarImage)"
+          [ngClass]="{'avatar-image-active': avatarImage === this.selectedIcon()}"
         >
-          <img src="/assets/avatars/{{avatarImage}}.svg" />
+          <img alt="#{{ i }}" [ngSrc]="`/public/avatars/${avatarImage}.svg`" [width]="96" [height]="96" />
         </button>
       </div>
-      <button
-        mat-button
-        class="scroll-right"
-        (click)="scroll($event, 'avatar-images', 'right')"
-      >
+      <button mat-button class="scroll-right" (click)="scroll($event, 'avatar-images', 'right')">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
 
-
     <p>Pick a color</p>
     <div class="color-swatches-row">
-      <button
-        mat-button
-        class="scroll-left"
-        (click)="scroll($event, 'color-swatches', 'left')"
-      >
+      <button mat-button class="scroll-left" (click)="scroll($event, 'color-swatches', 'left')">
         <mat-icon>chevron_left</mat-icon>
       </button>
       <div class="color-swatches">
         <button
-          *ngFor="let avatarColor of avatarColors"
-          (click)="setColor(avatarColor)"
+          *ngFor="let avatarColor of avatarColors()"
+          (click)="selectedColor.set(avatarColor)"
           class="color-swatch"
           [ngStyle]="{'background-color': avatarColor}"
-          [ngClass]="{'color-swatch-active': isSelectedColor(avatarColor)}"
-        >&nbsp;
+          [ngClass]="{'color-swatch-active': avatarColor === this.selectedColor()}"
+        >
+          &nbsp;
         </button>
       </div>
-      <button
-        mat-button
-        class="scroll-right"
-        (click)="scroll($event, 'color-swatches', 'right')"
-      >
+      <button mat-button class="scroll-right" (click)="scroll($event, 'color-swatches', 'right')">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
-
   </div>
   <div mat-dialog-actions>
-    <button
-      mat-flat-button
-      color="primary"
-      (click)="onSubmit()"
-      id="save_avatar_changes"
-    >Save</button>
-    <button
-      mat-button
-      (click)="onNoClick()"
-      id="cancel_avatar_changes"
-    >Cancel</button>
+    <button mat-flat-button color="primary" (click)="onSubmit()" id="save_avatar_changes">Save</button>
+    <button mat-button (click)="onNoClick()" id="cancel_avatar_changes">Cancel</button>
   </div>
 </div>

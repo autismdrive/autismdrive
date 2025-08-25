@@ -1,22 +1,37 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ParticipantProfileComponent } from './participant-profile.component';
+import {MatDialogRef} from '@angular/material/dialog';
+import {RouterModule} from '@angular/router';
+import {mockParticipant} from '@app/shared/fixtures/mock-participant';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {ParticipantProfileComponent} from './participant-profile.component';
 
 describe('ParticipantProfileComponent', () => {
   let component: ParticipantProfileComponent;
-  let fixture: ComponentFixture<ParticipantProfileComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ParticipantProfileComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<any>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ParticipantProfileComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(ParticipantProfileComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .mock(ApiService, {})
+      .keep(RouterModule)
+      .provide({
+        provide: MatDialogRef,
+        useValue: {
+          close: (_: any) => {},
+          afterClosed: jest.fn().mockReturnValue(of({confirm: true})),
+        },
+      });
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(
+      ParticipantProfileComponent,
+      {participant: mockParticipant, user: mockUser},
+      {detectChanges: true},
+    );
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

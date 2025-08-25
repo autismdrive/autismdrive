@@ -1,23 +1,23 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ContactItem} from '../_models/contact_item';
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatIconModule} from '@angular/material/icon';
+import {ContactItem} from '@models/contact_item';
+import {FlexModule} from '@ngbracket/ngx-layout';
 
 @Component({
+  standalone: true,
   selector: 'app-contact-item',
   templateUrl: './contact-item.component.html',
-  styleUrls: ['./contact-item.component.scss']
+  styleUrls: ['./contact-item.component.scss'],
+  imports: [CommonModule, FlexModule, MatIconModule],
 })
-export class ContactItemComponent implements OnInit {
+export class ContactItemComponent {
   @Input() contactItem: ContactItem;
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   isNotEmpty(s: string) {
     const trimmed = (s || '').replace(/\s/g, '');
     return trimmed !== '';
   }
-
 }

@@ -1,4 +1,4 @@
-<div class="video-preview {{videoSize}}">
+<div class="video-preview {{ videoSize }}">
   <button mat-mini-fab class="hide-video" (click)="hideVideo()"><mat-icon>close</mat-icon></button>
   <youtube-player
     [width]="videoWidth"
@@ -6,7 +6,7 @@
     [videoId]="videoId"
     [playerVars]="playerVars"
   ></youtube-player>
-  <markdown>{{instructions}}</markdown>
+  <markdown>{{ instructions }}</markdown>
   <app-details-link
     class="video-link"
     *ngFor="let link of links"

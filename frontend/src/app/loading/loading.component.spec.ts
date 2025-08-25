@@ -1,22 +1,17 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { LoadingComponent } from './loading.component';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {LoadingComponent} from './loading.component';
 
 describe('LoadingComponent', () => {
   let component: LoadingComponent;
-  let fixture: ComponentFixture<LoadingComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ LoadingComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<LoadingComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoadingComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(LoadingComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(LoadingComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

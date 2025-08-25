@@ -1,17 +1,22 @@
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {Component} from '@angular/core';
-import {ConfigService} from '../_services/config/config.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
+import {ImageDimensions} from '@models/image-dimensions';
+import {AppEnvironmentService} from '@services/app-environment/app-environment.service';
 
 @Component({
+  standalone: true,
   selector: 'app-footer',
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls: ['./footer.component.scss'],
+  imports: [CommonModule, NgOptimizedImage],
 })
 export class FooterComponent {
+  logoURL = '/public/logo/UVA_STAR-logo.svg';
+  logoDimensions: ImageDimensions;
 
   constructor(
-    public config: ConfigService,
+    public config: AppEnvironmentService,
     public router: Router,
   ) {}
-
 }

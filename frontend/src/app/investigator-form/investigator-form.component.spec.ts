@@ -1,22 +1,30 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { InvestigatorFormComponent } from './investigator-form.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {mockStudyInvestigator} from '@app/shared/fixtures/mock-study-investigator';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {InvestigatorFormComponent} from './investigator-form.component';
 
 describe('InvestigatorFormComponent', () => {
   let component: InvestigatorFormComponent;
-  let fixture: ComponentFixture<InvestigatorFormComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ InvestigatorFormComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<InvestigatorFormComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InvestigatorFormComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(InvestigatorFormComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .keep(FormsModule)
+      .keep(ReactiveFormsModule)
+      .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
+      .provide({
+        provide: MAT_DIALOG_DATA,
+        useValue: {
+          si: mockStudyInvestigator,
+        },
+      });
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(InvestigatorFormComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

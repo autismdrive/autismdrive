@@ -1,23 +1,45 @@
 import {SelectionModel} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
-import {Component, OnInit} from '@angular/core';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {Observable, of} from 'rxjs';
-import {Category} from '../_models/category';
-import {ApiService} from '../_services/api/api.service';
-import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {CommonModule} from '@angular/common';
+import {Component, effect} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatTreeModule, MatTreeNestedDataSource} from '@angular/material/tree';
+import {RouterModule} from '@angular/router';
+import {Category} from '@models/category';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {lastValueFrom, Observable, of} from 'rxjs';
 
 @Component({
+  standalone: true,
   selector: 'app-taxonomy-admin',
   templateUrl: './taxonomy-admin.component.html',
-  styleUrls: ['./taxonomy-admin.component.scss']
+  styleUrls: ['./taxonomy-admin.component.scss'],
+  imports: [
+    CommonModule,
+    FlexModule,
+    FormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatTooltipModule,
+    MatTreeModule,
+    RouterModule,
+  ],
 })
-export class TaxonomyAdminComponent implements OnInit {
+export class TaxonomyAdminComponent {
   treeControl: NestedTreeControl<Category>;
   dataSource: MatTreeNestedDataSource<Category>;
   dataLoaded = false;
-  nodes: { [key: number]: Category; } = {};
+  nodes: Record<number, Category> = {};
   showConfirmDelete = false;
   nodeToDelete: Category;
   currentUser: User;
@@ -31,26 +53,27 @@ export class TaxonomyAdminComponent implements OnInit {
     private api: ApiService,
     private authenticationService: AuthenticationService,
   ) {
-    this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
-    this.dataSource = new MatTreeNestedDataSource();
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.getCategoryTree(true);
-  }
-
-  ngOnInit() {
+    effect(() => {
+      this.treeControl = new NestedTreeControl<Category>(node => of(node.children));
+      this.dataSource = new MatTreeNestedDataSource();
+      this.currentUser = this.authenticationService.currentUser();
+      this.getCategoryTree(true);
+    });
   }
 
   getCategoryTree(updateDisplayOrder = false, done?: () => void) {
     this.api.getCategoryTree().subscribe(async (categories: Category[]) => {
       // Check tree for any categories with missing display_order.
-      if (updateDisplayOrder && await this.hasMissingDisplayOrder(categories)) {
+      if (updateDisplayOrder && (await this.hasMissingDisplayOrder(categories))) {
         // Add display order to each category and save it.
         await this.walkTree(categories, (cat, i) => {
           cat.display_order = i;
           return this.api.addCategory(cat);
         }).then(() => {
           this.dataSource.data = categories;
-          if (done) { done(); }
+          if (done) {
+            done();
+          }
         });
       } else {
         // Just walk the tree to update the node index.
@@ -59,24 +82,21 @@ export class TaxonomyAdminComponent implements OnInit {
           return of(true);
         }).then(() => {
           this.dataSource.data = categories;
-          if (done) { done(); }
+          if (done) {
+            done();
+          }
         });
       }
     });
   }
 
   hasNestedChild = (_: number, node: Category) => {
-    return (node.children && (node.children.length > 0));
-  }
+    return node.children && node.children.length > 0;
+  };
 
   hasNoContent = (_: number, _nodeData: Category) => {
-    const noContent = _nodeData.name === '' && _nodeData.id === undefined;
-    if (_nodeData.name === '') {
-      console.log({_nodeData});
-    }
-
-    return noContent;
-  }
+    return _nodeData.name === '' && _nodeData.id === undefined;
+  };
 
   /** Select the category so we can insert the new item. */
   addNewItem(node: Category) {
@@ -112,10 +132,12 @@ export class TaxonomyAdminComponent implements OnInit {
 
     // Do nothing if...
     if (
-      (siblings.length <= 1) ||                          // ...there is only one node (or fewer).
-      ((direction < 0) && (newIndex < 0)) ||              // ...decrementing and node is already first.
-      ((direction > 0) && (newIndex === siblings.length)) // ...incrementing and node is already last.
-    ) { return; }
+      siblings.length <= 1 || // ...there is only one node (or fewer).
+      (direction < 0 && newIndex < 0) || // ...decrementing and node is already first.
+      (direction > 0 && newIndex === siblings.length) // ...incrementing and node is already last.
+    ) {
+      return;
+    }
 
     const swapNode = siblings[newIndex];
     swapNode.display_order = oldIndex;
@@ -171,7 +193,7 @@ export class TaxonomyAdminComponent implements OnInit {
   private insertNewChildNode(parentNode: Category, cats: Category[]): Category[] {
     if (cats && cats.length > 0) {
       const parentIndex = cats.findIndex(c => c.id === parentNode.id);
-      if (parentIndex !== - 1) {
+      if (parentIndex !== -1) {
         cats[parentIndex].children.push({name: '', parent_id: parentNode.id});
         return cats;
       } else {
@@ -180,6 +202,9 @@ export class TaxonomyAdminComponent implements OnInit {
           return cat;
         });
       }
+    } else {
+      // Category list is empty, so just return it.
+      return cats;
     }
   }
 
@@ -191,23 +216,24 @@ export class TaxonomyAdminComponent implements OnInit {
 
   /** Recursively visits every node in the given tree and executes the given callback on each node */
   private async walkTree(cats: Category[], callback: (c: Category, i: number) => Observable<any>) {
-    return cats.map(async (c, i) => {
+    const results = [];
+
+    for (let i = 0; i < cats.length; i++) {
+      const c = cats[i];
+
       // Store node in an index for faster retrieval by id later.
       this.nodes[c.id] = c;
 
-      // Execute the callback.
-      const result = callback(c, i);
+      // Execute the callback and store the result in results.
+      results.push(await lastValueFrom(callback(c, i)));
 
       // If this node has children, recursively walk them.
       if (c.children && c.children.length > 0) {
-
-        // The callback must return an observable. Wait for the
-        // observable to resolve before going through the next level.
-        return result.subscribe(async () => {
-          return await this.walkTree(c.children, callback);
-        });
+        return await this.walkTree(c.children, callback);
       }
-    });
+    }
+
+    return results;
   }
 
   /** Returns true if any category in the given category tree is missing the display_order property. */

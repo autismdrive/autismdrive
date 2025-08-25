@@ -1,15 +1,32 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
-import { FormGroup } from '@angular/forms';
-import { FormlyFieldConfig } from '@ngx-formly/core';
-import { ApiService } from '../_services/api/api.service';
+import {CommonModule} from '@angular/common';
+import {ChangeDetectorRef, Component} from '@angular/core';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {Router} from '@angular/router';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {LogoComponent} from '@app/logo/logo.component';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationStateService} from '@services/authentication/authentication-state-service';
+import {StorageService} from '@services/storage/storage.service';
 
 @Component({
+  standalone: true,
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  styleUrls: ['./forgot-password.component.scss'],
+  imports: [
+    CommonModule,
+    FlexModule,
+    FormlyModule,
+    LoadingComponent,
+    LogoComponent,
+    MatButtonModule,
+    ReactiveFormsModule,
+  ],
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ForgotPasswordComponent {
   errorMessage: string;
   formStatus = 'form';
   form = new FormGroup({});
@@ -18,7 +35,7 @@ export class ForgotPasswordComponent implements OnInit {
     {
       key: 'email',
       type: 'input',
-      templateOptions: {
+      props: {
         type: 'email',
         label: 'Email Address:',
         placeholder: 'Enter email',
@@ -26,32 +43,34 @@ export class ForgotPasswordComponent implements OnInit {
       },
     },
   ];
+
   constructor(
     private api: ApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private router: Router
-  ) { }
-
-  ngOnInit() {
-  }
+    private router: Router,
+    private storageService: StorageService,
+  ) {}
 
   submit() {
-    localStorage.removeItem('token_url');
+    this.storageService.remove(AuthenticationStateService.LOCAL_TOKEN_URL_KEY);
     if (this.form.valid) {
       this.formStatus = 'submitting';
-      this.api.sendResetPasswordEmail(this.model['email']).subscribe(token_url => {
-        if (token_url) {
-          localStorage.setItem('token_url', token_url);
-        }
-        this.formStatus = 'complete';
-      }, error1 => {
-        if (error1) {
-          this.errorMessage = error1;
-        } else {
-          this.errorMessage = 'We encountered an error resetting your password.  Please contact support.';
-        }
-        this.formStatus = 'form';
-        this.changeDetectorRef.detectChanges();
+      this.api.sendResetPasswordEmail(this.model['email']).subscribe({
+        next: token_url => {
+          if (token_url) {
+            this.storageService.set(AuthenticationStateService.LOCAL_TOKEN_URL_KEY, token_url);
+          }
+          this.formStatus = 'complete';
+        },
+        error: error1 => {
+          if (error1) {
+            this.errorMessage = error1;
+          } else {
+            this.errorMessage = 'We encountered an error resetting your password.  Please contact support.';
+          }
+          this.formStatus = 'form';
+          this.changeDetectorRef.detectChanges();
+        },
       });
     }
   }

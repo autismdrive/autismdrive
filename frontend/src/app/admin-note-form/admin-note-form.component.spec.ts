@@ -1,22 +1,30 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AdminNoteFormComponent } from './admin-note-form.component';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {mockAdminNote} from '@app/shared/fixtures/mock-admin-note';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {AdminNoteFormComponent} from './admin-note-form.component';
 
 describe('AdminNoteFormComponent', () => {
   let component: AdminNoteFormComponent;
-  let fixture: ComponentFixture<AdminNoteFormComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ AdminNoteFormComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AdminNoteFormComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AdminNoteFormComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AdminNoteFormComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide({
+        provide: MatDialogRef,
+        useValue: {
+          close: (_: any) => {},
+        },
+      })
+      .provide({
+        provide: MAT_DIALOG_DATA,
+        useValue: {adminNote: mockAdminNote},
+      });
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(AdminNoteFormComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

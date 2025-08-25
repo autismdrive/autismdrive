@@ -1,22 +1,30 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { StudySurveyEntryComponent } from './study-survey-entry.component';
+import {signal} from '@angular/core';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {StudySurveyEntryComponent} from './study-survey-entry.component';
 
 describe('StudySurveyEntryComponent', () => {
   let component: StudySurveyEntryComponent;
-  let fixture: ComponentFixture<StudySurveyEntryComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ StudySurveyEntryComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<StudySurveyEntryComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StudySurveyEntryComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(StudySurveyEntryComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .mock(AuthenticationService, {currentUser: signal(mockUser)})
+      .mock(ApiService, {
+        getUser: jest.fn().mockReturnValue(of(mockUser)),
+        sendStudyInquiryEmail: jest.fn().mockReturnValue(of('')),
+      })
+      .mock(GoogleAnalyticsService, {});
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(StudySurveyEntryComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

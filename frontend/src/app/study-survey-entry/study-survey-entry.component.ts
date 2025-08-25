@@ -1,17 +1,24 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {Study} from '../_models/study';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {CommonModule} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
+import {Router} from '@angular/router';
+import {Study} from '@models/study';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {WindowService} from '@services/window/window.service';
 import {RegisterDialogComponent} from '../register-dialog/register-dialog.component';
-import {User} from '../_models/user';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {ApiService} from '../_services/api/api.service';
 
 @Component({
+  standalone: true,
   selector: 'app-study-survey-entry',
   templateUrl: './study-survey-entry.component.html',
-  styleUrls: ['./study-survey-entry.component.scss']
+  styleUrls: ['./study-survey-entry.component.scss'],
+  imports: [FlexModule, CommonModule, MatButtonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudySurveyEntryComponent implements OnInit {
   @Input() study: Study;
@@ -23,17 +30,20 @@ export class StudySurveyEntryComponent implements OnInit {
     private router: Router,
     private googleAnalytics: GoogleAnalyticsService,
     private authenticationService: AuthenticationService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private windowService: WindowService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser;
+    });
   }
 
   ngOnInit() {
-     if (this.currentUser) {
-       this.api.getUser(this.currentUser.id).subscribe(u => {
-         this.currentUser = new User(u);
-       });
-     }
+    if (this.currentUser) {
+      this.api.getUser(this.currentUser.id).subscribe(u => {
+        this.currentUser = new User(u);
+      });
+    }
   }
 
   goLogin() {
@@ -44,7 +54,7 @@ export class StudySurveyEntryComponent implements OnInit {
     if (this.surveyLink) {
       this.sendInquiry();
       this.googleAnalytics.studySurveyEvent(this.study);
-      window.open(this.surveyLink, '_blank');
+      this.windowService.window.open(this.surveyLink, '_blank');
     }
   }
 
@@ -55,10 +65,10 @@ export class StudySurveyEntryComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(RegisterDialogComponent, {
-      width: `${window.innerWidth}px`,
+      width: `${this.windowService.window.innerWidth}px`,
       data: {
-        'displaySurvey': false
-      }
+        displaySurvey: false,
+      },
     });
 
     dialogRef.afterClosed().subscribe(result => {

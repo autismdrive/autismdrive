@@ -1,30 +1,41 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {CommonModule, NgOptimizedImage, TitleCasePipe} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {Router} from '@angular/router';
-import {Participant} from '../_models/participant';
-import {ParticipantRelationship} from '../_models/participantRelationship';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
+import {Participant} from '@models/participant';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
 import {AvatarDialogComponent} from '../avatar-dialog/avatar-dialog.component';
 
 @Component({
+  standalone: true,
   selector: 'app-participant-profile',
   templateUrl: './participant-profile.component.html',
-  styleUrls: ['./participant-profile.component.scss']
+  styleUrls: ['./participant-profile.component.scss'],
+  imports: [
+    MatCardModule,
+    CommonModule,
+    MatProgressBarModule,
+    TitleCasePipe,
+    FlexModule,
+    MatButtonModule,
+    NgOptimizedImage,
+  ],
 })
-export class ParticipantProfileComponent implements OnInit {
+export class ParticipantProfileComponent {
   @Input() participant: Participant;
   @Input() user: User;
 
   constructor(
     private api: ApiService,
     private router: Router,
-    public dialog: MatDialog
-  ) {
-  }
-
-  ngOnInit() {
-  }
+    public dialog: MatDialog,
+  ) {}
 
   goEditEnroll($event) {
     if (this.participant.relationship === ParticipantRelationship.SELF_PARTICIPANT) {
@@ -50,15 +61,13 @@ export class ParticipantProfileComponent implements OnInit {
     this.router.navigate(['terms', this.participant.relationship, {preview: true}]);
   }
 
-  chooseAvatar($event, participant): void {
+  chooseAvatar(participant: Participant): void {
     const dialogRef = this.dialog.open(AvatarDialogComponent, {
       maxWidth: '100vw',
       maxHeight: '100vh',
-      data: {participant: participant}
+      data: {participant: participant},
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+    dialogRef.afterClosed().subscribe(_ => {});
   }
 }

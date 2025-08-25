@@ -1,22 +1,15 @@
 <div
   class="container mat-typography"
-  fxLayout="row"
+  fxLayout="row wrap"
   fxLayout.xs="column"
-  fxLayoutWrap
   fxLayoutGap="10px"
   fxLayoutAlign="center center"
+  id="timed-out-message"
 >
-  <div
-    fxFlex="50%"
-    class="message"
-  >
-    <app-logo variant="dark-lg" (click)="goHome()"></app-logo>
+  <div fxFlex="50%" class="message">
+    <app-logo variant="dark-lg" [routerLink]="['/home']"></app-logo>
     <h1>Your Autism DRIVE session has timed out.</h1>
     <p>You will need to log in again to access your profile.</p>
-    <button
-      mat-flat-button
-      color="accent"
-      (click)="goLogin()"
-    >Ok</button>
+    <button id="ok-button" mat-flat-button color="accent" [routerLink]="['/login']">Ok</button>
   </div>
 </div>

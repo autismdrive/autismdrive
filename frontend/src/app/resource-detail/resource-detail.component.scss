@@ -1,23 +1,38 @@
-@import '../../config';
+@use '../../styles/config' as config;
 
-agm-map {
+map-view {
   height: 50vh;
   width: 100%;
 }
 
-::ng-deep .gm-style-iw.gm-style-iw-c, ::ng-deep .gm-style-iw-d {
+:root .gm-style-iw.gm-style-iw-c,
+:root .gm-style-iw-d {
   max-height: 50vh !important;
 
-  @media (max-width: 575px) { max-width: 90vw !important; }
-  @media (min-width: 576px) { max-width: 80vw !important; }
-  @media (min-width: 768px) { max-width: 50vw !important; }
-  @media (min-width: 960px) { max-width: 40vw !important; }
-  @media (min-width: 1200px) { max-width: 30vw !important; }
+  @media (width <= 575px) {
+    max-width: 90vw !important;
+  }
+
+  @media (width >= 576px) {
+    max-width: 80vw !important;
+  }
+
+  @media (width >= 768px) {
+    max-width: 50vw !important;
+  }
+
+  @media (width >= 960px) {
+    max-width: 40vw !important;
+  }
+
+  @media (width >= 1200px) {
+    max-width: 30vw !important;
+  }
 }
 
 .no-address-message {
   font-weight: 700;
-  color: $brand-accent;
+  color: config.$brand-accent;
 }
 
 .button-overlay {

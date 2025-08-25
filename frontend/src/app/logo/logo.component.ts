@@ -1,16 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
+import {Component, Input} from '@angular/core';
+import {RouterModule} from '@angular/router';
 
 @Component({
+  standalone: true,
   selector: 'app-logo',
   templateUrl: './logo.component.html',
-  styleUrls: ['./logo.component.scss']
+  styleUrls: ['./logo.component.scss'],
+  imports: [RouterModule],
 })
-export class LogoComponent implements OnInit {
+export class LogoComponent {
   @Input() variant?: string;
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  constructor() {}
 }

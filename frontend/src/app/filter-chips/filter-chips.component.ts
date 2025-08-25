@@ -1,17 +1,22 @@
-import {Component, OnInit, Input} from '@angular/core';
-import {StudyCategory} from '../_models/study_category';
-import {ResourceCategory} from '../_models/resource_category';
-import {AgeRange, Language, Covid19Categories} from '../_models/hit_type';
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
 import {Router} from '@angular/router';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {AgeRange, Covid19Categories, Language} from '@models/hit_type';
+import {ResourceCategory} from '@models/resource_category';
+import {StudyCategory} from '@models/study_category';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
 
 @Component({
+  standalone: true,
   selector: 'app-filter-chips',
   templateUrl: './filter-chips.component.html',
-  styleUrls: ['./filter-chips.component.scss']
+  styleUrls: ['./filter-chips.component.scss'],
+  imports: [MatCardModule, MatChipsModule, CommonModule],
 })
-export class FilterChipsComponent implements OnInit {
-  @Input() categories: StudyCategory[] | ResourceCategory[] = [];
+export class FilterChipsComponent {
+  @Input() categories: StudyCategory[] | ResourceCategory[];
   @Input() ages: string[] = [];
   @Input() languages: string[] = [];
   @Input() covid19_categories: string[] = [];
@@ -23,16 +28,11 @@ export class FilterChipsComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private googleAnalytics: GoogleAnalyticsService
-  ) {
-  }
-
-  ngOnInit() {
-  }
+    private googleAnalytics: GoogleAnalyticsService,
+  ) {}
 
   goFilter(routerLink, type: string, queryParams) {
     this.googleAnalytics.relatedContentEvent(type, this.parentComponent);
     this.router.navigate(routerLink, queryParams);
   }
-
 }

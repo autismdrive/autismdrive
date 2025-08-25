@@ -1,6 +1,33 @@
-@import '../../config';
+@use '@angular/material' as mat;
+@use '../../styles/config' as config;
 
 .search-bar {
+  .mat-hint {
+    color: white !important;
+    font-style: italic;
+  }
+
+  h1,
+  h5,
+  .mat-select-value-text,
+  .mat-form-field-label,
+  .mat-menu-trigger,
+  .mat-tab-label,
+  .show-all,
+  .done-button,
+  app-search-filters-breadcrumbs h4,
+  app-search-filters-breadcrumbs .mat-button {
+    color: white !important;
+  }
+
+  .mat-menu-trigger {
+    background-color: rgb(0 0 0 / 20%);
+  }
+
+  background-color: #6f7ea0;
+
+
+
   display: inline-flex;
   width: 100%;
   margin-top: 3.5em;
@@ -8,11 +35,12 @@
   &.hidden {
     display: block;
     position: fixed;
-    top: 0px;
+    top: 0;
     left: 100%;
   }
 
-  h1, h5 {
+  h1,
+  h5 {
     margin: 0;
     padding: 0;
   }
@@ -20,9 +48,7 @@
   .mat-hint {
     font-size: 1em;
   }
-}
 
-::ng-deep .search-bar {
   mat-form-field {
     .mat-icon {
       margin-top: 6px;
@@ -30,13 +56,13 @@
     }
 
     .mat-form-field-wrapper {
-      padding: 10px 0px 0px 0px;
+      padding: 10px 0 0;
     }
 
     .mat-form-field-infix {
       padding-top: 10px;
       padding-bottom: 10px;
-      border-top-width: 0px;
+      border-top-width: 0;
     }
 
     .mat-icon-button.hidden {
@@ -44,62 +70,51 @@
     }
   }
 
-  &.dark-bg {
-    .mat-form-field-appearance-outline .mat-form-field-outline {
-      color: white;
-    }
-
-    .mat-hint,
-    input,
-    .mat-form-field-label {
-      color: white;
-    }
-
-    mat-form-field {
-      ::placeholder {
-        color: rgba(255,255,255,0.7);
-      }
-    }
+  .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: white;
   }
 
-  &.light-bg {
-    .mat-form-field-appearance-outline .mat-form-field-outline {
-      color: black;
-    }
+  .mat-hint,
+  input,
+  .mat-form-field-label {
+    color: white;
+  }
 
-    .mat-hint,
-    input,
-    .mat-form-field-label {
-      color: black;
-    }
-
-    mat-form-field {
-      ::placeholder {
-        color: $brand-gray-tint-1;
-      }
+  mat-form-field {
+    ::placeholder {
+      color: rgb(255 255 255 / 70%);
     }
   }
 }
 
-::ng-deep #search-field .mat-form-field-outline {
+#search-field .mat-form-field-outline {
   background-color: white;
   border-radius: 5px;
 }
 
-::ng-deep .mat-option-text {
+.mat-option-text {
   font-size: 16px;
   overflow: visible !important;
   text-overflow: unset !important;
 }
 
 .search-bar-header {
-  h1, h5 {
+  h1,
+  h5 {
     padding: 0;
     margin: 0;
   }
 }
 
-.btn-cancel, .btn-search {
+.btn-cancel,
+.btn-search {
   margin-top: 4px;
   margin-bottom: -4px;
+}
+
+.show-video {
+  @include mat.fab-overrides((
+    container-color: config.$brand-accent,
+    foreground-color: white,
+  ));
 }

@@ -1,44 +1,60 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Autism DRIVE</title>
+    <base href="/" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta property="og:site_name" content="Autism DRIVE" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Transform Outcomes. Together." />
+    <meta
+      property="og:description"
+      content="Transform Outcomes. Together. A centralized system for autism research & resources for individuals, families & professionals. "
+    />
+    <link
+      rel="preload"
+      href="/public/fonts/franklin-gothic-urw/franklin-gothic-urw-regular-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/public/fonts/bodoni-urw/bodoni-urw-700.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
+    <link rel="icon" href="/public/icon.svg" sizes="all" type="image/svg+xml" />
+    <link rel="icon" href="/public/icons/icon-16.png" sizes="16x16" type="image/png" />
+    <link rel="icon" href="/public/icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/public/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/public/manifest.webmanifest" />
+    <meta content="#ffffff" name="theme-color" />
 
-<head>
-  <meta charset="utf-8">
-  <title>Autism DRIVE</title>
-  <base href="/">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=__GOOGLE_ANALYTICS_TAG_ID__"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+    </script>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
-  <meta property="og:site_name" content="Autism DRIVE" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Transform Outcomes. Together." />
-  <meta property="og:description" content="Transform Outcomes. Together. A centralized system for autism research & resources for individuals, families & professionals. " />
-  <meta name="twitter:text:title" content="Transform Outcomes. Together." />
-  <link
-    rel="icon"
-    type="image/x-icon"
-    href="/assets/favicon.ico"
-  >
-  <link
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    rel="stylesheet"
-  >
-  <link
-    rel="stylesheet"
-    href="https://use.typekit.net/ato2zta.css"
-  >
-</head>
+    <!-- YouTube Embed API-->
+    <script>
+      // prettier-ignore
+      (_=>{let t=document.createElement('script');t.src='https://www.youtube.com/iframe_api';let f=document.getElementsByTagName('script')[0];f.parentNode.insertBefore(t,f);})();
+    </script>
 
-<body>
-  <app-root></app-root>
-  <script>
-    // YouTube IFrame Player API code
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  </script>
-</body>
-
+    <!-- Google Map Marker Clusterer -->
+    <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
 </html>

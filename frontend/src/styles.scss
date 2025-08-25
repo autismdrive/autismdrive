@@ -1,4 +1,35 @@
-@import './styles_curry.scss';
-@import './stardrive_material.scss';
-@import './icofont.min.css';
-@include stardrive-theme($stardrive-theme);
+@use 'styles/material' as custom-theme;
+@use 'styles/overrides' as overrides;
+@use '@angular/material' as mat;
+@use 'styles/config' as config;
+@use 'styles/ehd' as ehd;
+@use 'styles/other' as other;
+@forward 'public/css/bodoni-urw.css';
+@forward 'public/css/franklin-gothic-urw.css';
+@forward 'public/css/icofont.css';
+@forward 'public/css/material-icons.css';
+
+html {
+  @include mat.theme(custom-theme.$theme-config);
+  @include ehd.ehd-styles;
+  @include other.other-styles;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: config.$body-font-family, 'Helvetica Neue', sans-serif;
+}
+
+:root,
+:host {
+  @include mat.theme-overrides(overrides.$light-theme-overrides-config);
+}
+
+.dark {
+  @include mat.theme-overrides(overrides.$dark-theme-overrides-config);
+}

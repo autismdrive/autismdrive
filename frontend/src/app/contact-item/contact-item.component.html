@@ -1,30 +1,30 @@
 <div *ngIf="contactItem && contactItem.condition" class="contact-item" fxLayout="row" fxLayoutGap="8px">
   <div class="contact-item-icon">
-    <mat-icon>{{contactItem.icon}}</mat-icon>
+    <mat-icon>{{ contactItem.icon }}</mat-icon>
   </div>
-  <div class="contact-item-detail" *ngIf="!contactItem.type || (contactItem.type === 'p')">
+  <div class="contact-item-detail" *ngIf="!contactItem.type || contactItem.type === 'p'">
     <ng-container *ngFor="let d of contactItem.details">
-      <p *ngIf="isNotEmpty(d)">{{d}}</p>
+      <p *ngIf="isNotEmpty(d)">{{ d }}</p>
     </ng-container>
   </div>
-  <div class="contact-item-detail" *ngIf="contactItem.type && (contactItem.type === 'address')">
+  <div class="contact-item-detail" *ngIf="contactItem.type && contactItem.type === 'address'">
     <address *ngFor="let d of contactItem.details">
-      <p *ngIf="isNotEmpty(d)">{{d}}</p>
+      <p *ngIf="isNotEmpty(d)">{{ d }}</p>
     </address>
   </div>
-  <div class="contact-item-detail" *ngIf="contactItem.type && (contactItem.type === 'phone')">
+  <div class="contact-item-detail" *ngIf="contactItem.type && contactItem.type === 'phone'">
     <ng-container *ngFor="let d of contactItem.details">
-      <a *ngIf="isNotEmpty(d)" href="tel://{{d}}">{{d}}</a>
+      <a *ngIf="isNotEmpty(d)" href="tel://{{ d }}">{{ d }}</a>
     </ng-container>
   </div>
-  <div class="contact-item-detail" *ngIf="contactItem.type && (contactItem.type === 'phone_extension')">
+  <div class="contact-item-detail" *ngIf="contactItem.type && contactItem.type === 'phone_extension'">
     <ng-container *ngFor="let d of contactItem.details">
-      <p *ngIf="isNotEmpty(d)">Extension: {{d}}</p>
+      <p *ngIf="isNotEmpty(d)">Extension: {{ d }}</p>
     </ng-container>
   </div>
-  <div class="contact-item-detail" *ngIf="contactItem.type && (contactItem.type === 'link')">
+  <div class="contact-item-detail" *ngIf="contactItem.type && contactItem.type === 'link'">
     <ng-container *ngFor="let d of contactItem.details">
-      <a *ngIf="isNotEmpty(d)" target="_blank" href="{{d}}">{{d}}</a>
+      <a *ngIf="isNotEmpty(d)" target="_blank" href="{{ d }}">{{ d }}</a>
     </ng-container>
   </div>
 </div>

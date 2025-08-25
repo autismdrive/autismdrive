@@ -1,22 +1,34 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { RegisterDialogComponent } from './register-dialog.component';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {RouterModule} from '@angular/router';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {LOCAL_STORAGE} from '@app/tokens';
+import {ApiService} from '@services/api/api.service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {RegisterDialogComponent} from './register-dialog.component';
 
 describe('RegisterDialogComponent', () => {
   let component: RegisterDialogComponent;
-  let fixture: ComponentFixture<RegisterDialogComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ RegisterDialogComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<RegisterDialogComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RegisterDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(RegisterDialogComponent)
+      .keep(RouterModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .mock(ApiService, {addUser: jest.fn().mockReturnValue(of(mockUser))})
+      .mock(GoogleAnalyticsService)
+      .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
+      .provide({provide: MatDialogRef, useValue: {close: (_: any) => {}}})
+      .provide({
+        provide: MAT_DIALOG_DATA,
+        useValue: {displaySurvey: true},
+      });
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(RegisterDialogComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

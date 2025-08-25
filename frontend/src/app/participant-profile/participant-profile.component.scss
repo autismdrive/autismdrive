@@ -1,6 +1,6 @@
-@import '../../config';
+@use '../../styles/config' as config;
 
-::ng-deep mat-card {
+:root mat-card {
   width: 100%;
 }
 
@@ -15,49 +15,54 @@ mat-card-header {
 }
 
 [mat-card-avatar]:hover {
-  opacity: .5;
+  opacity: 0.5;
 }
 
-.change_text {
+.change-text {
   position: absolute;
   top: 105px;
   left: 7px;
   cursor: pointer;
 }
 
-.change_text:hover {
-  opacity: .5;
+.change-text:hover {
+  opacity: 0.5;
 }
 
-::ng-deep .mat-card-header-text {
+:root .mat-card-header-text {
   width: 100%;
 }
 
-::ng-deep mat-progress-bar {
+:root mat-progress-bar {
   height: 16px;
 
-  .mat-progress-bar-buffer { background-color: $brand-gray-tint-2; }
+  .mat-progress-bar-buffer {
+    background-color: config.$brand-gray-tint-2;
+  }
 
   .mat-progress-bar-background {
-    fill: $brand-gray-tint-2;
-    pattern { fill: $brand-gray-tint-2; }
-  }
-}
+    fill: config.$brand-gray-tint-2;
 
-::ng-deep mat-card-subtitle {
-  button {
-    margin-top: 20px;
+    pattern {
+      fill: config.$brand-gray-tint-2;
+    }
   }
-  .mat-subheading-2 {
-    color: black;
-  }
-
 }
 
 button {
   width: 100%;
 
-  @media (min-width: 768px) {
+  @media (width >= 768px) {
     width: 50%;
+  }
+}
+
+:root mat-card-subtitle {
+  button {
+    margin-top: 20px;
+  }
+
+  .mat-subheading-2 {
+    color: black;
   }
 }

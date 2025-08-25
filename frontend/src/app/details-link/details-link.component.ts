@@ -1,11 +1,15 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {Component, Input} from '@angular/core';
+import {RouterModule} from '@angular/router';
 
 @Component({
+  standalone: true,
   selector: 'app-details-link',
   templateUrl: './details-link.component.html',
-  styleUrls: ['./details-link.component.scss']
+  styleUrls: ['./details-link.component.scss'],
+  imports: [CommonModule, RouterModule],
 })
-export class DetailsLinkComponent implements OnInit {
+export class DetailsLinkComponent {
   @Input() url: string;
   @Input() label = 'Details';
   @Input() size = 1;
@@ -17,17 +21,17 @@ export class DetailsLinkComponent implements OnInit {
   @Input() externalLink = false;
   shouldHover = false;
 
-  constructor() { }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   onMouseOver() {
-    if (this.hover === undefined) { this.shouldHover = true; }
+    if (this.hover === undefined) {
+      this.shouldHover = true;
+    }
   }
 
   onMouseOut() {
-    if (this.hover === undefined) { this.shouldHover = false; }
+    if (this.hover === undefined) {
+      this.shouldHover = false;
+    }
   }
-
 }

@@ -1,4 +1,6 @@
-@import '../../material';
+@use '@angular/material' as mat;
+@use '../../styles/material' as material-config;
+@use '../../styles/config' as config;
 
 a {
   transition: all 0.5s;
@@ -6,10 +8,13 @@ a {
   display: inline-flex;
   align-items: center;
 
-  [class*="details-link-text"] {
-    @include mat-typography-level-to-styles($custom-typography, title);
+  [class*='details-link-text'] {
+    font-size: var(--mat-sys-title-large-size);
+    font-weight: var(--mat-sys-title-large-weight);
+    font-family: var(--mat-sys-title-large-font), sans-serif;
+    letter-spacing: var(--mat-sys-title-large-tracking);
     font-style: italic;
-    color: $brand-primary;
+    color: config.$brand-primary;
   }
 
   .details-link-text-1x {
@@ -22,13 +27,11 @@ a {
     margin-left: 0.75rem;
   }
 
-  [class*="icofont-"] {
-    color: $brand-accent;
+  [class*='icofont-'] {
+    color: config.$brand-accent;
     transition: all 0.5s;
   }
-}
 
-a {
   .details-link-icon {
     transform: rotate(0deg);
   }
@@ -49,16 +52,19 @@ a {
 }
 
 .muted {
-  color: $brand-gray;
+  color: config.$brand-gray;
 }
 
 .inverted {
   color: white;
-  [class*="details-link-text"] { color: white; }
+
+  [class*='details-link-text'] {
+    color: white;
+  }
 }
 
 .all-caps {
-  [class*="details-link-text"] {
+  [class*='details-link-text'] {
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }

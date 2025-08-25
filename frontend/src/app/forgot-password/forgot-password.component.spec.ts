@@ -1,22 +1,27 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ForgotPasswordComponent } from './forgot-password.component';
+import {RouterModule} from '@angular/router';
+import {LOCAL_STORAGE} from '@app/tokens';
+import {ApiService} from '@services/api/api.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {ForgotPasswordComponent} from './forgot-password.component';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
-  let fixture: ComponentFixture<ForgotPasswordComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ForgotPasswordComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<ForgotPasswordComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ForgotPasswordComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(ForgotPasswordComponent)
+      .keep(RouterModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide({provide: LOCAL_STORAGE, useValue: globalThis.localStorage})
+      .mock(ApiService, {
+        sendResetPasswordEmail: jest.fn().mockReturnValue(of('')),
+      });
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(ForgotPasswordComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

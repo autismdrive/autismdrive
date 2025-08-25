@@ -1,22 +1,17 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { FavoriteResourcesComponent } from './favorite-resources.component';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {FavoriteResourcesComponent} from './favorite-resources.component';
 
 describe('FavoriteResourcesComponent', () => {
   let component: FavoriteResourcesComponent;
-  let fixture: ComponentFixture<FavoriteResourcesComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ FavoriteResourcesComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<FavoriteResourcesComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FavoriteResourcesComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(FavoriteResourcesComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(FavoriteResourcesComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

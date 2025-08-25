@@ -1,0 +1,31 @@
+.tree-select-invisible {
+  display: none;
+}
+
+.tree-select ul,
+.tree-select li {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 1rem;
+  list-style-type: none;
+
+  button.toggle-node-button {
+    outline: none !important;
+  }
+}
+
+/*
+ * This padding sets alignment of the nested nodes.
+ */
+.tree-select .mat-nested-tree-node div[role='group'] {
+  padding-left: 2rem;
+
+  .mat-nested-tree-node {
+    padding-left: 0;
+  }
+}
+
+.leaf-tree-node {
+  display: flex;
+  align-items: center;
+}

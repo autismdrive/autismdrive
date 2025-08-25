@@ -1,6 +1,6 @@
-@import '../../config';
+@use '../../styles/config' as config;
 
 .hit-event-date {
-  color: $brand-accent;
+  color: config.$brand-accent;
   font-weight: 700;
 }

@@ -11,3 +11,5 @@ environment.prod.ts
 .stage
 /venv
 .DS_Store
+*.env
+!template*.env

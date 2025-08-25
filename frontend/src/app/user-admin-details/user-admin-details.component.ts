@@ -1,19 +1,43 @@
-import {Component, OnInit} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
+import {CommonModule, DatePipe, UpperCasePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatLineModule} from '@angular/material/core';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {ActivatedRoute} from '@angular/router';
-import {AdminNote} from '../_models/admin_note';
-import {EmailLog} from '../_models/email_log';
-import {ResourceChangeLog} from '../_models/resource_change_log';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
+import {ParticipantDetailComponent} from '@app/participant-detail/participant-detail.component';
+import {AdminNote} from '@models/admin_note';
+import {EmailLog} from '@models/email_log';
+import {ResourceChangeLog} from '@models/resource_change_log';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
+  standalone: true,
   selector: 'app-user-admin-details',
   templateUrl: './user-admin-details.component.html',
-  styleUrls: ['./user-admin-details.component.scss']
+  styleUrls: ['./user-admin-details.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    DatePipe,
+    FlexModule,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatLineModule,
+    MatSelectModule,
+    MatTableModule,
+    ParticipantDetailComponent,
+    UpperCasePipe,
+  ],
 })
-export class UserAdminDetailsComponent implements OnInit {
+export class UserAdminDetailsComponent {
   user: User;
   currentUser: User;
   dataSource: MatTableDataSource<EmailLog>;
@@ -26,59 +50,57 @@ export class UserAdminDetailsComponent implements OnInit {
     private api: ApiService,
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
+    private windowService: WindowService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.route.params.subscribe(params => {
-      const userId = params.userId ? parseInt(params.userId, 10) : null;
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+      this.route.params.subscribe(params => {
+        const userId = params['userId'] ? parseInt(params['userId'], 10) : null;
 
-      if (isFinite(userId)) {
-        this.api.getUser(userId).subscribe(user => {
-          this.user = user;
-          this.roleSelected = user.role;
+        if (isFinite(userId)) {
+          this.api.getUser(userId).subscribe(user => {
+            this.user = user;
+            this.roleSelected = user.role;
 
-          this.api.getUserEmailLog(this.user).subscribe(log => {
-            this.user.email_log = log;
-            this.dataSource = new MatTableDataSource<EmailLog>(log);
-          });
+            this.api.getUserEmailLog(this.user).subscribe(log => {
+              this.user.email_log = log;
+              this.dataSource = new MatTableDataSource<EmailLog>(log);
+            });
 
-          this.api.getUserAdminNotes(this.user.id).subscribe(notes => {
-            this.adminNotes = notes;
-          });
+            this.api.getUserAdminNotes(this.user.id).subscribe(notes => {
+              this.adminNotes = notes;
+            });
 
-          this.api.getUserResourceChangeLog(this.user.id).subscribe(log => {
-            this.resourceChangeLog = log;
-          });
+            this.api.getUserResourceChangeLog(this.user.id).subscribe(log => {
+              this.resourceChangeLog = log;
+            });
 
-          this.user.participants.forEach(pi => {
-            this.api
-              .getParticipantStepLog(pi)
-              .subscribe(log => {
+            this.user.participants.forEach(pi => {
+              this.api.getParticipantStepLog(pi).subscribe(log => {
                 pi.step_log = log;
               });
+            });
           });
-        });
-      }
+        }
+      });
     });
   }
 
-  ngOnInit() {
-  }
-
   exportUserData() {
-    console.log('clicking the button for export user data');
     this.api.exportUserQuestionnaire(this.user.id.toString()).subscribe(response => {
-      console.log('data', response);
       const filename = response.headers.get('x-filename');
-      const blob = new Blob([response.body], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const blob = new Blob([response.body], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
 
       const url = URL.createObjectURL(blob);
       const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
 
       a.href = url;
       a.download = filename;
-      window.document.body.appendChild(a);
+      this.windowService.window.document.body.appendChild(a);
       a.click();
-      window.document.body.removeChild(a);
+      this.windowService.window.document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
   }
@@ -87,5 +109,4 @@ export class UserAdminDetailsComponent implements OnInit {
     this.user.role = this.roleSelected;
     this.api.updateUser(this.user).subscribe();
   }
-
 }

@@ -1,4 +1,4 @@
-@import "../../config";
+@use '../../styles/config' as config;
 
 .tree-select-invisible {
   display: none;
@@ -22,12 +22,16 @@
 }
 
 .highlight-node {
-  background-color: $brand-primary-light;
-  -webkit-animation-name: fade-out;
+  background-color: config.$brand-primary-light;
   animation: fade-out 5s forwards;
 }
 
 @keyframes fade-out {
-  0% { background-color: $brand-primary-light; }
-  100% { background-color: transparent; }
+  0% {
+    background-color: config.$brand-primary-light;
+  }
+
+  100% {
+    background-color: transparent;
+  }
 }

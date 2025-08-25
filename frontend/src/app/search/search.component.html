@@ -1,42 +1,16 @@
-<div
-  id="hero"
-  #searchHeader
-  [class]="searchBgClass"
-  fxLayout="column"
->
-
-  <app-tutorial-video
-    *ngIf="videoPlacement === 'above' && !shouldHideVideo"
-    [videoSize]="videoSize"
-    [videoId]="videoId"
-    [instructions]="videoInstructions"
-    [links]="videoLinks"
-    fxFlexAlign="center"
-  ></app-tutorial-video>
-  <div
-    fxLayout="row"
-    fxLayout.lt-md="column"
-    fxLayoutAlign="center center"
-  >
-    <app-tutorial-video
-      *ngIf="videoPlacement === 'left' && !shouldHideVideo"
-      [videoSize]="videoSize"
-      [videoId]="videoId"
-      [instructions]="videoInstructions"
-      [links]="videoLinks"
-    ></app-tutorial-video>
+<div id="hero" #searchHeader fxLayout="column">
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="center center">
     <div fxLayout="column">
       <app-search-box
-        variant="light-bg"
-        (searchUpdated)="querySubject.next(this.query)"
+        (searchUpdated)="updateQueryParams($event)"
         (categorySelected)="selectCategory($event)"
-        [words]="query?.words"
+        [words]="query()?.words"
       ></app-search-box>
       <app-add-button
         *ngIf="currentUser && currentUser.permissions.includes('create_resource')"
-        [addLabel]='"Add Resource"'
-        [addLink]='"resources/add"'
-        [currentUser]=currentUser
+        [addLabel]="'Add Resource'"
+        [addLink]="'resources/add'"
+        [currentUser]="currentUser"
       ></app-add-button>
       <button
         id="show-filters-button"
@@ -49,16 +23,11 @@
         <mat-icon>filter_alt</mat-icon>
         Filter Search Results
       </button>
-      <div
-        fxLayout="column"
-        fxLayoutAlign="center center"
-        id="filters-container"
-      >
-        <div
-          id="filters"
-          fxFlex.gt-sm="60%"
-          [ngClass.lt-md]="filtersPanelStyles"
-        >
+      <div fxLayout="column" fxLayoutAlign="center center" id="filters-container">
+        <div id="filters" fxFlex.gt-sm="60%" [ngClass.lt-md]="{
+          'full-screen': showFilters,
+          minimized: !showFilters,
+        }">
           <div fxHide fxShow.lt-md>
             <div fxLayoutAlign="end end">
               <button class="done-button" mat-button (click)="toggleShowFilters()">Done</button>
@@ -66,28 +35,29 @@
             <h2>Filter Resources</h2>
           </div>
           <div id="TopOfSearch" class="filters-row" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="2em">
-
-            <div class="filter-select" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="2em" fxLayoutGap.lt-lg="1em" fxShow>
-
+            <div
+              class="filter-select"
+              fxLayout="row"
+              fxLayout.lt-lg="column"
+              fxLayoutGap="2em"
+              fxLayoutGap.lt-lg="1em"
+              fxShow
+            >
               <div fxHide fxShow.lt-md id="type-filter">
                 <mat-form-field>
                   <mat-label>Resource types</mat-label>
-                  <mat-select [(value)]="selectedType">
+                  <mat-select [value]="selectedType()">
                     <mat-select-trigger>
                       <app-type-icon
-                        *ngIf="selectedType"
-                        [iconType]="selectedType && selectedType.name"
+                        *ngIf="selectedType()"
+                        [iconType]="selectedType() && selectedType().name"
                         [size]="1"
                       ></app-type-icon>
-                      <span class="type-label" *ngIf="selectedType">{{selectedType.label}}</span>
+                      <span class="type-label" *ngIf="selectedType()">{{ selectedType().label }}</span>
                     </mat-select-trigger>
-                    <mat-option
-                      *ngFor="let type of resourceTypes"
-                      [value]="type"
-                      (click)="selectType(type.name)"
-                    >
+                    <mat-option *ngFor="let type of resourceTypes" [value]="type" (click)="selectType(type.name)">
                       <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
-                      <span class="type-label">{{type.label}}</span>
+                      <span class="type-label">{{ type.label }}</span>
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
@@ -104,30 +74,30 @@
               <div id="age-filter" fxFlex.lt-lg="100%" [ngClass.lt-md]="'filter-container'">
                 <div *ngIf="query">
                   <app-search-filter
-                    [aggregations]="query.age_counts"
+                    [aggregations]="query().age_counts"
                     [label_title]="'Filter by Age'"
                     [label_any]="'Any age'"
                     [label_map]="ageLabels"
                     [label_icon]="'cake'"
                     (filterSelected)="selectAgeRange($event)"
                     [ngClass]="'filter-by-age'"
-                    [isNotApplicable]="!loading && !query.hasAgeCounts"
+                    [isNotApplicable]="!loading() && !query().hasAgeCounts"
                     [notApplicableMessage]="'No age restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
               </div>
 
               <div id="language-filter" fxFlex.lt-lg="100%" [ngClass.lt-md]="'filter-container'">
-                <div *ngIf="query">
+                <div *ngIf="query()">
                   <app-search-filter
-                    [aggregations]="query.language_counts"
+                    [aggregations]="query().language_counts"
                     [label_title]="'Filter by Language'"
                     [label_any]="'Any language'"
                     [label_map]="languageLabels"
                     [label_icon]="'language'"
                     (filterSelected)="selectLanguage($event)"
                     [ngClass]="'filter-by-language'"
-                    [isNotApplicable]="!loading && !query.hasLanguageCounts"
+                    [isNotApplicable]="!loading() && !query().hasLanguageCounts"
                     [notApplicableMessage]="'No language restrictions available for these search results.'"
                   ></app-search-filter>
                 </div>
@@ -142,7 +112,7 @@
             ></app-search-sort>
           </div>
           <div fxHide fxShow.lt-md fxLayoutAlign="center center">
-            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{numTotalResults}} Results</button>
+            <button mat-flat-button (click)="toggleShowFilters()" color="accent">{{ numTotalResults }} Results</button>
           </div>
         </div>
       </div>
@@ -155,40 +125,25 @@
       [links]="videoLinks"
     ></app-tutorial-video>
   </div>
-  <app-tutorial-video
-    *ngIf="videoPlacement === 'below' && !shouldHideVideo"
-    [videoSize]="videoSize"
-    [videoId]="videoId"
-    [instructions]="videoInstructions"
-    [links]="videoLinks"
-    fxFlexAlign="center"
-  ></app-tutorial-video>
-  <div
-    class="type-tabs-container"
-    fxShow
-    fxHide.lt-md
-    fxLayout="row"
-    fxLayoutGap="2em"
-    fxLayoutAlign="start end"
-  >
+  <div class="type-tabs-container" fxShow fxHide.lt-md fxLayout="row" fxLayoutGap="2em" fxLayoutAlign="start end">
     <mat-tab-group
       mat-align-tabs="start"
       fxHide.lt-md
       [ngClass]="'type-tabs'"
       (selectedTabChange)="selectTypeTab($event)"
-      [(selectedIndex)]="selectedTypeTabIndex"
+      [selectedIndex]="selectedTypeTabIndex()"
       color="accent"
     >
       <mat-tab>
-        <ng-template mat-tab-label><div class="type-buttons all">All Resources</div></ng-template>
-      </mat-tab>
-      <mat-tab
-        *ngFor="let type of resourceTypesFiltered"
-      >
         <ng-template mat-tab-label>
-          <div class="type-buttons {{type.name}}">
+          <div class="type-buttons all">All Resources</div>
+        </ng-template>
+      </mat-tab>
+      <mat-tab *ngFor="let type of resourceTypesFiltered">
+        <ng-template mat-tab-label>
+          <div class="type-buttons {{ type.name }}">
             <app-type-icon [iconType]="type.name" [size]="1"></app-type-icon>
-            {{type.label}}
+            {{ type.label }}
           </div>
         </ng-template>
       </mat-tab>
@@ -198,10 +153,10 @@
 <div fxHide fxShow.lt-md id="results-vs-map">
   <mat-button-toggle-group [value]="expandResults" (change)="expandResults = !expandResults">
     <mat-button-toggle [value]="true">
-      <ng-container *ngIf="!restrictToMappedResults">{{numTotalResults}} results</ng-container>
-      <ng-container *ngIf="restrictToMappedResults">{{hits.length}} mapped results</ng-container>
+      <ng-container *ngIf="!restrictToMappedResults">{{ numTotalResults }} results</ng-container>
+      <ng-container *ngIf="restrictToMappedResults">{{ numResultsText(hits) }}</ng-container>
     </mat-button-toggle>
-    <mat-button-toggle [value]="false" [disabled]="!shouldShowMap">Map</mat-button-toggle>
+    <mat-button-toggle [value]="false" [disabled]="!shouldShowMap()">Map</mat-button-toggle>
   </mat-button-toggle-group>
 </div>
 <div id="content" fxLayout="row" fxLayoutAlign="start start">
@@ -216,24 +171,40 @@
     fxHide.lt-md
     [fxShow.lt-md]="!!expandResults"
   >
-    <ng-container *ngIf="!loading; else loadingMessage">
-      <div *ngIf="query?.hits.length === 0" fxLayout="column" fxLayoutGap="20px"
-           fxLayoutAlign="center center" class="pad-4">
+    <ng-container *ngIf="!loading(); else loadingMessage">
+      <div
+        *ngIf="hitsLoaded && queryWithResults?.total?.value === 0"
+        fxLayout="column"
+        fxLayoutGap="20px"
+        fxLayoutAlign="center center"
+        class="pad-4"
+      >
         <h2>No results currently available.</h2>
-        <p>We could not find any results for your search. Please try removing some of the conditions
-          by clicking on the 'x' in the filter tiles above. This will broaden the search and give you more results.</p>
+        <p>
+          We could not find any results for your search. Please try removing some of the conditions by clicking on the
+          'x' in the filter tiles above. This will broaden the search and give you more results.
+        </p>
         <h3>Check back soon for more updates!</h3>
       </div>
-      <div *ngIf="query?.total != 0" id="sort-and-status" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between end">
+      <div
+        *ngIf="queryWithResults?.total?.value !== 0"
+        id="sort-and-status"
+        fxLayout="row"
+        fxLayout.lt-md="column"
+        fxLayoutAlign="space-between end"
+      >
         <div
           class="search-result-status"
-          [attr.data-num-results]="restrictToMappedResults ? hits.length : numTotalResults"
+          [attr.data-num-results]="restrictToMappedResults ? hits?.length || 0 : numTotalResults"
           fxShow
           fxHide.lt-md
           *ngIf="paginatorElement"
         >
-          <h4 *ngIf="!restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} results</h4>
-          <h4 *ngIf="restrictToMappedResults">Showing {{numResultsFrom}}-{{numResultsTo}} of {{numTotalResults}} mapped results.</h4>
+          <h4 *ngIf="hitsLoaded">
+            Showing {{ numResultsFrom }}-{{ numResultsTo }} of {{ numTotalResults }}
+            {{ restrictToMappedResults ? 'mapped' : '' }} results
+          </h4>
+          <h4 *ngIf="!hitsLoaded">Loading results...</h4>
         </div>
         <div class="sort-order" fxShow fxHide.lt-md>
           <app-search-sort
@@ -245,7 +216,7 @@
       </div>
       <div class="sort-order" fxShow fxHide.lt-md>
         <app-search-filters-breadcrumbs
-          *ngIf="query"
+          *ngIf="query()"
           (ageRangeChipClicked)="selectAgeRange()"
           (categoryChipClicked)="removeCategory()"
           (clearAllClicked)="clearAllFilters()"
@@ -257,12 +228,12 @@
           [fxHide]="!showBreadcrumbs()"
           [fxShow]="showBreadcrumbs()"
           [languageLabels]="languageLabels"
-          [query]="query"
+          [query]="query()"
           [restrictToMappedResults]="restrictToMappedResults"
           [typeLabels]="typeLabels"
         ></app-search-filters-breadcrumbs>
       </div>
-      <div *ngIf="hits.length > 0">
+      <div *ngIf="hitsLoaded">
         <app-search-result
           *ngFor="let hit of hits; let i = index"
           [hit]="hit"
@@ -280,7 +251,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="pageSizeOptions"
       (page)="updatePage($event)"
-      [ngClass]="{'ghost': (!query || (numTotalResults === 0))}"
+      [ngClass]="{ghost: !queryWithResults || numTotalResults === 0}"
     >
     </mat-paginator>
   </div>
@@ -289,8 +260,9 @@
     fxFlex="40%"
     fxFlex.lt-md="100%"
     fxShow
+    *ngIf="shouldShowMap()"
     [fxShow.lt-md]="!expandResults"
-    [ngClass.gt-sm]="mapDockClass(scrollSpy, searchHeader, searchFooter)"
+    [ngClass.gt-sm]="mapDockClass()"
     [ngStyle.gt-sm]="{width: '40%'}"
   >
     <span class="inset-shadow"></span>
@@ -302,135 +274,128 @@
       [ngClass]="'mat-elevation-z1'"
       [ngClass.gt-sm]="'gt-sm'"
       [ngClass.lt-md]="'lt-md'"
-      [fxHide]="!shouldShowMap"
+      [fxHide]="!shouldShowMap()"
     >
       <mat-icon *ngIf="!restrictToMappedResults">check_box_outline_blank</mat-icon>
       <mat-icon *ngIf="restrictToMappedResults">check_box</mat-icon>
       Limit results to map
     </button>
     <mat-expansion-panel
-      *ngIf="shouldShowMap"
+      *ngIf="shouldShowMap()"
       id="set-location"
-      [ngClass]="'zipCodeSetButton mat-elevation-z1'"
+      [ngClass]="'zip-code-set-button mat-elevation-z1'"
       (afterExpand)="focusOnInput(zipCodeInput)"
-      [expanded]="showLocationWindow()"
-      #setLocationExpansionPanel
+      [expanded]="showLocationWindow() && panelOpenState()"
+      (opened)="panelOpenState.set(true)"
+      (closed)="panelOpenState.set(false)"
     >
       <mat-expansion-panel-header>
         <ng-container *ngIf="locationMode === locationModes.default">Set Location</ng-container>
-        <ng-container *ngIf="locationMode === locationModes.zipcode">Location: {{storedZip}}</ng-container>
+        <ng-container *ngIf="locationMode === locationModes.zipcode">Location: {{ storedZip }}</ng-container>
         <ng-container *ngIf="locationMode === locationModes.gps">Your current location</ng-container>
         <ng-container *ngIf="locationMode === locationModes.map">Using Map's Center</ng-container>
       </mat-expansion-panel-header>
-      <div [ngClass]="'zipCodeSet'" fxLayout="column">
-        <mat-form-field class="zipCodeField">
+      <div ngClass="zip-code-set" fxLayout="column">
+        <mat-form-field class="zip-code-field">
           <input
             matInput
             placeholder="Enter ZIP Code"
             [(ngModel)]="storedZip"
-            (keyup.enter)="submitZip($event, setLocationExpansionPanel)"
+            (keyup.enter)="submitZip($event)"
             #zipCodeInput
-          >
+          />
         </mat-form-field>
         <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
-            <button
-              mat-flat-button
-              color="accent"
-              (click)="submitZip($event, setLocationExpansionPanel)"
-              id="btn_save"
-            >Save</button>
-            <button
-              *ngIf="gpsEnabled"
-              mat-flat-button
-              (click)="useGPSLocation($event, setLocationExpansionPanel)"
-              id="btn_gps"
-            >Current Location</button>
+          <button mat-flat-button color="accent" (click)="submitZip($event)" id="btn_save">Save</button>
+          <button *ngIf="gpsEnabled" mat-flat-button (click)="useGPSLocation($event)" id="btn_gps">
+            Current Location
+          </button>
         </div>
       </div>
     </mat-expansion-panel>
-    <div id="map" fxLayout="column" fxLayoutGap="2em">
-      <agm-map
+
+    <div id="map" *ngIf="shouldShowMap()">
+      <google-map
         #mapTemplate
-        *ngIf="shouldShowMap"
-        [latitude]="loc.lat"
-        [longitude]="loc.lng"
-        [streetViewControl]="false"
-        mapTypeId="roadmap"
-        [zoom]="mapZoomLevel ? mapZoomLevel : defaultZoom"
-        (mapReady)="mapLoad($event)"
-        [scrollwheel]="null"
+        [options]="mapOptions()"
+        (mapInitialized)="mapLoad($event)"
         (mapClick)="closeInfoWindow()"
-        (zoomChange)="updateZoom($event)"
-        (boundsChange)="updateResultsList($event)"
+        (mapDragend)="handleMapDragEnd()"
+        (zoomChanged)="updateZoom(mapTemplate.getZoom())"
+        (boundsChanged)="updateResultsList(mapTemplate.getBounds())"
+        width="100%"
+        height="100%"
       >
-        <agm-marker-cluster [imagePath]="'assets/map/m'" [maxZoom]="8">
-          <agm-marker
-            *ngIf="loc"
-            [latitude]="loc.lat"
-            [longitude]="loc.lng"
-            [iconUrl]="{url: '/assets/map/your-location.svg', anchor: {x: 48, y: 48}}"
-          ></agm-marker>
+        <map-marker-clusterer>
+          <map-advanced-marker *ngIf="loc" [options]="markerOptions(loc, 'user')"></map-advanced-marker>
           <ng-container *ngFor="let hit of hitsWithNoAddress">
-            <agm-circle
-              [latitude]="hit.latitude + mapJitter(hit.id, true)"
-              [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [radius]="circleRadius"
-              [fillColor]="hit.type.toLowerCase() === 'location' ? '#6C799C' : '#E57200'"
-              fillOpacity="0.1"
-              [clickable]="true"
-              [visible]="isInfoWindowOpen && selectedMapHit.id == hit.id"
-              (circleClick)="showInfoWindow(hit)"
-              zIndex="-1"
+            <map-circle *ngIf="selectedMapHit()?.id === hit.id" [options]="mapCircleOptions(hit)"></map-circle>
+            <map-advanced-marker
+              #markerWithNoAddress="mapAdvancedMarker"
+              [options]="
+                markerOptions(
+                  {
+                    lat: hit.latitude + mapJitter(hit.id, true),
+                    lng: hit.longitude + mapJitter(hit.id, false),
+                  },
+                  hit.type + '-no-address'
+                )
+              "
+              (mapClick)="showInfoWindow(markerWithNoAddress, hit)"
             >
-            </agm-circle>
-            <agm-marker
-              [latitude]="hit.latitude + mapJitter(hit.id, true)"
-              [longitude]="hit.longitude + mapJitter(hit.id, false)"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '-no-address.svg', anchor: {x: 24, y: 24}}"
-              (markerClick)="showInfoWindow(hit)"
-            >
-            </agm-marker>
+            </map-advanced-marker>
           </ng-container>
           <ng-container *ngFor="let hit of hitsWithAddress">
-            <agm-marker
-              [latitude]="hit.latitude"
-              [longitude]="hit.longitude"
-              [iconUrl]="{url: '/assets/map/' + hit.type + '.svg', anchor: {x: 16, y: 16}}"
-              (markerClick)="showInfoWindow(hit)"
-            ></agm-marker>
+            <map-advanced-marker
+              #markerWithAddress="mapAdvancedMarker"
+              [options]="
+                markerOptions(
+                  {
+                    lat: hit.latitude,
+                    lng: hit.longitude,
+                  },
+                  hit.type
+                )
+              "
+              (mapClick)="showInfoWindow(markerWithAddress, hit)"
+            ></map-advanced-marker>
           </ng-container>
-        </agm-marker-cluster>
-        <ng-container *ngIf="selectedMapResource">
-          <agm-info-window [isOpen]="isInfoWindowOpen" [latitude]="selectedMapHit.latitude"
-                           [longitude]="selectedMapHit.longitude" (infoWindowClose)="closeInfoWindow()">
-            <a
-              class="title mat-h2"
-              href="/#/{{selectedMapResource.type.toLowerCase()}}/{{selectedMapResource.id}}"
-              (click)="goSelectedMapResource(selectedMapResource)"
-            >{{selectedMapResource.title}}</a>
-            <a
-              class="chevron-link"
-              (click)="goSelectedMapResource(selectedMapResource)"
-            >
-              {{selectedMapHit.no_address ? 'In-home therapy' : selectedMapHit.type}} Details</a>
-          </agm-info-window>
-        </ng-container>
-      </agm-map>
-
+        </map-marker-clusterer>
+        <map-info-window
+          [options]="{
+            position: {
+              lat: selectedMapHit()?.latitude || loc.lat,
+              lng: selectedMapHit()?.longitude || loc.lng,
+            },
+          }"
+          (closeclick)="closeInfoWindow()"
+        >
+          <a
+            class="title"
+            href="/#/{{ selectedMapResource()?.type?.toLowerCase() }}/{{ selectedMapResource()?.id }}"
+            (click)="goSelectedMapResource(selectedMapResource())"
+          >{{ selectedMapResource()?.title }}</a
+          >
+          <a class="chevron-link" (click)="goSelectedMapResource(selectedMapResource())">
+            {{ selectedMapHit()?.no_address ? 'In-home therapy' : selectedMapHit()?.type }} Details</a
+          >
+        </map-info-window>
+      </google-map>
       <div *ngIf="highlightedStudy" id="studies-highlight">
         <mat-card>
           <mat-card-content>
-            <h3>Highlighted Study: <a href="/#/study/{{highlightedStudy.id}}">{{highlightedStudy.short_title}}</a></h3>
-            <p>{{highlightedStudy.short_description}}</p>
-            <a
-              class="chevron-link"
-              [routerLink]="['/studies']"
-              routerLinkActive="router-link-active">
-              Explore other studies</a>
+            <h3>
+              Highlighted Study: <a href="/#/study/{{ highlightedStudy.id }}">{{ highlightedStudy.short_title }}</a>
+            </h3>
+            <p>{{ highlightedStudy.short_description }}</p>
+            <a class="chevron-link" [routerLink]="['/studies']" routerLinkActive="router-link-active">
+              Explore other studies</a
+            >
           </mat-card-content>
         </mat-card>
       </div>
     </div>
+
   </div>
 </div>
 <div
@@ -440,50 +405,50 @@
   fxLayoutGap="3em"
   fxLayoutAlign="auto center"
   #searchFooter
-  [ngStyle.lt-md]="{marginTop: '120vh'}"
 >
   <div fxLayout="column" fxLayoutAlign="start">
     <h1>Resource partners</h1>
-    <p class="pad-0">We are partnering with the following initiatives and organizations to identify
-      resources that will improve outcomes for individuals with autism and their families.</p>
+    <p class="pad-0">
+      We are partnering with the following initiatives and organizations to identify resources that will improve
+      outcomes for individuals with autism and their families.
+    </p>
     <div fxLayoutAlign.gt-xs="row" fxLayout.lt-sm="row wrap" fxLayoutAlign="space-between center" fxLayoutGap="40px">
-      <span
-        *ngFor="let rg of resourceGatherers"
-        fxFlex.lt-md="40%"
-        fxLayoutAlign="center center"
-      >
+      <span *ngFor="let rg of resourceGatherers" fxFlex.lt-md="40%" fxLayoutAlign="center center">
         <a
           [href]="rg.url"
           [title]="rg.name"
           [matTooltip]="rg.shortName + ' - ' + rg.description"
           class="resource-gatherer"
         >
-          <img
-            [alt]="rg.shortName"
-            [src]="rg.image"
-          >
+          <img [alt]="rg.shortName" src="{{ rg.image }}" fill="fill" />
         </a>
       </span>
     </div>
   </div>
-  <app-border-box-tile *ngIf="!loading"
+  <app-border-box-tile
+    *ngIf="!loading() && hitsLoaded"
     [title]="'Can\'t find your resource on drive?'"
     [subtitle]="'Click Here To Submit'"
     [linkSize]="2"
     (click)="submitResource()"
   ></app-border-box-tile>
+  <app-border-box-tile
+    *ngIf="!loading() && !hitsLoaded"
+    [title]="'Loading...'"
+    [subtitle]="`Retrieving ${query()?.types}`"
+  ></app-border-box-tile>
 </div>
 <span id="scroll-spy" #scrollSpy></span>
 
-<p style="padding: 2em; text-align: center;" >The listings included in the Autism DRIVE Resource Directory are provided for informational
-    purposes only. Most of the resources are not affiliated with the University of Virginia (UVA),
-    and their inclusion does not reflect a recommendation, referral or endorsement of a specific
-    organization or professional. For questions about information or content listed on external sites,
-    contact the external organization directly. The views and opinions expressed by external organizations
-    linked through on our website do not necessarily reflect the views of the UVA Supporting Transformative
-    Research (STAR) Initiative.</p>
+<p style="padding: 2em; text-align: center">
+  The listings included in the Autism DRIVE Resource Directory are provided for informational purposes only. Most of the
+  resources are not affiliated with the University of Virginia (UVA), and their inclusion does not reflect a
+  recommendation, referral or endorsement of a specific organization or professional. For questions about information or
+  content listed on external sites, contact the external organization directly. The views and opinions expressed by
+  external organizations linked through on our website do not necessarily reflect the views of the UVA Supporting
+  Transformative Research (STAR) Initiative.
+</p>
 
 <ng-template #loadingMessage>
   <app-loading></app-loading>
 </ng-template>
-

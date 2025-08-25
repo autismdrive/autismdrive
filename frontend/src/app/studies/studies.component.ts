@@ -1,17 +1,21 @@
-import {Component, OnInit} from '@angular/core';
-import {ApiService} from '../_services/api/api.service';
-import {Hit, Query} from '../_models/query';
-import {Study, StudyStatus} from '../_models/study';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {User} from '../_models/user';
-import {ActivatedRoute, Router} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, signal, WritableSignal} from '@angular/core';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSelectModule} from '@angular/material/select';
 import {Meta} from '@angular/platform-browser';
-import {AgeRange} from '../_models/hit_type';
-
-interface StudyStatusObj {
-  name: string;
-  label: string;
-}
+import {ActivatedRoute, Router} from '@angular/router';
+import {AddButtonComponent} from '@app/add-button/add-button.component';
+import {LoadingComponent} from '@app/loading/loading.component';
+import {SearchResultComponent} from '@app/search-result/search-result.component';
+import {AgeRange} from '@models/hit_type';
+import {Hit, Query} from '@models/query';
+import {Study, StudyStatus, StudyStatuses, StudyStatusItem} from '@models/study';
+import {User} from '@models/user';
+import {ExtendedModule, FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {lastValueFrom} from 'rxjs';
 
 interface AgeObj {
   name: string;
@@ -19,16 +23,29 @@ interface AgeObj {
 }
 
 @Component({
+  standalone: true,
   selector: 'app-studies',
   templateUrl: './studies.component.html',
-  styleUrls: ['./studies.component.scss']
+  styleUrls: ['./studies.component.scss'],
+  imports: [
+    AddButtonComponent,
+    ExtendedModule,
+    FlexModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    CommonModule,
+    SearchResultComponent,
+    LoadingComponent,
+    MatIconModule,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StudiesComponent implements OnInit {
+export class StudiesComponent {
   query: Query;
-  studyStatuses: StudyStatusObj[];
-  selectedStatus: StudyStatusObj;
+  studyStatuses = StudyStatuses;
+  selectedStatus: StudyStatusItem = StudyStatuses[0];
   selectedAge: AgeObj;
-  studyHits: Hit[];
+  studyHits: WritableSignal<Hit[]> = signal(undefined);
   currentUser: User;
   Ages: AgeObj[];
 
@@ -39,58 +56,58 @@ export class StudiesComponent implements OnInit {
     private router: Router,
     private meta: Meta,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
-    this.meta.updateTag(
-        { property: 'og:image', content: location.origin + '/assets/studies/hero.jpg' },
-        `property='og:image'`);
-    this.meta.updateTag(
-      { property: 'og:image:secure_url', content: location.origin + '/assets/studies/hero.jpg' },
-      `property='og:image:secure_url'`);
-    this.meta.updateTag(
-      { name: 'twitter:image', content: location.origin + '/assets/studies/hero.jpg' },
-      `name='twitter:image'`);
-    this.studyStatuses = Object.keys(StudyStatus).map(k => {
-      return {name: k, label: StudyStatus[k]};
-    });
-    this.Ages = Object.keys(AgeRange.labels).map(k => {
-      return {name: k, label: AgeRange.labels[k]};
-    });
-    console.log(this.Ages);
-    this.route.params.subscribe(params => {
-      if ('studyStatus' in params) {
-        this.selectedStatus = this.studyStatuses.find(x => x.name === params['studyStatus']);
-        if ('age' in params) {
-          this.selectedAge = this.Ages.find(x => x.name === params['age']);
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+      this.meta.updateTag(
+        {property: 'og:image', content: location.origin + '/public/studies/hero.jpg'},
+        `property='og:image'`,
+      );
+      this.meta.updateTag(
+        {property: 'og:image:secure_url', content: location.origin + '/public/studies/hero.jpg'},
+        `property='og:image:secure_url'`,
+      );
+      this.meta.updateTag(
+        {name: 'twitter:image', content: location.origin + '/public/studies/hero.jpg'},
+        `name='twitter:image'`,
+      );
+      this.studyStatuses = Object.keys(StudyStatus).map(k => {
+        return {name: k, label: StudyStatus[k]};
+      });
+      this.Ages = Object.keys(AgeRange.labels).map(k => {
+        return {name: k, label: AgeRange.labels[k]};
+      });
+      this.route.params.subscribe(params => {
+        if ('studyStatus' in params) {
+          this.selectedStatus = this.studyStatuses.find(x => x.name === params['studyStatus']);
+          if ('age' in params) {
+            this.selectedAge = this.Ages.find(x => x.name === params['age']);
+          } else {
+            this.selectedAge = undefined;
+          }
         } else {
+          this.selectedStatus = this.studyStatuses[0];
+          this.route.params['studyStatus'] = this.studyStatuses[0].name;
           this.selectedAge = undefined;
+          this.router.navigate(['/studies/' + this.studyStatuses[0].name]);
         }
-      } else {
-        this.selectedStatus = this.studyStatuses[0];
-        this.route.params['studyStatus'] = this.studyStatuses[0].name;
-        this.selectedAge = undefined;
-        this.router.navigate(['/studies/' + this.studyStatuses[0].name]);
-      }
+      });
+      this.loadStudies();
     });
-    this.loadStudies();
   }
 
-  ngOnInit() {
-  }
-
-  loadStudies() {
+  async loadStudies() {
+    let studies: Study[];
     if (this.selectedAge) {
-      this.api.getStudiesByAge(this.selectedStatus.name, this.selectedAge.name).subscribe(studies => {
-        this.studyHits = this._studiesToHits(studies);
-      });
+      studies = await lastValueFrom(this.api.getStudiesByAge(this.selectedStatus.name, this.selectedAge.name));
     } else {
-      this.api.getStudiesByStatus(this.selectedStatus.name).subscribe(studies => {
-        this.studyHits = this._studiesToHits(studies);
-      });
+      studies = await lastValueFrom(this.api.getStudiesByStatus(this.selectedStatus.name));
     }
+    this.studyHits.set(this._studiesToHits(studies));
   }
 
-  selectStatus(status: StudyStatusObj) {
+  selectStatus(status: StudyStatusItem) {
     this.selectedStatus = status;
+    this.studyHits.set(undefined);
     this.router.navigate(['/studies/' + status.name]);
     this.loadStudies();
   }
@@ -105,22 +122,36 @@ export class StudiesComponent implements OnInit {
     this.loadStudies();
   }
 
-   private _studiesToHits(studies: Study[]): Hit[] {
-      return studies
-        .map(s => {
-          return new Hit({
-            id: s.id,
-            type: 'study',
-            ages: s.ages,
-            title: s.short_title,
-            content: s.description,
-            description: s.short_description,
-            last_updated: s.last_updated,
-            highlights: null,
-            url: `/study/${s.id}`,
-            label: 'Research Studies',
-            status: this.studyStatuses.find(stat => stat.name === s.status).label
-          });
-        });
+  private _studiesToHits(studies: Study[]): Hit[] {
+    return studies.map(s => {
+      return new Hit({
+        id: s.id,
+        type: 'study',
+        ages: s.ages,
+        title: s.short_title,
+        content: s.description,
+        description: s.short_description,
+        last_updated: s.last_updated,
+        highlights: null,
+        url: `/study/${s.id}`,
+        label: 'Research Studies',
+        status: this.studyStatuses.find(stat => stat.name === s.status).label,
+      });
+    });
+  }
+
+  getEnrollmentStatusMessage(selectedStatus: StudyStatusItem): string {
+    switch (StudyStatus[selectedStatus.name]) {
+      case StudyStatus.currently_enrolling:
+        return 'that are enrolling';
+      case StudyStatus.results_being_analyzed:
+        return 'where results are being analyzed';
+      case StudyStatus.study_in_progress:
+        return 'that are in progress';
+      case StudyStatus.study_results_published:
+        return 'where results have been published';
+      default:
+        return '';
+    }
   }
 }

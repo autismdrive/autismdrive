@@ -1,0 +1,90 @@
+[project]
+requires-python = ">=3.12,<3.13"
+authors = [
+    { name = "Rose Nevill", email = "rn4ee@virginia.edu" },
+]
+maintainers = [
+    { name = "Aaron Louie", email = "4656575+ajlouie@users.noreply.github.com" },
+]
+description = "Autism DRIVE backend API"
+name = "autismdrive"
+version = "0.1.0"
+readme = "README.md"
+dependencies = [
+    "apscheduler",
+    "flask-bcrypt",
+    "flask-cors",
+    "flask-httpauth",
+    "flask-migrate",
+    "flask==3.1.1",
+    "pyjwt",
+    "sqlalchemy",
+    "sqlalchemy-utils",
+    "xlsxwriter",
+    "alembic",
+    "click",
+    "elasticsearch==9.1.0",
+    "flask-marshmallow",
+    "googlemaps",
+    "httpretty",
+    "icecream",
+    "idna",
+    "itsdangerous",
+    "marshmallow-sqlalchemy==1.1.0",
+    "marshmallow==3.26.1",
+    "openpyxl",
+    "psycopg",
+    "psycopg-binary",
+    "psycopg-c",
+    "pycparser",
+    "pydantic",
+    "pydantic-settings",
+    "pyjwt[crypto]",
+    "python-dateutil",
+    "python-dotenv",
+    "pytz",
+    "requests",
+    "six",
+    "tzlocal",
+    "urllib3",
+    "uwsgi",
+]
+
+[project.urls]
+homepage = "https://autismdrive.virginia.edu"
+source = "https://github.com/autismdrive/autismdrive"
+issues = "https://github.com/autismdrive/autismdrive/issues"
+documentation = "https://github.com/autismdrive/autismdrive/blob/main/backend/README.md"
+icon = "https://autismdrive.virginia.edu/favicon.ico"
+
+[dependency-groups]
+dev = [
+    "coverage",
+    "Faker",
+    "faker-biology",
+    "gevent",
+    "ruff",
+    "traceback-with-variables",
+    "line-profiler",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.setuptools.packages.find]
+where = ["app"]
+include = ["app"]
+exclude = [
+    "config",
+    "example_data",
+    "instance",
+    "migrations",
+    "tests",
+]
+namespaces = false
+
+[tool.ruff.lint]
+ignore = [
+    "E402",  # module level import not at top of file
+    "F841",  # local variable assigned but never used
+]

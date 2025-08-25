@@ -1,44 +1,48 @@
-version: "3.7"
 services:
   db:
-    image: sartography/cr-connect-db
+    image: postgres:17.6
     volumes:
-      - $HOME/docker/volumes/stardrive/postgres:/var/lib/postgresql/data
+      - $HOME/docker/volumes/autismdrive/postgres:/var/lib/postgresql/data
+      - ./initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
     ports:
       - 127.0.0.1:5432:5432
     environment:
-      - POSTGRES_USER=ed_user
-      - POSTGRES_PASSWORD=ed_pass
-      - POSTGRES_MULTIPLE_DATABASES=stardrive,stardrive_test
+      - PGDATA
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_MULTIPLE_DATABASES
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.11
+    image: docker.elastic.co/elasticsearch/elasticsearch-wolfi:${ES_STACK_VERSION}
     environment:
-      - "discovery.type=single-node"
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - TAKE_FILE_OWNERSHIP=1
+      - bootstrap.memory_lock=true
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - http.cors.allow-credentials=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-origin=localhost
+      - http.cors.enabled=true
+      - http.max_content_length=10MB
+      - http.port=${ES_PORT}
+      - network.publish_host=localhost
+      - xpack.license.self_generated.type=basic
+      - xpack.ml.use_auto_machine_memory_percent=true
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    mem_limit: 2gb
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 655350
+        hard: 655350
     volumes:
-      - $HOME/docker/volumes/stardrive/elasticsearch:/usr/share/elasticsearch/data
+      - ${HOME}/docker/volumes/autismdrive/elasticsearch:/usr/share/elasticsearch/data
     ports:
-      - 127.0.0.1:9200:9200
-      - 127.0.0.1:9300:9300
-
-  backend:
-    image: stardrive-test-backend:latest
-    ports:
-      - 127.0.0.1:5000:5000
-    restart: unless-stopped
-    depends_on:
-      - es
-      - db
-
-
-  frontend:
-    image: stardrive-test-frontend:latest
-    environment:
-      - "API_URL=http://star-drive_backend_1:5000"
-    ports:
-      - 127.0.0.1:4200:4200
-    depends_on:
-      - es
-      - db
-      - backend
+      - "${ES_HOST}:${ES_PORT}:9200"
+      - "${ES_HOST}:${ES_MGMT_PORT}:9300"

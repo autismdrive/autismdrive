@@ -1,15 +1,15 @@
-@import '../../material';
+@use '../../styles/config' as config;
 
 .news-item {
   display: grid;
   position: relative;
 
-  @media screen and (max-width: 767px) {
+  @media screen and (width <= 767px) {
     grid-template-columns: 1fr;
   }
 
-  @media screen and (min-width: 768px) {
-    grid-template-areas: "leftCol rightCol";
+  @media screen and (width >= 768px) {
+    grid-template-areas: 'leftCol rightCol';
     grid-template-columns: 1fr 1fr;
   }
 
@@ -17,23 +17,23 @@
     display: grid;
     align-content: center;
 
-    @media screen and (max-width: 767px) {
+    @media screen and (width <= 767px) {
       text-align: center;
       padding: 2em;
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (width >= 768px) {
       padding: 4em;
     }
 
-    &:after {
+    &::after {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('/assets/theme/starburst.svg');
+      background-image: url('/public/theme/starburst.svg');
       background-position: top center;
       background-repeat: no-repeat;
       background-size: contain;
@@ -46,28 +46,31 @@
     }
 
     .item-title {
-      @include mat-typography-level-to-styles($custom-typography, headline);
+      font-family: var(--mat-sys-headline-medium-font), sans-serif;
+      font-size: var(--mat-sys-headline-medium-size);
+      font-weight: var(--mat-sys-headline-medium-weight);
+      line-height: var(--mat-sys-headline-medium-line-height);
+      letter-spacing: var(--mat-sys-headline-medium-tracking);
       font-style: italic;
-      color: $brand-primary;
+      color: config.$brand-primary;
       cursor: pointer;
       margin-top: 0.75rem;
 
-      &:after {
+      &::after {
         content: '';
-        background-color: $brand-accent;
+        background-color: config.$brand-accent;
         width: 6.25rem;
-        height: .125rem;
+        height: 0.125rem;
         display: block;
 
-        @media screen and (max-width: 767px) {
+        @media screen and (width <= 767px) {
           margin-left: auto;
           margin-right: auto;
         }
 
-        @media screen and (min-width: 768px) {
+        @media screen and (width >= 768px) {
           margin: 0.45em 0;
         }
-
       }
     }
 
@@ -84,17 +87,17 @@
 
   &.even {
     .image {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: leftCol;
       }
     }
 
     .content {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: rightCol;
       }
 
-      &:before {
+      &::before {
         left: -50%;
       }
     }
@@ -102,17 +105,17 @@
 
   &.odd {
     .image {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: rightCol;
       }
     }
 
     .content {
-      @media screen and (min-width: 768px) {
+      @media screen and (width >= 768px) {
         grid-area: leftCol;
       }
 
-      &:before {
+      &::before {
         right: -50%;
       }
     }

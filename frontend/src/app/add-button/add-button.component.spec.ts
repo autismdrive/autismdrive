@@ -1,22 +1,26 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { AddButtonComponent } from './add-button.component';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {AddButtonComponent} from './add-button.component';
 
 describe('AddButtonComponent', () => {
   let component: AddButtonComponent;
-  let fixture: ComponentFixture<AddButtonComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ AddButtonComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<AddButtonComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AddButtonComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(AddButtonComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(
+      AddButtonComponent,
+      {
+        currentUser: mockUser,
+        addLink: 'https://some.link',
+        addLabel: 'Some Label',
+      },
+      {detectChanges: true},
+    );
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

@@ -2,26 +2,26 @@
   margin: 1em;
 }
 
-.move_up {
+.move-up {
   position: relative;
   width: 575px;
   top: -110px;
 }
 
-.move_up_mobile {
+.move-up-mobile {
   position: relative;
   width: 400px;
   top: -120px;
 }
 
 #hero {
-  background-image: url('/assets/about/diversity.jpg');
+  background-image: url('/public/about/diversity.jpg');
   background-position: 50% 17%;
   height: 480px;
 }
 
 #feature {
-  background-image: url('/assets/about/diversity.jpg');
+  background-image: url('/public/about/diversity.jpg');
   background-position: 100% 20%;
   height: 480px;
 }

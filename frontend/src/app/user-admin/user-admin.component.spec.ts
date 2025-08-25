@@ -1,22 +1,24 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { UserAdminComponent } from './user-admin.component';
+import {RouterModule} from '@angular/router';
+import {mockUser} from '@app/shared/fixtures/mock-user';
+import {ApiService} from '@services/api/api.service';
+import {MockBuilder, MockedComponentFixture, MockRender, NG_MOCKS_ROOT_PROVIDERS} from 'ng-mocks';
+import {of} from 'rxjs';
+import {UserAdminComponent} from './user-admin.component';
 
 describe('UserAdminComponent', () => {
   let component: UserAdminComponent;
-  let fixture: ComponentFixture<UserAdminComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ UserAdminComponent ]
-    })
-    .compileComponents();
-  }));
+  let fixture: MockedComponentFixture<UserAdminComponent>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UserAdminComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    return MockBuilder(UserAdminComponent)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .keep(RouterModule)
+      .mock(ApiService, {findUsers: jest.fn().mockReturnValue(of({pages: 1, total: 1, users: [mockUser]}))});
+  });
+
+  beforeEach(() => {
+    fixture = MockRender(UserAdminComponent, null, {detectChanges: true});
+    component = fixture.point.componentInstance;
   });
 
   it('should create', () => {

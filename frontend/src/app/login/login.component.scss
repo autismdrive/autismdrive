@@ -1,24 +1,28 @@
+@use '@angular/cdk';
+
+@include cdk.a11y-visually-hidden();
+
 .container {
   // SM
-  @media (max-width: 959px) {
+  @media (width <= 959px) {
     min-height: 60vh;
 
-    ::ng-deep .mat-form-field-wrapper {
+    :root .mat-form-field-wrapper {
       padding-bottom: 0.25em;
     }
   }
 
   // MD
-  @media (min-width: 960px) {
+  @media (width >= 960px) {
     min-height: 70vh;
   }
 
   // XL
-  @media (min-width: 1280px) {
+  @media (width >= 1280px) {
     min-height: 80vh;
   }
 }
 
-.form{
+.form {
   padding: 2%;
 }

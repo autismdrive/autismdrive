@@ -1,19 +1,27 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {CommonModule, TitleCasePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, Input, OnInit} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {Router} from '@angular/router';
-import {ParticipantRelationship} from '../_models/participantRelationship';
-import {Study} from '../_models/study';
-import {User} from '../_models/user';
-import {ApiService} from '../_services/api/api.service';
-import {AuthenticationService} from '../_services/authentication/authentication-service';
-import {GoogleAnalyticsService} from '../_services/google-analytics/google-analytics.service';
+import {ParticipantRelationship} from '@models/participantRelationship';
+import {Study} from '@models/study';
+import {User} from '@models/user';
+import {FlexModule} from '@ngbracket/ngx-layout';
+import {ApiService} from '@services/api/api.service';
+import {AuthenticationService} from '@services/authentication/authentication-service';
+import {GoogleAnalyticsService} from '@services/google-analytics/google-analytics.service';
+import {WindowService} from '@services/window/window.service';
 
 @Component({
+  standalone: true,
   selector: 'app-study-inquiry',
   templateUrl: './study-inquiry.component.html',
-  styleUrls: ['./study-inquiry.component.scss']
+  styleUrls: ['./study-inquiry.component.scss'],
+  imports: [FlexModule, MatButtonModule, MatCardModule, MatProgressBarModule, CommonModule, TitleCasePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudyInquiryComponent implements OnInit {
-
   currentUser: User;
   @Input() study: Study;
   haveUserContact = false;
@@ -24,9 +32,12 @@ export class StudyInquiryComponent implements OnInit {
     private api: ApiService,
     private authenticationService: AuthenticationService,
     private router: Router,
-    private googleAnalytics: GoogleAnalyticsService
+    private googleAnalytics: GoogleAnalyticsService,
+    private windowService: WindowService,
   ) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    effect(() => {
+      this.currentUser = this.authenticationService.currentUser();
+    });
   }
 
   ngOnInit() {
@@ -49,7 +60,6 @@ export class StudyInquiryComponent implements OnInit {
       });
     }
   }
-
 
   goLogin() {
     this.router.navigate(['/login'], {queryParams: {returnUrl: this.router.url}});
@@ -83,7 +93,7 @@ export class StudyInquiryComponent implements OnInit {
 
   goEligibility() {
     if (this.study && this.study.eligibility_url) {
-      window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank');
+      this.windowService.window.open(this.study.eligibility_url + '?user_id=' + this.currentUser.id, '_blank');
       this.sendInquiry();
     }
   }

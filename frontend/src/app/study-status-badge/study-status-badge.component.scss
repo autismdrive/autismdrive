@@ -1,0 +1,25 @@
+@use '../../styles/config' as config;
+
+.status-currently-enrolling,
+.status-study-in-progress,
+.status-results-being-analyzed,
+.status-study-results-published {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.status-currently-enrolling {
+  color: config.$brand-accent;
+}
+
+.status-study-in-progress {
+  color: config.$brand-primary-tint-1;
+}
+
+.status-results-being-analyzed {
+  color: config.$brand-primary-tint-2;
+}
+
+.status-study-results-published {
+  color: config.$brand-primary-tint-3;
+}

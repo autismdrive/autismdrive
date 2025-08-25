@@ -1,11 +1,11 @@
-@import '../../config';
+@use '../../styles/config' as config;
 
 .applied-filters {
   grid-area: filters;
   margin-left: 0;
   justify-self: start;
 
-  ::ng-deep .mat-chip-list-wrapper {
+  :root .mat-chip-list-wrapper {
     display: flex;
     flex-wrap: wrap;
     overflow-x: auto;
@@ -18,7 +18,7 @@
 
   .applied-filter {
     color: white;
-    background-color: $brand-accent;
+    background-color: config.$brand-accent;
 
     mat-icon {
       margin-left: 0.75rem;
@@ -35,8 +35,11 @@
   &.applied-filters-small {
     .applied-filter {
       font-size: 0.75rem;
-      mat-icon { font-size: 1rem; line-height: 1.5; }
+
+      mat-icon {
+        font-size: 1rem;
+        line-height: 1.5;
+      }
     }
   }
 }
-
