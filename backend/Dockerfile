@@ -1,11 +1,14 @@
-FROM tiangolo/uwsgi-nginx-flask:python3.9 as builder
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+FROM tiangolo/uwsgi-nginx-flask:python3.12 as builder
+COPY ./pyproject.toml /app/pyproject.toml
+RUN uv sync
 
 COPY . /app
 
-RUN /bin/bash -c "cd /autismdrive/backend/ && echo $PWD && mkdir -p instance && cp config/docker.py instance/instance_config.py"
-ENV FLASK_DEBUG=1
-ENV FLASK_APP=/app/__init__.py
+RUN /bin/bash -c "cd /autismdrive/backend/"
+ENV FLASK_DEBUG=0
+ENV FLASK_APP=/autismdrive/backend/main.py
+ENV PYTHONPATH=/autismdrive/backend
+ENV ENV_NAME=docker
+
 
 FROM builder

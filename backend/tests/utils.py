@@ -1,6 +1,25 @@
+import os
 import uuid
+from contextlib import contextmanager
 
 from tests.fixtures.fixture_utils import fake
+
+
+@contextmanager
+def set_env_var(var_name, value):
+    # Save the original value
+    original_value = os.environ.get(var_name)
+
+    # Overwrite the environment variable
+    os.environ[var_name] = value
+    try:
+        yield  # Yield control back to the test
+    finally:
+        # Restore the original value
+        if original_value is not None:
+            os.environ[var_name] = original_value
+        else:
+            del os.environ[var_name]  # Remove if it didn't exist
 
 
 def get_new_uuid():

@@ -13,7 +13,6 @@ from app.elastic_index import elastic_index
 from app.models import Category, Hit, MapHit, Search
 from app.rest_exception import RestException
 from app.schemas import SchemaRegistry
-from app.utils.category_utils import search_path
 
 ResultType = Literal["resource", "location", "event", "study"]
 
@@ -98,6 +97,7 @@ class SearchEndpoint(MethodView):
         """
 
         from app.database import session
+        from app.utils.category_utils import category_tree_mapper
         from app.resources.CategoryEndpoint import (
             add_joins_to_statement,
             get_category_by_id,
@@ -140,7 +140,7 @@ class SearchEndpoint(MethodView):
         for child in category.children:
             for bucket in results.aggregations.category.buckets:
                 # Remove topic category id from child search path
-                child_search_path = search_path(child.id)
+                child_search_path = category_tree_mapper.get_search_path(child.id)
                 child_key: str = child_search_path.replace(f"{topic_category.id},", "")
 
                 if bucket.key == child_key:

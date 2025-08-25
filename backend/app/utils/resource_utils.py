@@ -154,7 +154,7 @@ def to_database_object_dict(schema: Schema = None, db_object: DatabaseObject = N
     We have to do this to avoid circular imports and stale sessions causing all kinds of downstream problems
     when indexing database objects that have many nested relationships and complicated join behaviors.
     """
-    from app.utils.category_utils import all_search_paths
+    from app.utils.category_utils import category_tree_mapper
 
     if schema is None:
         raise ValueError("Invalid schema.")
@@ -162,7 +162,7 @@ def to_database_object_dict(schema: Schema = None, db_object: DatabaseObject = N
     if db_object is None:
         raise ValueError("Invalid db_object.")
 
-    category_search_paths = [all_search_paths(c.id) for c in db_object.categories]
+    category_search_paths = [category_tree_mapper.get_all_search_paths(c.id) for c in db_object.categories]
     has_address = (
         hasattr(db_object, "street_address1")
         and db_object.street_address1 is not None

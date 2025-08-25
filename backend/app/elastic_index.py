@@ -221,7 +221,7 @@ class ElasticIndex(object):
     def search(cls, search):
         from flask import g
 
-        from app.utils.category_utils import calculate_level, search_path
+        from app.utils.category_utils import category_tree_mapper
         from app.resources.CategoryEndpoint import get_category_by_id
         from app.resources.UserEndpoint import get_user_by_id
 
@@ -328,13 +328,13 @@ class ElasticIndex(object):
         if search.category and search.category.id:
             cat_id = int(search.category.id)
             cat = get_category_by_id(cat_id, with_joins=True)
-            cat_search_path = str(search_path(cat.id)) if cat else ""
+            cat_search_path = str(category_tree_mapper.get_search_path(cat.id)) if cat else ""
 
             if cat:
                 elastic_search = elastic_search.filter("terms", category=[cat_search_path])
 
             # Include all subcategories of the given root-level category.
-            cat_level = calculate_level(search.category.id)
+            cat_level = category_tree_mapper.get_category_level(search.category.id)
             if cat_level == 0:
                 category_agg_args.update(
                     {
@@ -348,7 +348,7 @@ class ElasticIndex(object):
                 category_agg_args.pop("exclude")
 
                 # Include only children of the given 2nd-level category.
-                cat_level = calculate_level(search.category.id)
+                cat_level = category_tree_mapper.get_category_level(search.category.id)
                 if cat_level == 1:
                     category_agg_args.update({"include": ".*\\,.*\\,.*"})
 

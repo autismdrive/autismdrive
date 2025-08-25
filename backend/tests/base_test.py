@@ -60,6 +60,7 @@ from app.models import (
 from app.resources.CategoryEndpoint import get_category_by_id
 from app.resources.ParticipantEndpoint import get_participant_by_id
 from app.resources.ResourceEndpoint import get_resource_by_id
+from app.resources.UserEndpoint import get_user_by_id
 from app.schemas import SchemaRegistry
 from app.utils.resource_utils import to_database_object_dict
 from config.base import Settings
@@ -135,8 +136,8 @@ class BaseTest(TestCase):
         self.assertIn("stardrive_test", self.app.config["SQLALCHEMY"].get_uri())
         self.assertEqual("stardrive_test", self.app.config["ELASTIC_SEARCH"].index_prefix)
 
-        # self.reset_db()
-        # self.reset_indices()
+        self.reset_db()
+        self.reset_indices()
         self.auths = {}
 
         self.default_user = self.construct_user(role=Role.admin)
@@ -168,8 +169,6 @@ class BaseTest(TestCase):
 
     @profiler
     def logged_in_headers(self, user_id: int = None, password: str = None) -> dict[str, str]:
-        from app.resources.UserEndpoint import get_user_by_id
-
         # If no user is provided, generate a dummy Admin user
         if user_id is not None and user_id in self.auths:
             print(f"Reusing auth headers for user {user_id}: {self.auths[user_id]}")
@@ -192,8 +191,6 @@ class BaseTest(TestCase):
 
     @profiler
     def login_user(self, user_id: int, password: str):
-        from app.resources.UserEndpoint import get_user_by_id
-
         user = get_user_by_id(user_id, with_joins=False)
         user_email = user.email
         user.email_verified = True
@@ -256,11 +253,8 @@ class BaseTest(TestCase):
         email = email or fake.email()
         if isinstance(last_login, str):
             last_login = datetime.datetime.strptime(last_login, "%m/%d/%y %H:%M")
-        db_user = (
-            self.session.execute(select(User).options(joinedload(User.participants)).filter(User.email == email))
-            .unique()
-            .scalar_one_or_none()
-        )
+        # db_user = get_user_by_email(email, with_joins=False)
+        db_user = self.session.query(User).filter(User.email == email).one_or_none()
         if db_user:
             return db_user
         user = User(email=email, role=role, last_login=last_login)
@@ -325,8 +319,6 @@ class BaseTest(TestCase):
         self.session.add(category)
         self.session.commit()
         category_id = category.id
-        self.session.close()
-
         db_category = get_category_by_id(category_id, with_joins=True)
         self.assertIsNotNone(db_category.id)
         self.assertEqual(db_category.name, name)

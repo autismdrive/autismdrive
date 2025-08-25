@@ -1,15 +1,17 @@
+from datetime import datetime
+
 import click
 from sqlalchemy.orm import make_transient
-from sqlalchemy_utils import database_exists
 
-from app.database import session, engine
+from app.database import session
 from app.models import Category
+from app.utils import utcnow
 
 
 class CategoryTreeMapper:
-    """A utility class to map and cache category relationships in memory for efficient lookups."""
-
-    _instance: "CategoryTreeMapper" = None
+    """
+    A set of dictionaries representing category relationships in memory for efficient lookups.
+    """
 
     # Data structure to hold category ID to Category object mappings
     category_map: dict[int, Category] = {}
@@ -25,13 +27,6 @@ class CategoryTreeMapper:
 
     # Cache for category search paths to avoid recomputation
     category_search_path_map: dict[int, str] = {}
-
-    def __init__(self):
-        """Implements the singleton pattern to ensure only one instance exists."""
-        if database_exists(engine.url):
-            if CategoryTreeMapper._instance is None:
-                CategoryTreeMapper._instance = self
-                self.rebuild_category_map()
 
     def rebuild_category_map(self):
         """Rebuilds the in-memory maps of categories, their parents, children, and levels."""
@@ -76,7 +71,7 @@ class CategoryTreeMapper:
 
         while current_id is not None:
             path_parts.append(str(current_id))
-            parent_id = self.category_parent_map.get(current_id)
+            parent_id = self.category_parent_map.get(current_id, None)
             if parent_id is not None:
                 level += 1
             current_id = parent_id
@@ -89,58 +84,104 @@ class CategoryTreeMapper:
 
         return level, search_path_str
 
-def calculate_level(cat_id: int) -> int:
-    """
-    Returns the hierarchy depth of the given category.
+    def get_category_level(self, cat_id: int) -> int:
+        """
+        Returns the hierarchy depth of the given category.
 
 
-    For instance, if the category hierarchy contained...
-        fruits (id: 1) -> level 0
-            > apples (id: 18) -> level 1
-                > fuji (id: 59) -> level 2
+        For instance, if the category hierarchy contained...
+            fruits (id: 1) -> level 0
+                > apples (id: 18) -> level 1
+                    > fuji (id: 59) -> level 2
 
-    ...this function would return 2 for the category ID 59.
-    """
-    return CategoryTreeMapper().category_level_map[cat_id]
+        ...this function would return 2 for the category ID 59.
+        """
+        return self.category_level_map.get(cat_id, 0)
 
+    def get_all_search_paths(self, cat_id: int) -> list[str]:
+        """
+        Returns an array of strings, each containing a comma-delimited sequence of integer IDs
+        that should be used to search for this category.
 
-def all_search_paths(cat_id: int) -> list[str]:
-    """
-    Returns an array of strings, each containing a comma-delimited sequence of integer IDs
-    that should be used to search for this category.
+        For instance, if the category hierarchy contained...
+            fruits (id: 1) -> level 0
+                > apples (id: 18) -> level 1
+                    > fuji (id: 59) -> level 2
 
-    For instance, if the category hierarchy contained...
-        fruits (id: 1) -> level 0
-            > apples (id: 18) -> level 1
-                > fuji (id: 59) -> level 2
+        ...this function would return: ["1", "1,18", "1,18,59"] for the category ID 59.
+        """
+        cat = self.category_map.get(cat_id)
 
-    ...this function would return: ["1", "1,18", "1,18,59"] for the category ID 59.
-    """
-    cat = CategoryTreeMapper().get_category(cat_id)
+        if cat is None:
+            return []
 
-    if cat is None:
-        return []
+        paths = [self.get_search_path(cat_id)]
 
-    paths = [search_path(cat_id)]
-
-    parent_id = cat.parent_id
-
-    while parent_id is not None:
-        paths.append(search_path(parent_id))
         parent_id = cat.parent_id
 
-    return paths
+        while parent_id is not None:
+            paths.append(self.get_search_path(parent_id))
+            parent_id = self.category_parent_map.get(parent_id, None)
+
+        return paths
+
+    def get_search_path(self, cat_id: int) -> str:
+        """
+        Return a comma-delimited string of category IDs representing the path to the given category.
+
+        For instance, if the category hierarchy contained...
+            fruits (id: 1) -> level 0
+                > apples (id: 18) -> level 1
+                    > fuji (id: 59) -> level 2
+
+        ...this function would return: "1,18,59" for the category ID 59.
+        """
+        return self.category_search_path_map.get(cat_id, str(cat_id))
 
 
-def search_path(cat_id: int) -> str:
+class CategoryTreeMapperSingleton:
     """
-    Return a comma-delimited string of category IDs representing the path to the given category.
-
-    For instance, if the category hierarchy contained...
-        fruits (id: 1) -> level 0
-            > apples (id: 18) -> level 1
-                > fuji (id: 59) -> level 2
-
-    ...this function would return: "1,18,59" for the category ID 59.
+    Creates a singleton instance of a tree of categories that can be accessed globally.
+    A utility class to map and cache category relationships in memory for efficient lookups.
     """
-    return CategoryTreeMapper().category_search_path_map.get(cat_id, str(cat_id))
+
+    _instance: CategoryTreeMapper = None
+    last_updated: datetime = None
+
+    def __new__(cls) -> CategoryTreeMapper:
+        """
+        Initializes the singleton instance with the category tree mapper,
+        loading all the categories and constructing the relationship dictionaries.
+
+        If an instance already exists, it returns that instance. If the categories table has changed,
+        it reinitializes the instance with updated categories.
+
+        Runs BEFORE a CategoryTreeMapperSingleton instance object is created.
+        """
+
+        # Find latest last_updated datetime from categories table
+        newest_cat = session.query(Category).order_by(Category.last_updated.desc()).first()
+        has_been_updated = cls.last_updated != newest_cat.last_updated if newest_cat else True
+
+        if cls._instance is None or has_been_updated:
+            cls.last_updated = newest_cat.last_updated if newest_cat else utcnow()
+            cls._instance = cls.load_category_tree_mapper()
+
+        return cls._instance
+
+    @classmethod
+    def load_category_tree_mapper(cls) -> CategoryTreeMapper:
+        """
+        Loads the category tree mapper, rebuilding the in-memory maps of categories,
+        their parents, children, and levels.
+
+        Returns:
+            CategoryTreeMapper: The singleton instance of the category tree mapper.
+        """
+        click.secho("Loading category tree mapper...")
+        mapper = CategoryTreeMapper()
+        mapper.rebuild_category_map()
+        return mapper
+
+
+category_tree_mapper = CategoryTreeMapperSingleton()

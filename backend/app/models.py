@@ -6,28 +6,28 @@ from datetime import datetime, timedelta
 from typing import Literal, Optional, TypedDict
 
 import googlemaps
-import jwt
 from sqlalchemy import ARRAY, TEXT, Boolean, ForeignKey, Integer, String, cast, func, select
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, backref, column_property, declared_attr, mapped_column, relationship
-from sqlalchemy.sql import expression
+from sqlalchemy.sql.functions import GenericFunction
 from sqlalchemy.types import DateTime
 
+from config.load import settings
 from app.auth import bcrypt, password_requirements
 from app.database import Base, get_class, random_integer, session
 from app.enums import Relationship, Role, Status, StudyUserStatus
 from app.export_service import ExportService
 from app.utils import pascal_case_it, utcnow
-from config.load import settings
 
 
-class sqla_func_utcnow(expression.FunctionElement):
+class DateTimeAsUTC(GenericFunction[datetime]):
+    name = "as_utc"
     type = DateTime()
     inherit_cache = True
 
 
-@compiles(sqla_func_utcnow, "postgresql")
+@compiles(DateTimeAsUTC, "postgresql")
 def pg_utcnow(element, compiler, **kw):
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
 
@@ -55,7 +55,7 @@ class AdminNote(Base):
     resource: Mapped["Resource"] = relationship(back_populates="admin_notes", lazy="joined")
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship(back_populates="admin_notes", lazy="joined")
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     note: Mapped[str]
 
 
@@ -100,7 +100,7 @@ class Category(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey("category.id"), default=None)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     display_order: Mapped[Optional[int]] = mapped_column(default=None)
     parent: Mapped[Optional["Category"]] = relationship(back_populates="children", remote_side="Category.id")
     children: Mapped[list["Category"]] = relationship(
@@ -122,7 +122,7 @@ class ChainStep(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     instruction: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
 
 
 DataTransferLogType = Literal["importing", "exporting"]
@@ -135,10 +135,10 @@ class DataTransferLog(Base):
     __tablename__ = "data_transfer_log"
     __no_export__ = True  # Don't export this logging information.
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc())
     details: Mapped[list["DataTransferLogDetail"]] = relationship(back_populates="data_transfer_log")
     type: Mapped[DataTransferLogType] = mapped_column(default="exporting")  # Either importing or exporting
-    date_started: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
+    date_started: Mapped[datetime] = mapped_column(default=func.as_utc())
     total_records: Mapped[int] = mapped_column(default=0)
     alerts_sent: Mapped[int] = mapped_column(default=0)
 
@@ -156,9 +156,9 @@ class DataTransferLogDetail(Base):
     __no_export__ = True  # Don't export this logging information.
     id: Mapped[int] = mapped_column(primary_key=True)
     data_transfer_log_id: Mapped[int] = mapped_column(ForeignKey("data_transfer_log.id"))
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     data_transfer_log: Mapped["DataTransferLog"] = relationship(back_populates="details")
-    date_started: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
+    date_started: Mapped[datetime] = mapped_column(default=func.as_utc())
     class_name: Mapped[str] = mapped_column(default="")
     successful: Mapped[bool] = mapped_column(default=False)
     success_count: Mapped[int] = mapped_column(default=0)
@@ -182,9 +182,9 @@ class EmailLog(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     type: Mapped[str]
     tracking_code: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     viewed: Mapped[bool] = mapped_column(default=False)
-    date_viewed: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
+    date_viewed: Mapped[datetime] = mapped_column(default=func.as_utc())
 
 
 class Resource(Base):
@@ -192,7 +192,7 @@ class Resource(Base):
     __label__ = "Online Information"
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     description: Mapped[str]
     insurance: Mapped[Optional[str]] = mapped_column(default=None)
     organization_name: Mapped[Optional[str]] = mapped_column(default=None)
@@ -221,7 +221,7 @@ class Resource(Base):
 class ResourceCategory(Base):
     __tablename__ = "resource_category"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     resource_id: Mapped[int] = mapped_column(ForeignKey("resource.id"))
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     resource: Mapped["Resource"] = relationship(back_populates="resource_categories")
@@ -266,7 +266,7 @@ class Event(Location):
     users: Mapped[list["User"]] = relationship(secondary="event_user", back_populates="events", viewonly=True)
     registered_users: Mapped[list["EventUser"]] = relationship(back_populates="event")
     e_type: Mapped[str] = mapped_column("type", default="event")
-    date: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
+    date: Mapped[datetime] = mapped_column(default=func.as_utc())
 
     __mapper_args__ = {
         "polymorphic_identity": "event",
@@ -276,7 +276,7 @@ class Event(Location):
 class EventUser(Base):
     __tablename__ = "event_user"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     event_id: Mapped[int] = mapped_column(ForeignKey("event.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     event: Mapped["Event"] = relationship(back_populates="registered_users")
@@ -324,9 +324,9 @@ class StepLog(Base):
     flow: Mapped[str]
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
-    date_completed: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
+    date_completed: Mapped[datetime] = mapped_column(default=func.as_utc())
     time_on_task_ms: Mapped[int]
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
 
 
 class Flow:
@@ -558,7 +558,7 @@ class Geocode:
 class Investigator(Base):
     __tablename__ = "investigator"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     name: Mapped[str]
     title: Mapped[str]
     organization_name: Mapped[Optional[str]] = mapped_column(default=None)
@@ -579,7 +579,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -690,7 +690,7 @@ class IdentificationQuestionnaire(Base, QuestionnaireMixin):
         default=None,
     )
     birthdate: Mapped[datetime] = mapped_column(
-        default=sqla_func_utcnow(),
+        default=func.as_utc(),
         info={
             "display_order": 7,
             "type": "datepicker",
@@ -815,7 +815,7 @@ class ContactQuestionnaire(Base, QuestionnaireMixin):
     marketing_other_hide_expression = '!(model.marketing_channel && (model.marketing_channel === "other"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -1010,8 +1010,8 @@ class Participant(Base):
     # with a user account; sometimes that of themselves and sometimes that of their guardian.
     __tablename__ = "stardrive_participant"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    # last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
-    last_updated: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
+    # last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
+    last_updated: Mapped[datetime] = mapped_column(default=func.as_utc())
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     user: Mapped["User"] = relationship(back_populates="participants")
     identification: Mapped["IdentificationQuestionnaire"] = relationship()
@@ -1108,7 +1108,7 @@ class Hit:
     post_event_description: Optional[str] = ""
     post_survey_link: Optional[str] = None
     primary_contact: Optional[str] = None
-    registered_users: Optional[list[any]] = None
+    registered_users: Optional[list[dict]] = None
     registration_url: Optional[str] = None
     resource_categories: Optional[str] = None
     results_url: Optional[str] = None
@@ -1127,7 +1127,7 @@ class Hit:
     time: Optional[str] = None
     title: Optional[str] = ""
     type: Optional[str] = ""
-    users: Optional[list[any]] = None
+    users: Optional[list[dict]] = None
     video_code: Optional[str] = None
     webinar_link: Optional[str] = None
     website: Optional[str] = ""
@@ -1163,7 +1163,7 @@ class Search:
     geo_box: Optional[GeoBoxType] = None
     geo_point: Optional[GeoPointType] = None
 
-    # Creates a pre ordered list of aggregation counts based on order in Age Range class.
+    # Creates a pre-ordered list of aggregation counts based on order in Age Range class.
     @staticmethod
     def known_age_counts():
         return list(map(lambda age_name: (AggCount(age_name, 0, False)), AgeRange.ages))
@@ -1192,14 +1192,14 @@ class Search:
                 ac = next(ac for ac in self.age_counts if ac.value == value)
                 ac.count = count
                 ac.is_selected = is_selected
-            except StopIteration:  # Go ahead and add it so it shows up, but this is bad data..
+            except StopIteration:  # Go ahead and add it so it shows up, but this is bad data...
                 self.age_counts.append(AggCount(value, count, is_selected))
         if field == "languages":
             try:
                 lc = next(lc for lc in self.language_counts if lc.value == value)
                 lc.count = count
                 lc.is_selected = is_selected
-            except StopIteration:  # Go ahead and add it so it shows up, but this is bad data..
+            except StopIteration:  # Go ahead and add it so it shows up, but this is bad data...
                 self.language_counts.append(AggCount(value, count, is_selected))
         if field == "types":
             self.type_counts.append(AggCount(value, count, is_selected))
@@ -1256,7 +1256,7 @@ class Study(Base):
     short_title: Mapped[Optional[str]] = mapped_column(default=None)
     short_description: Mapped[Optional[str]] = mapped_column(default=None)
     image_url: Mapped[Optional[str]] = mapped_column(default=None)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     description: Mapped[str]
     participant_description: Mapped[str]
     benefit_description: Mapped[str]
@@ -1289,7 +1289,7 @@ class StudyInvestigator(Base):
     investigator_id: Mapped[int] = mapped_column(ForeignKey("investigator.id"))
     study: Mapped["Study"] = relationship(back_populates="study_investigators")
     investigator: Mapped["Investigator"] = relationship(back_populates="investigator_studies")
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
 
 
 class StudyCategory(Base):
@@ -1299,13 +1299,13 @@ class StudyCategory(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
     study: Mapped["Study"] = relationship(back_populates="study_categories")
     category: Mapped["Category"] = relationship(back_populates="category_studies")
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
 
 
 class StudyUser(Base):
     __tablename__ = "study_user"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     status: Mapped[Optional["StudyUserStatus"]] = mapped_column(default=None)
     study_id: Mapped[int] = mapped_column(ForeignKey("study.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -1324,10 +1324,10 @@ class User(Base):
 
     __tablename__ = "stardrive_user"
     id: Mapped[int] = mapped_column(primary_key=True, default=random_integer)
-    # last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
-    last_updated: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
-    registration_date: Mapped[datetime] = mapped_column(default=sqla_func_utcnow())
-    last_login: Mapped[Optional[datetime]] = mapped_column(onupdate=sqla_func_utcnow(), default=None)
+    # last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
+    last_updated: Mapped[datetime] = mapped_column(default=func.as_utc())
+    registration_date: Mapped[datetime] = mapped_column(default=func.as_utc())
+    last_login: Mapped[Optional[datetime]] = mapped_column(onupdate=func.as_utc(), default=None)
     email: Mapped[Optional[str]] = mapped_column(unique=True, default=None)
     role: Mapped[Role]
     participants: Mapped[list["Participant"]] = relationship(back_populates="user")
@@ -1395,8 +1395,6 @@ class User(Base):
             message = "Please enter a valid password. " + password_requirements[role_name]["instructions"]
             raise RestException(RestException.INVALID_INPUT, details=message)
 
-        session.close()
-
     def role_name(self):
         return self.role if isinstance(self.role, str) else self.role.name
 
@@ -1431,6 +1429,8 @@ class User(Base):
 
     @classmethod
     def encode_auth_token(cls, user_id: int):
+        import jwt
+
         try:
             payload = {
                 "exp": utcnow() + timedelta(hours=2, minutes=0, seconds=0),
@@ -1449,6 +1449,7 @@ class User(Base):
 
     @classmethod
     def decode_auth_token(cls, auth_token: str) -> int:
+        import jwt
         from app.rest_exception import RestException
 
         try:
@@ -1488,7 +1489,7 @@ class User(Base):
 class UserFavorite(Base):
     __tablename__ = "user_favorite"
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     type: Mapped[str]
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
     resource_id: Mapped[Optional[int]] = mapped_column(ForeignKey("resource.id"), default=None)
@@ -1505,7 +1506,7 @@ class UserMeta(Base):
     __tablename__ = "usermeta"
     __label__ = "User Meta Info"
     id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"), primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     self_participant: Mapped[Optional[bool]] = mapped_column(default=None)
     self_has_guardian: Mapped[Optional[bool]] = mapped_column(default=None)
     guardian: Mapped[Optional[bool]] = mapped_column(default=None)
@@ -1533,7 +1534,7 @@ class ZipCode(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     latitude: Mapped[float]
     longitude: Mapped[float]
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
 
 
 class AlternativeAugmentative(Base, QuestionnaireMixin):
@@ -1542,7 +1543,7 @@ class AlternativeAugmentative(Base, QuestionnaireMixin):
     __no_export__ = True  # This will be transferred as a part of a parent class
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     type: Mapped[Optional[str]] = mapped_column(
         info={
@@ -1636,7 +1637,7 @@ class AssistiveDevice(Base, QuestionnaireMixin):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     type_group: Mapped[Optional[str]] = mapped_column(
         info={
@@ -1843,7 +1844,7 @@ class ChainQuestionnaire(Base, QuestionnaireMixin):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
@@ -1864,7 +1865,7 @@ class ChainSession(Base, QuestionnaireMixin):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     chain_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("chain_questionnaire.id", ondelete="CASCADE"))
     chain_questionnaire: Mapped["ChainQuestionnaire"] = relationship(back_populates="sessions")
@@ -1876,7 +1877,7 @@ class ChainSession(Base, QuestionnaireMixin):
     )
 
     date: Mapped[datetime] = mapped_column(
-        default=sqla_func_utcnow(),
+        default=func.as_utc(),
         info={
             "display_order": 1,
             "type": "datepicker",
@@ -1927,10 +1928,10 @@ class ChallengingBehavior(Base, QuestionnaireMixin):
     __no_export__ = True  # This will be transferred as a part of a parent class
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     chain_session_step_id: Mapped[int] = mapped_column(ForeignKey("chain_session_step.id", ondelete="CASCADE"))
     time: Mapped[datetime] = mapped_column(
-        default=sqla_func_utcnow(),
+        default=func.as_utc(),
         info={
             "display_order": 1,
             "type": "datepicker",
@@ -1955,7 +1956,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
     focus_step_hide_expression = "!model.was_focus_step"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     chain_session_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("chain_session.id", ondelete="CASCADE"), default=None
     )
@@ -1998,7 +1999,7 @@ class ChainSessionStep(Base, QuestionnaireMixin):
     #     )
 
     date: Mapped[datetime] = mapped_column(
-        default=sqla_func_utcnow(),
+        default=func.as_utc(),
         info={
             "display_order": 2,
             "type": "datepicker",
@@ -2161,15 +2162,6 @@ class ChainSessionStep(Base, QuestionnaireMixin):
     num_stars: Mapped[Optional[int]] = mapped_column(default=None)
 
 
-#
-# ChainSession.step_attempts = relationship(
-#     "ChainSessionStep",
-#     backref=backref("chain_session", lazy="joined"),
-#     cascade="all, delete-orphan",
-#     passive_deletes=True,
-# )
-
-
 def _get_chain_session_field_groups(_self):
     return {
         "step_attempts": {
@@ -2237,7 +2229,7 @@ class ClinicalDiagnosesQuestionnaire(Base, QuestionnaireMixin):
     genetic_other_hide_expression = '!(model.genetic && model.genetic.includes("geneticOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -2450,14 +2442,15 @@ class CurrentBehaviorsMixin(object):
     academic_difficulty_areas_desc = ""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
-    def has_academic_difficulties(self):
+    @classmethod
+    def has_academic_difficulties(cls):
         return mapped_column(
             Boolean,
             info={
@@ -2472,13 +2465,14 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "props.description": self.has_academic_difficulties_desc,
+                    "props.description": cls.has_academic_difficulties_desc,
                 },
             },
         )
 
     @declared_attr
-    def academic_difficulty_areas(self):
+    @classmethod
+    def academic_difficulty_areas(cls):
         return mapped_column(
             ARRAY(String),
             info={
@@ -2496,7 +2490,7 @@ class CurrentBehaviorsMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "props.description": self.academic_difficulty_areas_desc,
+                    "props.description": cls.academic_difficulty_areas_desc,
                     "props.required": "model.has_academic_difficulties",
                 },
                 "hide_expression": "!(model.has_academic_difficulties)",
@@ -2658,7 +2652,7 @@ class DemographicsQuestionnaire(Base, QuestionnaireMixin):
     race_ethnicity_other_hide_expression = '!(model.race_ethnicity && model.race_ethnicity.includes("raceOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -2812,7 +2806,7 @@ class DevelopmentalQuestionnaire(Base, QuestionnaireMixin):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -2923,14 +2917,15 @@ class EducationMixin(object):
     attends_school_desc = ""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
-    def attends_school(self):
+    @classmethod
+    def attends_school(cls):
         return mapped_column(
             Boolean,
             info={
@@ -2945,7 +2940,7 @@ class EducationMixin(object):
                     ],
                 },
                 "expression_properties": {
-                    "props.label": self.attends_school_desc,
+                    "props.label": cls.attends_school_desc,
                 },
             },
         )
@@ -2963,6 +2958,7 @@ class EducationMixin(object):
     )
 
     @declared_attr
+    @classmethod
     def school_type(cls):
         return mapped_column(
             String,
@@ -2986,6 +2982,7 @@ class EducationMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def placement_other(cls):
         return mapped_column(
             String,
@@ -3002,6 +2999,7 @@ class EducationMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def current_grade(cls):
         return mapped_column(
             String,
@@ -3018,6 +3016,7 @@ class EducationMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def school_services(cls):
         return mapped_column(
             ARRAY(String),
@@ -3176,7 +3175,7 @@ class EmploymentQuestionnaire(Base, QuestionnaireMixin):
     __estimated_duration_minutes__ = 2
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -3239,12 +3238,13 @@ class EvaluationHistoryMixin(object):
     where_diagnosed_other_hide_expression = '!(model.where_diagnosed && (model.where_diagnosed === "diagnosisOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
+    @classmethod
     def has_autism_diagnosis(cls):
         return mapped_column(
             Boolean,
@@ -3264,6 +3264,7 @@ class EvaluationHistoryMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def self_identifies_autistic(cls):
         return mapped_column(
             Boolean,
@@ -3282,6 +3283,7 @@ class EvaluationHistoryMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def years_old_at_first_diagnosis(cls):
         return mapped_column(
             Integer,
@@ -3307,6 +3309,7 @@ class EvaluationHistoryMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def who_diagnosed(cls):
         return mapped_column(
             String,
@@ -3355,6 +3358,7 @@ class EvaluationHistoryMixin(object):
     )
 
     @declared_attr
+    @classmethod
     def where_diagnosed(cls):
         return mapped_column(
             String,
@@ -3447,6 +3451,7 @@ class EvaluationHistoryMixin(object):
     )
 
     @declared_attr
+    @classmethod
     def gives_permission_to_link_evaluation_data(cls):
         return mapped_column(
             Boolean,
@@ -3469,6 +3474,7 @@ class EvaluationHistoryMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def has_iq_test(cls):
         return mapped_column(
             Boolean,
@@ -3490,6 +3496,7 @@ class EvaluationHistoryMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def recent_iq_score(cls):
         return mapped_column(
             Integer,
@@ -3571,12 +3578,13 @@ class HomeMixin(object):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("stardrive_user.id"))
 
     @declared_attr
+    @classmethod
     def housemates(cls):
         return relationship(
             "Housemate",
@@ -3586,6 +3594,7 @@ class HomeMixin(object):
         )
 
     @declared_attr
+    @classmethod
     def struggle_to_afford(cls):
         return mapped_column(
             Boolean,
@@ -3700,7 +3709,7 @@ class Housemate(Base, QuestionnaireMixin):
     relationship_other_hide_expression = '!(model.relationship && (model.relationship === "relationOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     home_dependent_questionnaire_id: Mapped[int] = mapped_column(
         ForeignKey("home_dependent_questionnaire.id", ondelete="CASCADE"), nullable=True
     )
@@ -3869,7 +3878,7 @@ class Medication(Base, QuestionnaireMixin):
     symptom_other_hide_expression = '!(model.symptom && (model.symptom === "symptomOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     symptom: Mapped[Optional[str]] = mapped_column(
         info={
@@ -3959,7 +3968,7 @@ class ProfessionalProfileQuestionnaire(Base, QuestionnaireMixin):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -4164,7 +4173,7 @@ class RegistrationQuestionnaire(Base, QuestionnaireMixin):
     __estimated_duration_minutes__ = 5
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -4192,7 +4201,7 @@ class SupportsQuestionnaire(Base, QuestionnaireMixin):
     alternative_med_other_hide_expression = '!(model.alternative_med && model.alternative_med.includes("altMedVitaminOther") || model.alternative_med && model.alternative_med.includes("altMedOther"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     time_on_task_ms: Mapped[int] = mapped_column(default=0)
 
     participant_id: Mapped[int] = mapped_column(ForeignKey("stardrive_participant.id"))
@@ -4358,7 +4367,7 @@ class Therapy(Base, QuestionnaireMixin):
     type_other_hide_expression = '!(model.type && (model.type === "other"))'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
     supports_questionnaire_id: Mapped[int] = mapped_column(ForeignKey("supports_questionnaire.id", ondelete="CASCADE"))
     type: Mapped[Optional[str]] = mapped_column(
         info={
@@ -4482,7 +4491,7 @@ class ResourceChangeLog(Base):
     user_email: Mapped[str]
     resource_id: Mapped[int]
     resource_title: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())
 
 
 class StudyChangeLog(Base):
@@ -4493,4 +4502,4 @@ class StudyChangeLog(Base):
     user_email: Mapped[str]
     study_id: Mapped[int]
     study_title: Mapped[str]
-    last_updated: Mapped[datetime] = mapped_column(server_default=sqla_func_utcnow(), onupdate=sqla_func_utcnow())
+    last_updated: Mapped[datetime] = mapped_column(server_default=func.as_utc(), onupdate=func.as_utc())

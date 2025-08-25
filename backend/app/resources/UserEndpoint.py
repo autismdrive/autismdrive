@@ -48,8 +48,8 @@ def get_user_by_email(email: str, with_joins=False) -> User | None:
     if with_joins:
         statement = add_joins_to_statement(statement)
 
-    statement = statement.filter_by(email=email)
-    return session.execute(statement).unique().scalar_one_or_none()
+    statement = statement.filter(User.email == email)
+    return session.scalars(statement).unique().one_or_none()
 
 
 def get_user_by_id(user_id: int, with_joins=False) -> User | None:

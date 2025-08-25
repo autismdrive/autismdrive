@@ -24,6 +24,7 @@ from app.models import (
 
 from app.data_loader import DataLoader
 
+
 class TestDataLoader(BaseTest):
     loader: DataLoader
 
@@ -31,6 +32,12 @@ class TestDataLoader(BaseTest):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.loader = DataLoader(directory=cls.current_dir + "/../example_data")
+
+    # def setUp(self) -> None:
+    #     # Ensure a clean state before each test
+    #     self.reset_db()
+    #     self.reset_indices()
+    #     super().setUp()
 
     def _load_and_assert_success(self, class_to_load, load_method=Callable, category_class=None, category_type=""):
         num_rc_after = -math.inf

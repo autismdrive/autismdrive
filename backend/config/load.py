@@ -22,16 +22,7 @@ _error_message = (
 )
 
 
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class SettingsSingleton(metaclass=Singleton):
+class SettingsSingleton:
     """
     Creates a singleton instance of Settings that can be accessed globally.
     """
@@ -48,7 +39,7 @@ class SettingsSingleton(metaclass=Singleton):
         Runs BEFORE a SettingsSingleton instance object is created.
         """
 
-        env_name = os.getenv("ENV_NAME", default=None)
+        env_name = os.environ["ENV_NAME"] if "ENV_NAME" in os.environ else None
         click.secho(f"\n*** config.load.SettingsSingleton.__new__ > env_name: {env_name} ***\n")
 
         if env_name is None:
@@ -71,13 +62,20 @@ class SettingsSingleton(metaclass=Singleton):
 
     @classmethod
     def load_settings(cls) -> Settings:
-        env_name = os.getenv("ENV_NAME", default=None)
+        env_name = os.environ["ENV_NAME"] if "ENV_NAME" in os.environ else None
         click.secho(f"\n*** config.load.SettingsSingleton.__new__ > env_name: {env_name} ***\n")
 
         if env_name is None:
             raise ValueError(
                 "Environment variable 'ENV_NAME' is not set. Please set it to one of the valid environment names."
             )
+
+        if env_name not in ("ci", "docker", "local", "mirror", "template", "testing", "production"):
+            raise ValueError(
+                f"Invalid environment name '{env_name}'. Please set 'ENV_NAME' to one of the following valid environment names: 'ci', 'docker', 'local', 'mirror', 'template', 'testing', or 'production'."
+            )
+
+        cls._env_name = env_name
 
         # Load settings from a specific environment file based on the environment name
         # Get the absolute path of the current directory

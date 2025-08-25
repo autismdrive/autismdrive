@@ -79,9 +79,10 @@ from app.models import (
     ZipCode,
 )
 from app.url_for_endpoint_map import URLForEndpointMap
-from app.utils.category_utils import calculate_level
 
 url_for = URLForEndpointMap()
+
+
 
 
 class ModelSchema(SQLAlchemyAutoSchema):
@@ -115,13 +116,19 @@ class ParentCategorySchema(ModelSchema):
         fields = ["id", "name", "parent", "level", "_links", "display_order"]
 
     parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
-    level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0)
+    level = Method("get_category_level", dump_only=True)
+
     _links = Hyperlinks(
         {
             "self": url_for.Category("id"),
             "collection": url_for.CategoryList(),
         }
     )
+
+    def get_category_level(self, cat: Category):
+        from app.utils.category_utils import category_tree_mapper
+
+        return category_tree_mapper.get_category_level(cat.id) if isinstance(cat, Category) else 0
 
 
 class ChildCategoryInSearchSchema(ModelSchema):
@@ -147,10 +154,15 @@ class CategoryInSearchSchema(ModelSchema):
         fields = ["id", "name", "children", "parent_id", "parent", "level", "display_order"]
 
     parent_id = Integer(required=False, allow_none=True)
-    level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0, dump_only=True)
+    level = Method("get_category_level", dump_only=True)
     name = String(required=False, dump_only=True)
     children = List(Nested("ChildCategoryInSearchSchema", dump_only=True))
     parent = Nested("ParentCategorySchema", dump_only=True, required=False, allow_none=True)
+
+    def get_category_level(self, cat: Category):
+        from app.utils.category_utils import category_tree_mapper
+
+        return category_tree_mapper.get_category_level(cat.id) if isinstance(cat, Category) else 0
 
 
 class CategorySchema(ModelSchema):
@@ -178,7 +190,7 @@ class CategorySchema(ModelSchema):
 
     id = Integer(required=False, allow_none=True)
     parent_id = Integer(required=False, allow_none=True)
-    level = Function(lambda obj: calculate_level(obj.id) if isinstance(obj, Category) else 0, dump_only=True)
+    level = Method("get_category_level", dump_only=True)
     event_count = Method("get_event_count", dump_only=True)
     location_count = Method("get_location_count", dump_only=True)
     resource_count = Method("get_resource_count", dump_only=True)
@@ -193,6 +205,12 @@ class CategorySchema(ModelSchema):
             "collection": url_for.CategoryList(),
         }
     )
+
+    def get_category_level(self, cat: Category):
+        from app.utils.category_utils import category_tree_mapper
+
+        return category_tree_mapper.get_category_level(cat.id) if isinstance(cat, Category) else 0
+
 
     def get_event_count(self, obj):
         if obj is None:
